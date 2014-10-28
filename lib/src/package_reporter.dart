@@ -1,12 +1,15 @@
+// Copyright 2014 Google Inc. All Rights Reserved.
+// Licensed under the Apache License, Version 2.0, found in the LICENSE file.
+
 part of shapeshift;
 
 class PackageReporter {
   final Map<String,DiffNode> diff = new Map<String,DiffNode>();
   final String leftPath, rightPath, out;
   MarkdownWriter io;
-  
+
   PackageReporter(this.leftPath, this.rightPath, { this.out });
-  
+
   void calculateDiff(String fileName) {
     File leftFile = new File('$leftPath/$fileName');
     File rightFile = new File('$rightPath/$fileName');

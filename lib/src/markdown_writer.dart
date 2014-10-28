@@ -1,3 +1,6 @@
+// Copyright 2014 Google Inc. All Rights Reserved.
+// Licensed under the Apache License, Version 2.0, found in the LICENSE file.
+
 part of shapeshift;
 
 class MarkdownWriter {
@@ -25,7 +28,7 @@ class MarkdownWriter {
       Future.wait([io.close()]);
     }
   }
-  
+
   void writeln(String s) {
     if (buffer != null) {
       io.writeln(buffer);
@@ -42,13 +45,13 @@ class MarkdownWriter {
 
     io.writeln(s);
   }
-  
+
   void writeBad(String s, String s2) {
     writeln('<p style="color: red;">$s</p>');
     writeln('<pre><code style="color: red;">$s2</code></pre>');
     writeln('<hr />');
   }
-  
+
   void writeBlockquote(String s) {
     String joined = s.split('\n').map((m) => '> $m\n').join();
     //print("SPLITTING ON NEWLINES YIELDS:");
