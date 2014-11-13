@@ -1,11 +1,11 @@
 Shapeshift
 ==========
 
-Understand how the shape of your package is shifting.
+Understand how the shape of your Dart package is shifting.
 
-Execute shapeshift against two versions of your docgen-generated API to expose
-how your API has changed. Shapeshift generates a set of markdown files that
-list API differences in your package.
+Execute shapeshift against two versions of your Dart docgen-generated API to
+expose how your API has changed. Shapeshift generates a set of markdown files
+that list API differences in your Dart package.
 
 Basic example
 -------------
@@ -13,8 +13,8 @@ Basic example
 Assuming you have two versions of your docgen-generated docs at:
 
 ```bash
-/Users/me/code/my_package/api_docs/docs-v1.6.0
-/Users/me/code/my_package/api_docs/docs-v1.7.0
+/Code/my_package/docs/docs-v1.6.0/
+/Code/my_package/docs/docs-v1.7.0/
 ```
 
 Then you can run the following command to generate reports of the API
@@ -22,7 +22,7 @@ differences.
 
 ```bash
 shapeshift \
-    --base=/Users/me/code/my_package/api_docs \
+    --base=/Code/my_package/docs \
     --out=./diff-1.6.0_1.7.0 \
     docs-v1.6.0 docs-v1.7.0
 ```
@@ -30,7 +30,20 @@ shapeshift \
 In this command, `--base` specifies the directory where your two documentation
 directories live. `--out` specifies a new or existing directory where you want
 the output markdown files to be written. The final two arguments are the
-directories with the old and the new documentation.
+directory with the _old_ and the directory with the _new_ documentation.
+
+Options
+-------
+
+The shapeshift Dart script accepts the following options:
+
+* `--base` is the file path that the two directories (old and new) have in
+  common.
+* `--out` is an optional directory where the API changes can be written to.
+  Shapeshift will write a separate Markdown file for each library it finds.
+  Each Markdown file will include changes for all member classes of a library.
+  If `--out` is not used, the differences, still in Markdown format, will be
+  printed to stdout.
 
 Contributing
 ------------
