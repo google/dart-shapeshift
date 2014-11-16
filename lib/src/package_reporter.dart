@@ -38,18 +38,13 @@ class PackageReporter {
         .map((File f) => f.path)
         .toList();
 
-    int i = 0;
     rightLs.forEach((String file) {
-      i += 1;
-      if (i < 1200) {
-        file = file.replaceFirst(rightPath, '');
-        if (file == '/docgen/index.json' || file == '/docgen/library_list.json' || !file.endsWith('.json')) {
-          print('Skipping $file');
-          return;
-        }
-        print('$i: diffing $file');
-        calculateDiff(file);
+      file = file.replaceFirst(rightPath, '');
+      if (file == '/docgen/index.json' || file == '/docgen/library_list.json' || !file.endsWith('.json')) {
+        print('Skipping $file');
+        return;
       }
+      calculateDiff(file);
     });
   }
 
@@ -206,7 +201,7 @@ class FileReporter {
       io.writeln('\n---\n');
     }
 
-    // iterate over the method categories
+    // Iterate over the method categories.
     diff.forEachOf('methods', (String methodCategory, DiffNode d) {
       reportEachMethodThing(methodCategory, d);
     });
@@ -423,10 +418,8 @@ class FileReporter {
       io.writeCodeblockHr(methodSignature(method as Map, includeComment: false, includeAnnotations: false));
     });
     erase(d.removed);
-          
-    // iterate over the methods
+
     d.forEach((method, attributes) {
-      // for a method, iterate over its attributes
       reportEachMethodAttribute(category, method, attributes);
     });
   }

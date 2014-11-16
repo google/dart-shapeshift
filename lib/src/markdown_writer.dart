@@ -54,8 +54,6 @@ class MarkdownWriter {
 
   void writeBlockquote(String s) {
     String joined = s.split('\n').map((m) => '> $m\n').join();
-    //print("SPLITTING ON NEWLINES YIELDS:");
-    //print(joined);
     io.writeln(joined);
   }
 
@@ -159,12 +157,14 @@ List<Diff> diffAndCleanup(String theOld, String theNew) {
         if (result[i+2].operation != DIFF_EQUAL) {
           prependToDiff(result[i+2], dirtyDom);
         }
-      } else {
+      }
+      else {
         if (result[i+1].operation == DIFF_EQUAL) {
           prependToDiff(result[i+1], dirtyDom);
-        } else {
-          // If dirtyDom in result[i+1] != dirtyDom, then we should pull the unopend
-          // back instead of pushing the unclosed forward.
+        }
+        else {
+          // If dirtyDom in result[i+1] != dirtyDom, then we should pull the
+          // unopened back instead of pushing the unclosed forward.
           if (unclosedTag.stringMatch(result[i+1].text) == dirtyDom) {
             removeFromDiff(result[i+1], unclosedTag);
             prependToDiff(result[i+2], dirtyDom);
@@ -183,26 +183,7 @@ List<Diff> diffAndCleanup(String theOld, String theNew) {
       }
     }
   }
-  /*for (int i=result.length-1; i>=0; i--) {
-    Diff d = result[i];
-    if (d.text.contains(unopenedTag)) {
-      String dirtyDom = unopenedTag.stringMatch(d.text);
-      removeFromDiff(d, unopenedTag);
-      if (d.operation == DIFF_EQUAL) {
-        appendToDiff(result[i-1], dirtyDom);
-        if (result[i-2].operation != DIFF_EQUAL) {
-          appendToDiff(result[i-2], dirtyDom);
-        }
-      } else {
-        if (result[i-1].operation == DIFF_EQUAL) {
-          appendToDiff(result[i-1], dirtyDom);
-        } else {
-          removeFromDiff(result[i-1], unopenedTag);
-          appendToDiff(result[i-2], dirtyDom);
-        }
-      }
-    }
-  }*/
+
   return result;
 }
 
