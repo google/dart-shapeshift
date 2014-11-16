@@ -142,7 +142,17 @@ class FileReporter {
     diff.forEachOf('classes', (String classCategory, DiffNode d) {
       reportEachClassThing(classCategory, d);
     });
-    
+
+    diff.changed.forEach((String key, List oldNew) {
+      io.writeln("${diff.metadata['name']}'s `${key}` changed:\n");
+      io.writeWasNow(
+          (oldNew as List<String>)[0],
+          (oldNew as List<String>)[1],
+          blockquote: key=='comment');
+      io.writeln('\n---\n');
+    });
+    diff.changed.clear();
+
     diff.forEachOf('functions', reportEachMethodThing);
   }
 
@@ -352,6 +362,21 @@ class FileReporter {
     }
 
     d.forEach((String classThingName, DiffNode classThing) {
+      if (classThing.hasAdded) {
+        classThing.added.forEach((String key, dynamic thing) {
+          String name = classThing.metadata['qualifiedName'].replaceAll(new RegExp(r'.*\.'), '');
+          String classThingLink = mdLinkToDartlang(classThing.metadata['qualifiedName'], name);
+          io.writeln("${diff.metadata['name']}'s $classThingLink $classCategory has a new `$key`:\n");
+          if (key == 'preview') {
+            io.writeBlockquote(thing);
+          } else {
+            io.writeCodeblockHr(thing);
+          }
+          io.writeln('\n---\n');
+        });
+      }
+      erase(classThing.added);
+
       if (classThing.hasChanged &&
           classThing.changed.containsKey('name') &&
           classThing.changed.containsKey('qualifiedName')) {
@@ -359,13 +384,27 @@ class FileReporter {
         // another was added, at the same index in the class thing list.
         // Awkward.
         var changed = classThing.changed;
-        var newThingLink = mdLinkToDartlang(changed['qualifiedName'][1], changed['name'][1]);
+        String newThingLink = mdLinkToDartlang(changed['qualifiedName'][1], changed['name'][1]);
         io.writeln('Removed $classCategory: ${changed['name'][0]}.');
         io.writeln('\n---\n');
         io.writeln('New $classCategory: $newThingLink.');
         io.writeln('\n---\n');
-        erase(classThing.changed);
       }
+
+      if (classThing.hasChanged) {
+        classThing.changed.forEach((String key, List oldNew) {
+          String name = classThing.metadata['qualifiedName'].replaceAll(new RegExp(r'.*\.'), '');
+          String classThingLink = mdLinkToDartlang(classThing.metadata['qualifiedName'], name);
+          io.writeln("${diff.metadata['name']}'s $classThingLink $classCategory `$key` changed:\n");
+          io.writeWasNow(
+              (oldNew as List<String>)[0],
+              (oldNew as List<String>)[1],
+              blockquote: ['comment', 'preview'].contains(key));
+          io.writeln('\n---\n');
+        });
+      }
+
+      erase(classThing.changed);
     });
   }
   

@@ -163,8 +163,22 @@ List<Diff> diffAndCleanup(String theOld, String theNew) {
         if (result[i+1].operation == DIFF_EQUAL) {
           prependToDiff(result[i+1], dirtyDom);
         } else {
-          removeFromDiff(result[i+1], unclosedTag);
-          prependToDiff(result[i+2], dirtyDom);
+          // If dirtyDom in result[i+1] != dirtyDom, then we should pull the unopend
+          // back instead of pushing the unclosed forward.
+          if (unclosedTag.stringMatch(result[i+1].text) == dirtyDom) {
+            removeFromDiff(result[i+1], unclosedTag);
+            prependToDiff(result[i+2], dirtyDom);
+          }
+          else {
+            if (result[i+2].text.contains(unopenedTag)) {
+              String plus2DirtyDom = unopenedTag.stringMatch(result[i+2].text);
+              removeFromDiff(result[i+2], unopenedTag);
+              // Just kidding put it back!
+              appendToDiff(d, dirtyDom);
+              appendToDiff(d, plus2DirtyDom);
+              appendToDiff(result[i+1], plus2DirtyDom);
+            }
+          }
         }
       }
     }
