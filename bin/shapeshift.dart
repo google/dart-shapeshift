@@ -1,7 +1,7 @@
 // Copyright 2014 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-import 'package:shapeshift/shapeshift.dart';
+import 'package:shapeshift/shapeshift_cli.dart';
 import 'package:args/args.dart';
 
 class Shapeshift {
