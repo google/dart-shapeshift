@@ -1,16 +1,35 @@
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 body {
   background-color: #F8F8F8;
-  font-family: 'Open Sans', sans-serif;
-  font-size: 14px;
-  font-weight: normal;
-  line-height: 1.2em;
-  margin: 15px;
-  max-width: 940px;
+  color: rgb(72, 72, 72);
+  font: 400 14px/17px 'Montserrat', sans-serif;
 }
 
-h1, p {
-  color: #333;
+.container {
+  background-color: #FFF;
+  border: solid 1px #CCC;
+  border-top: 0;
+  border-bottom: 0;
+  box-shadow: 0 2px 8px #CCC;
+  margin: 0 auto;
+  max-width: 940px;
+  height: auto !important;
+  height: 100%;
+  min-height: 100%;
+}
+
+.c2 {
+  padding: 15px;
+}
+
+h1 {
+  margin-top: 0;
+  font: 400 46px/52px 'Montserrat', sans-serif;
 }
 
 #upload {
@@ -27,7 +46,7 @@ input[type="text"] {
 
 #or {
   color: #666;
-  padding: 0 14px;
+  padding: 0 12px;
   font-size: 24px;
   font-style: italic;
   letter-spacing: 0.1em;
@@ -38,12 +57,17 @@ input[type="text"] {
   font-style: italic;
 }
 
+table td {
+  padding: 0;
+  vertical-align: top;
+}
+table td:first-child {
+  padding-right: 30px;
+}
+
 #gaps {
   background-color: #FFF;
-  border: solid 1px #CCC;
-  border-radius: 8px;
   margin: 10px 0;
-  padding: 16px 8px;
 }
 
 #gaps .placeholder {
@@ -51,6 +75,14 @@ input[type="text"] {
   font-style: italic;
   font-size: 24px;
   text-align: center;
+}
+
+#gaps h1 {
+  font: 400 32px/40px 'Montserrat', sans-serif;
+}
+
+#gaps h2 {
+  font: 400 17px/24px 'Montserrat', sans-serif;
 }
 
 #gaps p.quote {

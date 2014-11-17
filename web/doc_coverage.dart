@@ -14,11 +14,11 @@ void main() {
   querySelector('#getPackage').onClick.listen(getPackage);
   String p = window.location.pathname;
   String dir = p.substring(0, p.lastIndexOf('/'));
-  querySelector('.such-as')
-      ..appendText(' or ')
+  /*querySelector('.such-as')
+      ..appendHtml(' or<br />')
       ..append(new SpanElement()
           ..appendText('${window.location.protocol}//${window.location.host}/${dir}/dart-collection.SetMixin.json')
-      );
+      );*/
 }
 
 // http://www.dartdocs.org/documentation/args/0.12.1/index.html
@@ -42,7 +42,8 @@ void getUrl(Event event) {
 String base;
 
 void getPackage(Event event) {
-  String url = (querySelector("#package") as InputElement).value;
+  String nameVersion = (querySelector("#package") as InputElement).value;
+  String url = 'http://www.dartdocs.org/documentation/$nameVersion/index.html';
   base = url.substring(0, url.lastIndexOf('/')) + '/docs';
   String library_list = '$base/library_list.json';
   HttpRequest.getString(library_list).then(reportPackages);
@@ -66,6 +67,8 @@ void reportPackages(json) {
   } else {
     throw new FormatException('JSON must be JSON, not $json');
   }
+  gapsDiv.text = '';
+
   (package['libraries'] as List).forEach((Map lib) {
     if ((lib['name'] as String).startsWith('dart-')) return;
     gapsDiv.append(new HeadingElement.h2()..text = 'package ${lib['packageName']}');
