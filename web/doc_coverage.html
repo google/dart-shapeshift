@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Doc gaps</title>
+    
+    <script async type="application/dart" src="doc_coverage.dart"></script>
+    <script async src="packages/browser/dart.js"></script>
+    
+    <link rel="stylesheet" href="doc_coverage.css">
+  </head>
+  <body>
+    <h1>Doc gaps</h1>
+    
+    <table style="width: 100%;"><tr>
+      <td style="width: 320px;">
+        <input type="file" id="upload" />
+        <span id="or">or</span>
+      </td>
+      <td>
+        <input type="text" id="url" placeholder="documentation JSON URL" />
+        <input type="button" id="getUrl" value="get documentation JSON" />
+        <p class="such-as">Such as
+          <span style="text-decoration: line-through;">http://www.dartdocs.org/documentation/collection/1.1.0/docs/collection/dart-pkg-collection.Equality.json</span>
+          or
+          <span style="text-decoration: line-through;">https://api.dartlang.org/apidocs/channels/stable/docs/dart-async.ZoneSpecification.json</span>
+        </p>
+        <input type="text" id="package" placeholder="dartdocs package URL" value="http://www.dartdocs.org/documentation/args/0.12.1/index.html" />
+        <input type="button" id="getPackage" value="get package JSON" />
+      </td>
+    </tr></table>
+    
+    <div id="gaps">
+      <p class="placeholder">Upload some documentation JSON or paste a URL to see gaps!</p>
+    </div>
+    <div id="log">Log.</div>
+  </body>
+</html>

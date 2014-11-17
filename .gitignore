@@ -2,6 +2,7 @@ build/
 packages/
 bin/packages
 test/packages
+web/packages
 pubspec.lock
 .buildlog
 .project

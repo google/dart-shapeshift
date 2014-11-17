@@ -1,0 +1,76 @@
+
+body {
+  background-color: #F8F8F8;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 1.2em;
+  margin: 15px;
+  max-width: 940px;
+}
+
+h1, p {
+  color: #333;
+}
+
+#upload {
+  border: solid 1px #999;
+  border-radius: 8px;
+  background: #FFF;
+  padding: 8px;
+}
+
+input[type="text"] {
+  width: 50%;
+  max-width: 400px;
+}
+
+#or {
+  color: #666;
+  padding: 0 14px;
+  font-size: 24px;
+  font-style: italic;
+  letter-spacing: 0.1em;
+}
+
+.such-as span {
+  font-size: 12px;
+  font-style: italic;
+}
+
+#gaps {
+  background-color: #FFF;
+  border: solid 1px #CCC;
+  border-radius: 8px;
+  margin: 10px 0;
+  padding: 16px 8px;
+}
+
+#gaps .placeholder {
+  color: #666;
+  font-style: italic;
+  font-size: 24px;
+  text-align: center;
+}
+
+#gaps p.quote {
+  background-color: #F8F8FF;
+  border-left: solid 2px #DDF;
+  margin: 1em;
+  padding: 0.5em;
+}
+
+#gaps p p {
+  margin: 0;
+  padding: 0;
+}
+
+#log {
+  max-height: 240px;
+  overflow: auto;
+  border: solid 1px #999;
+  background-color: #FFF;
+  font-family: monospace;
+  font-size: 11px;
+  padding: 4px;
+}

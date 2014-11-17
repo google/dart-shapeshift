@@ -5,3 +5,5 @@ dependencies:
   diff_match_patch: '>=0.2.1'
   json_diff:
     path: /Users/srawlins/dart/json_diff
+dev_dependencies:
+  unittest: '>=0.11.0'
