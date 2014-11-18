@@ -5,7 +5,6 @@ import 'package:shapeshift/doc_coverage_common.dart';
 import 'package:shapeshift/shapeshift_common.dart';
 import 'package:shapeshift/shapeshift_frontend.dart';
 
-Element log = querySelector("#log");
 Element gapsDiv = querySelector('#gaps');
 
 void main() {
@@ -14,11 +13,6 @@ void main() {
   querySelector('#getPackage').onClick.listen(getPackage);
   String p = window.location.pathname;
   String dir = p.substring(0, p.lastIndexOf('/'));
-  /*querySelector('.such-as')
-      ..appendHtml(' or<br />')
-      ..append(new SpanElement()
-          ..appendText('${window.location.protocol}//${window.location.host}/${dir}/dart-collection.SetMixin.json')
-      );*/
 }
 
 // http://www.dartdocs.org/documentation/args/0.12.1/index.html
@@ -39,27 +33,45 @@ void getUrl(Event event) {
   HttpRequest.getString(url).then(report);
 }
 
+
+String dartdocs = 'http://www.dartdocs.org/documentation';
+String version;
 String base;
+String versionUrl;
 
 void getPackage(Event event) {
-  String nameVersion = (querySelector("#package") as InputElement).value;
-  String url = 'http://www.dartdocs.org/documentation/$nameVersion/index.html';
-  base = url.substring(0, url.lastIndexOf('/')) + '/docs';
-  String library_list = '$base/library_list.json';
-  HttpRequest.getString(library_list).then(reportPackages);
+  String name = (querySelector("#package") as InputElement).value;
+  String url = '$dartdocs/$name/latest/';
+  HttpRequest.getString(url).then((data) => redirectToPackageVersion(data, name));
 }
 
+void redirectToPackageVersion(String html, String name) {
+  // This is wacky. dartdocs.org doesn't offer a URL that reports back the
+  // latest version of a package (AFAIK). So, I punch out to latest/, which
+  // gives me back an HTML file which includes some JavaScript that redirects
+  // to the latest package version. Wah-wah. So we parse that HTML (really the
+  // JavaScript inside), for said version:
+  RegExp pattern = new RegExp("latestUrl='$dartdocs/$name/([^/]+)/index.html'");
+  if (pattern.hasMatch(html)) {
+    version = pattern.firstMatch(html)[1];
+    versionUrl = '$dartdocs/$name/$version/index.html';
+    base = '$dartdocs/$name/$version/docs';
+    String url = '$base/library_list.json';
+    HttpRequest.getString(url).then(reportPackages);
+  } else {
+    print('Error! $html');
+  }
+}
 
-void report(json) {
+void report(String json) {
   Map<String,dynamic> gaps = new DocCoverage().calculateCoverage(json);
-  log.text = "raw gaps: ${gaps}";
   gapsDiv.innerHtml = '';
   
-  if (gaps['packageName'] != null) reportLibraryGaps(gaps);
-  else reportClassGaps(gaps);
+  /*if (gaps['packageName'] != null) reportLibraryGaps(gaps);
+  else reportClassGaps(gaps);*/
 }
 
-void reportPackages(json) {
+void reportPackages(String json) {
   Map<String,dynamic> package;
   dynamic _package = new JsonDecoder().convert(json);
   if (_package is Map) {
@@ -67,67 +79,118 @@ void reportPackages(json) {
   } else {
     throw new FormatException('JSON must be JSON, not $json');
   }
-  gapsDiv.text = '';
+  gapsDiv.innerHtml = '';
 
   (package['libraries'] as List).forEach((Map lib) {
-    if ((lib['name'] as String).startsWith('dart-')) return;
-    gapsDiv.append(new HeadingElement.h2()..text = 'package ${lib['packageName']}');
+    if (!(lib['name'] as String).startsWith('dart-pkg') &&
+        ((lib['name'] as String).startsWith('dart-') ||
+         (lib['name'] as String).startsWith('dart:'))) return;
+    
+    new LibraryDocAnalyzer(lib)..go();
+  });
+}
+
+class LibraryDocAnalyzer {
+
+  Map lib;
+  Element section;
+  List<Element> sortedSections = new List();
+
+  LibraryDocAnalyzer(this.lib);
+
+  void go() {
+    sortedSections.clear();
+    AnchorElement versionAnchor = new AnchorElement()
+        ..text = 'version $version'
+        ..classes.add('version')
+        ..attributes['href'] = '$versionUrl#${lib['qualifiedName']}';
+
+    section = new Element.section()
+        ..append(new HeadingElement.h1()..text = 'library ${lib['qualifiedName']}')
+        ..append(versionAnchor);
+    gapsDiv.append(section);
+
     HttpRequest.getString('$base/${lib['qualifiedName']}.json').then(reportPackage);
-  });
-}
+  }
 
-void reportPackage(String json) {
-  Map<String,dynamic> package = new JsonDecoder().convert(json);
-  //classes[class[], error[], typedef[]], comment, functions, variables
-  (package['classes']['class'] as List).forEach((klass) {
-    HttpRequest.getString('$base/${klass['qualifiedName']}.json').then(reportClass);
-  });
-}
+  void reportPackage(String json) {
+    Map<String,dynamic> package = new JsonDecoder().convert(json);
+    //classes[class[], error[], typedef[]], comment, functions, variables
+    (package['classes']['class'] as List).forEach((klass) {
+      HttpRequest.getString('$base/${klass['qualifiedName']}.json').then(reportClass);
+    });
+  }
 
-void reportClass(String json) {
-  Map<String,dynamic> klass = new JsonDecoder().convert(json);
-  //gapsDiv.append(new HeadingElement.h3()..text = 'class ${klass['name']}');
-  Map<String,dynamic> gaps = new DocCoverage().calculateCoverage(json);
-  reportClassGaps(gaps);
+  void reportClass(String json) {
+    Map<String,dynamic> klass = new JsonDecoder().convert(json);
+    Map<String,dynamic> gaps = new DocCoverage().calculateCoverage(json);
+    reportClassGaps(gaps);
+  }
+
+  void reportClassGaps(Map<String,dynamic> gaps) {
+    if (gaps['gapCount'] == 0) { return; }
+    Element classSection = new Element.section();
+
+    addToSortedSections(classSection, gaps['gapCount']);
+    classSection.dataset['count'] = '${gaps['gapCount']}';
+    classSection.append(new HeadingElement.h2()..text = 'class ${gaps['name']}');
+    classSection.append(new HeadingElement.h3()..text = 'Gap Count: ${gaps['gapCount'].toString()}');
+
+    reportOnTopLevelComment(gaps, classSection);
+    reportOnMethods(gaps, classSection);
+    reportOnVariables(gaps, classSection);
+  }
+
+  void addToSortedSections(Element classSection, int gapCount) {
+    int i = 0;
+    if (sortedSections.isEmpty) {
+      sortedSections.add(classSection);
+      section.append(classSection);
+      return;
+    }
+
+    while (i < sortedSections.length &&
+        gapCount > int.parse(sortedSections[i].dataset['count'])) { i++; }
+    if (i == sortedSections.length) {
+      section.append(classSection);
+    }
+    else {
+      section.insertBefore(classSection, sortedSections[i]);
+    }
+    sortedSections.insert(i, classSection);
+  }
+
 }
 
 void reportLibraryGaps(Map<String,dynamic> gaps) {
-  gapsDiv.children.add(new HeadingElement.h1()..text = 'library ${gaps['qualifiedName']}');
-  gapsDiv.children.add(new HeadingElement.h2()..text = 'Gap Count: ${gaps['gapCount'].toString()}');
-  
+  gapsDiv.children.add(new HeadingElement.h2()..text = 'library ${gaps['qualifiedName']}');
+  gapsDiv.children.add(new HeadingElement.h3()..text = 'Gap Count: ${gaps['gapCount'].toString()}');
+
   reportOnTopLevelComment(gaps);
 }
 
-void reportClassGaps(Map<String,dynamic> gaps) {
-  gapsDiv.children.add(new HeadingElement.h1()..text = 'class ${gaps['name']}');
-  gapsDiv.children.add(new HeadingElement.h2()..text = 'Gap Count: ${gaps['gapCount'].toString()}');
-  
-  reportOnTopLevelComment(gaps);
-  reportOnMethods(gaps);
-  reportOnVariables(gaps);
-}
-
-void reportOnTopLevelComment(Map<String,dynamic> gaps) {
+void reportOnTopLevelComment(Map<String,dynamic> gaps, [Element section]) {
+  if (section == null) { section = gapsDiv; }
   if (!gaps.containsKey('comment') || (gaps['comment'] as String).isEmpty) {
-    gapsDiv.append(new ParagraphElement()
+    section.append(new ParagraphElement()
         ..append(dartlangAnchor(gaps['qualifiedName']))
         ..appendText(' has no comment!')
     );
   }
   else if ((gaps['comment'] as String).split('\n').length < 2 ) {
     String x = linkToDartlang(gaps['qualifiedName']);
-    gapsDiv.append(new ParagraphElement()
+    section.append(new ParagraphElement()
         ..append(dartlangAnchor(gaps['qualifiedName']))
         ..appendText('\'s comment is too short:')
     );
-    gapsDiv.append(new ParagraphElement()
+    section.append(new ParagraphElement()
         ..innerHtml = gaps['comment']
         ..className = 'quote'
     );
   }
 }
 
-reportOnMethods(Map<String,dynamic> gaps) {
+reportOnMethods(Map<String,dynamic> gaps, [Element section]) {
   bool any = false;
   ['getters', 'setters', 'constructors', 'methods'].forEach((cat) {
     if (gaps[cat].length > 0) {
@@ -136,10 +199,10 @@ reportOnMethods(Map<String,dynamic> gaps) {
   });
   if (!any) { return; }
   
-  ['getters', 'setters', 'constructors', 'methods'].forEach((cat) => reportOnCategory(cat, gaps));
+  ['getters', 'setters', 'constructors', 'methods'].forEach((cat) => reportOnCategory(cat, gaps, section));
 }
 
-void reportOnVariables(Map<String,dynamic> gaps) {
+void reportOnVariables(Map<String,dynamic> gaps, [Element section]) {
   if (!gaps.containsKey('variables')) return;
   bool any = false;
   if (gaps['variables'].length > 0) {
@@ -147,20 +210,21 @@ void reportOnVariables(Map<String,dynamic> gaps) {
   }
   if (!any) { return; }
   
-  reportOnCategory('variables', gaps);
+  reportOnCategory('variables', gaps, section);
 }
 
-void reportOnCategory(String cat, Map<String,dynamic> gaps) {
+void reportOnCategory(String cat, Map<String,dynamic> gaps, [Element section]) {
+  if (section == null) { section = gapsDiv; }
   List missing = gaps[cat]['missing'];
   List noOneLiner = gaps[cat]['no-one-liner'];
 
   if (missing.length > 0) {
     String catMsg = missing.length == 1 ? '${singularize(cat)} is' : '$cat are';
-    gapsDiv.append(new ParagraphElement()
+    section.append(new ParagraphElement()
         ..text = '${missing.length} ${catMsg} missing comments:'
     );
     UListElement l = new UListElement();
-    gapsDiv.append(l);
+    section.append(l);
     missing.forEach((Map<String,Object> meth) {
       String name = meth['name'] as String;
       if (name.isEmpty) { name = "(default constructor)"; }
@@ -172,11 +236,11 @@ void reportOnCategory(String cat, Map<String,dynamic> gaps) {
       
   if (noOneLiner.length > 0) {
     String catMsg = noOneLiner.length == 1 ? '${singularize(cat)} has' : '$cat have';
-    gapsDiv.append(new ParagraphElement()
+    section.append(new ParagraphElement()
         ..text = '${noOneLiner.length} ${catMsg} no one-liner (the first line is too long):'
     );
     UListElement l = new UListElement();
-    gapsDiv.append(l);
+    section.append(l);
     noOneLiner.forEach((Map<String,Object> meth) {
       String name = meth['name'] as String;
       if (name.isEmpty) { name = "(default constructor)"; }

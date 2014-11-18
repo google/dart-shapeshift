@@ -7,10 +7,10 @@ html, body {
 body {
   background-color: #F8F8F8;
   color: rgb(72, 72, 72);
-  font: 400 14px/17px 'Montserrat', sans-serif;
+  font: 400 15px/19px 'Roboto', sans-serif;
 }
 
-.container {
+.the-body {
   background-color: #FFF;
   border: solid 1px #CCC;
   border-top: 0;
@@ -23,11 +23,17 @@ body {
   min-height: 100%;
 }
 
-.c2 {
+.container {
+  border-top: solid 3px #CCC;
   padding: 15px;
 }
 
-h1 {
+.container:first-child {
+  border-top: 0;
+}
+
+.container >h1 {
+  color: #000;
   margin-top: 0;
   font: 400 46px/52px 'Montserrat', sans-serif;
 }
@@ -78,10 +84,26 @@ table td:first-child {
 }
 
 #gaps h1 {
+  border-bottom: solid 2px rgb(72,72,72);
+  font: 400 46px/52px 'Montserrat', sans-serif;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  position: relative;
+}
+
+/*#gaps h1 .version {
+  position: absolute;
+  //font: 400 15px/19px 'Roboto', sans-serif;
+  font: 400 17px/24px 'Montserrat', sans-serif;
+  right: 0;
+  bottom: 4px;
+}*/
+
+#gaps h2 {
   font: 400 32px/40px 'Montserrat', sans-serif;
 }
 
-#gaps h2 {
+#gaps h3 {
   font: 400 17px/24px 'Montserrat', sans-serif;
 }
 
@@ -97,12 +119,27 @@ table td:first-child {
   padding: 0;
 }
 
-#log {
-  max-height: 240px;
-  overflow: auto;
-  border: solid 1px #999;
-  background-color: #FFF;
-  font-family: monospace;
-  font-size: 11px;
-  padding: 4px;
+h1 .draft-comment {
+  color: #999;
+  float: right;
+  font-style: italic;
+  font-size: 28px;
+  padding-right: 3px;
+}
+
+p.draft-comment {
+  color: rgba(255,0,0,0.6);
+  font-style: italic;
+  text-align: right;
+}
+
+/* #0084c5 */
+a {
+  color: #428bca;
+  text-decoration: none;
+}
+
+a:hover, a:focus {
+  color: #2a6496;
+  text-decoration: underline;
 }

@@ -11,22 +11,26 @@
 
     <link rel="stylesheet" href="doc_coverage.css">
     <link href='//fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=RobotoDraft:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en' rel='stylesheet' type='text/css'>
   </head>
   <body>
-    <div class="container">
-      <div class="c2">
-        <h1>Dart doc coverage</h1>
+    <div class="the-body">
+      <div class="container">
+        <h1>Dart doc coverage
+          <span class="draft-comment">draft draft draft</span>
+        </h1>
 
         <table style="width: 100%;"><tr>
           <td style="width: 310px;">
-            <p>Use the name/version of a Dart package, like args/0.12.1:</p>
-            <input type="text" id="package" placeholder="dartdocs package URL" value="args/0.12.1" />
-            <input type="button" id="getPackage" value="get package JSON" /><br /><br />
+            <p>Gimme the name of a Dart package, like args, collection, or unittest:</p>
+            <input type="text" id="package" placeholder="package name" />
+            <input type="button" id="getPackage" value="calculate coverage gaps" /><br /><br />
             <br /><br />
-            <p>Or upload a Dart documentation JSON file:</p>
-            <input type="file" id="upload" />
+            <!-- HIDING FOR DEMO -->
+            <div style="display: none;"><p>Or upload a Dart documentation JSON file:</p>
+            <input type="file" id="upload" /></div>
           </td>
-          <td>
+          <td style="display: none;"><!-- HIDING FOR DEMO -->
             <p>Or paste the URL of some Dart documentation JSON:</p>
             <input type="text" id="url" placeholder="documentation JSON URL" />
             <input type="button" id="getUrl" value="get documentation JSON" />
@@ -36,13 +40,12 @@
               or<br />
               <span>https://api.dartlang.org/apidocs/channels/stable/docs/dart-async.ZoneSpecification.json</span><br />
             </p>
+            <p class="draft-comment">This whole area needs work - I've built in too many options!</p>
           </td>
         </tr></table>
-
         <div id="gaps">
-          <p class="placeholder">Upload some documentation JSON or paste a URL to see gaps!</p>
+          <p class="placeholder" style="display: none;">Upload some documentation JSON or paste a URL to see gaps!</p>
         </div>
-        <div id="log">Log.</div>
       </div>
     </div>
   </body>
