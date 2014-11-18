@@ -2,6 +2,7 @@ name: shapeshift
 description: A sample command-line application
 dependencies:
   args: '>=0.12.0'
+  browser: any
   diff_match_patch: '>=0.2.1'
   json_diff:
     path: /Users/srawlins/dart/json_diff
