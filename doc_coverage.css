@@ -1,0 +1,158 @@
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background-color: #F8F8F8;
+  color: rgb(72, 72, 72);
+  font: 400 15px/19px 'Roboto', sans-serif;
+}
+
+.the-body {
+  background-color: #FFF;
+  border: solid 1px #CCC;
+  border-top: 0;
+  border-bottom: 0;
+  box-shadow: 0 2px 8px #CCC;
+  margin: 0 auto;
+  max-width: 940px;
+  height: auto !important;
+  height: 100%;
+  min-height: 100%;
+  position: relative;
+}
+
+.container {
+  border-top: solid 3px #CCC;
+  padding: 15px;
+}
+
+.container:first-child {
+  border-top: 0;
+}
+
+.container >h1 {
+  color: #000;
+  margin-top: 0;
+  font: 400 46px/52px 'Montserrat', sans-serif;
+}
+
+#upload {
+  border: solid 1px #999;
+  border-radius: 8px;
+  background: #FFF;
+  padding: 8px;
+}
+
+input[type="text"] {
+  width: 50%;
+  max-width: 400px;
+}
+
+#or {
+  color: #666;
+  padding: 0 12px;
+  font-size: 24px;
+  font-style: italic;
+  letter-spacing: 0.1em;
+}
+
+.such-as span {
+  font-size: 12px;
+  font-style: italic;
+}
+
+table td {
+  padding: 0;
+  vertical-align: top;
+}
+table td:first-child {
+  padding-right: 30px;
+}
+
+#gaps {
+  background-color: #FFF;
+  margin: 10px 0;
+}
+
+#gaps .placeholder {
+  color: #666;
+  font-style: italic;
+  font-size: 24px;
+  text-align: center;
+}
+
+#gaps h1 {
+  border-bottom: solid 2px rgb(72,72,72);
+  font: 400 46px/52px 'Montserrat', sans-serif;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  position: relative;
+}
+
+/*#gaps h1 .version {
+  position: absolute;
+  //font: 400 15px/19px 'Roboto', sans-serif;
+  font: 400 17px/24px 'Montserrat', sans-serif;
+  right: 0;
+  bottom: 4px;
+}*/
+
+#gaps h2 {
+  font: 400 32px/40px 'Montserrat', sans-serif;
+}
+
+#gaps h3 {
+  font: 400 17px/24px 'Montserrat', sans-serif;
+}
+
+#gaps p.quote {
+  background-color: #F8F8FF;
+  border-left: solid 2px #DDF;
+  margin: 1em;
+  padding: 0.5em;
+}
+
+#gaps p p {
+  margin: 0;
+  padding: 0;
+}
+
+h1 .draft-comment {
+  color: #999;
+  float: right;
+  font-style: italic;
+  font-size: 28px;
+  padding-right: 3px;
+}
+
+p.draft-comment {
+  color: rgba(255,0,0,0.6);
+  font-style: italic;
+  text-align: right;
+}
+
+/* #0084c5 */
+a {
+  color: #428bca;
+  text-decoration: none;
+}
+
+a:hover, a:focus {
+  color: #2a6496;
+  text-decoration: underline;
+}
+
+footer {
+  background: white;
+  border-top: solid 1px #999;
+  display: block;
+  font-size: 16px;
+  padding: 4px 0 4px 0;
+  position: absolute;
+  bottom: 0;
+  text-align: right;
+  width: 100%;
+}

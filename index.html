@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Doc coverage</title>
+
+    <script async type="application/dart" src="doc_coverage.dart"></script>
+    <script async src="packages/browser/dart.js"></script>
+
+    <link rel="stylesheet" href="doc_coverage.css">
+    <link href='//fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=RobotoDraft:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en' rel='stylesheet' type='text/css'>
+  </head>
+  <body>
+    <div class="the-body">
+      <div class="container">
+        <h1>Dart doc coverage
+          <span class="draft-comment">draft draft draft</span>
+        </h1>
+
+        <table style="width: 100%;"><tr>
+          <td style="width: 310px;">
+            <form>
+              <p>Gimme the name of a Dart package, like args, collection, or unittest:</p>
+              <input type="text" id="package" placeholder="package name" />
+              <input type="button" id="getPackage" value="calculate coverage gaps" />
+            </form>
+            <br /><br />
+            <!-- HIDING FOR DEMO -->
+            <div style="display: none;"><p>Or upload a Dart documentation JSON file:</p>
+            <input type="file" id="upload" /></div>
+          </td>
+          <td style="display: none;"><!-- HIDING FOR DEMO -->
+            <p>Or paste the URL of some Dart documentation JSON:</p>
+            <input type="text" id="url" placeholder="documentation JSON URL" />
+            <input type="button" id="getUrl" value="get documentation JSON" />
+            <p class="such-as">
+              Such as<br />
+              <span>http://www.dartdocs.org/documentation/collection/1.1.0/docs/collection/dart-pkg-collection.Equality.json</span><br />
+              or<br />
+              <span>https://api.dartlang.org/apidocs/channels/stable/docs/dart-async.ZoneSpecification.json</span><br />
+            </p>
+            <p class="draft-comment">This whole area needs work - I've built in too many options!</p>
+          </td>
+        </tr></table>
+        <div id="gaps">
+          <p class="placeholder" style="display: none;">Upload some documentation JSON or paste a URL to see gaps!</p>
+        </div>
+      </div>
+      <footer>Disclaimer: This is not a Google product.</footer>
+    </div>
+  </body>
+</html>
