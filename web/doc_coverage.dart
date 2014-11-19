@@ -18,11 +18,6 @@ void main() {
   String dir = p.substring(0, p.lastIndexOf('/'));
 }
 
-// http://www.dartdocs.org/documentation/args/0.12.1/index.html
-// http://www.dartdocs.org/documentation/args/0.12.1/docs/library_list.json
-// http://www.dartdocs.org/documentation/args/0.12.1/docs/args/args.json
-// http://www.dartdocs.org/documentation/args/0.12.1/docs/args/args.ArgParser.json
-
 void readFile(Event event) {
   FileList fs = (event.target as InputElement).files;
   File f = fs.item(0);
@@ -37,6 +32,7 @@ void getUrl(Event event) {
 }
 
 
+String apidocs = 'https://api.dartlang.org/apidocs/channels/stable/docs';
 String dartdocs = 'http://www.dartdocs.org/documentation';
 String version;
 String base;
@@ -44,8 +40,22 @@ String versionUrl;
 
 void getPackage(Event event) {
   String name = (querySelector("#package") as InputElement).value;
-  String url = '$dartdocs/$name/latest/';
-  HttpRequest.getString(url).then((data) => redirectToPackageVersion(data, name));
+  if (name.startsWith('dart:')) {
+    name = name.replaceFirst(':', '-');
+    // https://api.dartlang.org/apidocs/channels/stable/docs/dart-collection.json
+    // https://api.dartlang.org/apidocs/channels/stable/docs/dart-collection.DoubleLinkedQueue.json
+    base = '$apidocs';
+    gapsDiv.innerHtml = '';
+    new LibraryDocAnalyzer(name)..go();
+  }
+  else {
+    // http://www.dartdocs.org/documentation/args/0.12.1/index.html
+    // http://www.dartdocs.org/documentation/args/0.12.1/docs/library_list.json
+    // http://www.dartdocs.org/documentation/args/0.12.1/docs/args/args.json
+    // http://www.dartdocs.org/documentation/args/0.12.1/docs/args/args.ArgParser.json
+    String url = '$dartdocs/$name/latest/';
+    HttpRequest.getString(url).then((data) => redirectToPackageVersion(data, name));
+  }
 }
 
 void redirectToPackageVersion(String html, String name) {
@@ -60,9 +70,9 @@ void redirectToPackageVersion(String html, String name) {
     versionUrl = '$dartdocs/$name/$version/index.html';
     base = '$dartdocs/$name/$version/docs';
     String url = '$base/library_list.json';
-    HttpRequest.getString(url).then(reportPackages);
+    HttpRequest.getString(url).then(reportPackage);
   } else {
-    print('Error! $html');
+    gapsDiv.text = 'Error! $html';
   }
 }
 
@@ -74,7 +84,7 @@ void report(String json) {
   else reportClassGaps(gaps);*/
 }
 
-void reportPackages(String json) {
+void reportPackage(String json) {
   Map<String,dynamic> package;
   dynamic _package = new JsonDecoder().convert(json);
   if (_package is Map) {
@@ -100,30 +110,30 @@ void reportPackages(String json) {
         ((lib['name'] as String).startsWith('dart-') ||
          (lib['name'] as String).startsWith('dart:'))) return;
 
-    new LibraryDocAnalyzer(lib)..go();
+    new LibraryDocAnalyzer(lib['qualifiedName'])..go();
   });
 }
 
 class LibraryDocAnalyzer {
 
-  Map lib;
+  String name;
   final Element section = new Element.section();
   final ParagraphElement classSum = new ParagraphElement();
   List<Element> sortedSections = new List();
 
-  LibraryDocAnalyzer(this.lib);
+  LibraryDocAnalyzer(this.name);
 
   void go() {
     sortedSections.clear();
 
     section
-        ..append(new HeadingElement.h1()..text = 'library ${lib['qualifiedName']}')
+        ..append(new HeadingElement.h1()..text = 'library ${name}')
         ..classes.add('hidden');
     gapsDiv.append(section);
     classSum.dataset['value'] = '0';
     section.append(classSum);
 
-    HttpRequest.getString('$base/${lib['qualifiedName']}.json').then(reportLibrary);
+    HttpRequest.getString('$base/${name}.json').then(reportLibrary);
   }
 
   void reportLibrary(String json) {
@@ -161,6 +171,7 @@ class LibraryDocAnalyzer {
   }
 
   void addToSortedSections(Element classSection, int gapCount) {
+    // This is craziness. There has to be a better way.
     int i = 0;
     if (sortedSections.isEmpty) {
       sortedSections.add(classSection);
@@ -169,7 +180,7 @@ class LibraryDocAnalyzer {
     }
 
     while (i < sortedSections.length &&
-        gapCount > int.parse(sortedSections[i].dataset['count'])) { i++; }
+        gapCount < int.parse(sortedSections[i].dataset['count'])) { i++; }
     if (i == sortedSections.length) {
       section.append(classSection);
     }
