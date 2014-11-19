@@ -33,9 +33,11 @@ body {
   border-top: 0;
 }
 
-.container >h1 {
+.container >h1,
+#gaps >h1 {
   color: #000;
   margin-top: 0;
+  margin-bottom: 16px;
   font: 400 46px/52px 'Montserrat', sans-serif;
 }
 
@@ -84,28 +86,29 @@ table td:first-child {
   text-align: center;
 }
 
-#gaps h1 {
+#gaps section h1 {
   border-bottom: solid 2px rgb(72,72,72);
-  font: 400 46px/52px 'Montserrat', sans-serif;
+  font: 400 32px/40px 'Montserrat', sans-serif;
+  //font: 400 32px/40px 'Alegreya Sans', sans-serif;
   margin-bottom: 8px;
   padding-bottom: 4px;
   position: relative;
 }
 
-/*#gaps h1 .version {
-  position: absolute;
-  //font: 400 15px/19px 'Roboto', sans-serif;
-  font: 400 17px/24px 'Montserrat', sans-serif;
-  right: 0;
-  bottom: 4px;
-}*/
-
 #gaps h2 {
-  font: 400 32px/40px 'Montserrat', sans-serif;
+  font: 400 17px/24px 'Montserrat', sans-serif;
+  //font: 400 17px/24px 'Alegreya Sans', sans-serif;
+}
+
+#gaps h2 span {
+  font-size: 14px;
+  font-style: italic;
+  color: #666;
+  padding-left: 6px;
 }
 
 #gaps h3 {
-  font: 400 17px/24px 'Montserrat', sans-serif;
+  font: 400 15px/21px 'Montserrat', sans-serif;
 }
 
 #gaps p.quote {
@@ -153,4 +156,8 @@ footer {
   width: 100%;
   border-top: solid 1px #CCC;
   padding: 4px 0;
+}
+
+.hidden {
+  display: none;
 }

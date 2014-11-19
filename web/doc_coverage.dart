@@ -84,11 +84,22 @@ void reportPackages(String json) {
   }
   gapsDiv.innerHtml = '';
 
+  // A hack to get past the dart: libraries up front.
+  Map lastLib = package['libraries'][package['libraries'].length - 1];
+  AnchorElement versionAnchor = new AnchorElement()
+      ..text = 'Using version $version docs from dartdocs.org'
+      ..classes.add('version')
+      ..attributes['href'] = '$versionUrl#${lastLib['qualifiedName']}';
+
+  gapsDiv
+      ..append(new HeadingElement.h1()..text = 'package ${lastLib['packageName']}')
+      ..append(versionAnchor);
+
   (package['libraries'] as List).forEach((Map lib) {
     if (!(lib['name'] as String).startsWith('dart-pkg') &&
         ((lib['name'] as String).startsWith('dart-') ||
          (lib['name'] as String).startsWith('dart:'))) return;
-    
+
     new LibraryDocAnalyzer(lib)..go();
   });
 }
@@ -96,27 +107,26 @@ void reportPackages(String json) {
 class LibraryDocAnalyzer {
 
   Map lib;
-  Element section;
+  final Element section = new Element.section();
+  final ParagraphElement classSum = new ParagraphElement();
   List<Element> sortedSections = new List();
 
   LibraryDocAnalyzer(this.lib);
 
   void go() {
     sortedSections.clear();
-    AnchorElement versionAnchor = new AnchorElement()
-        ..text = 'version $version'
-        ..classes.add('version')
-        ..attributes['href'] = '$versionUrl#${lib['qualifiedName']}';
 
-    section = new Element.section()
+    section
         ..append(new HeadingElement.h1()..text = 'library ${lib['qualifiedName']}')
-        ..append(versionAnchor);
+        ..classes.add('hidden');
     gapsDiv.append(section);
+    classSum.dataset['value'] = '0';
+    section.append(classSum);
 
-    HttpRequest.getString('$base/${lib['qualifiedName']}.json').then(reportPackage);
+    HttpRequest.getString('$base/${lib['qualifiedName']}.json').then(reportLibrary);
   }
 
-  void reportPackage(String json) {
+  void reportLibrary(String json) {
     Map<String,dynamic> package = new JsonDecoder().convert(json);
     //classes[class[], error[], typedef[]], comment, functions, variables
     (package['classes']['class'] as List).forEach((klass) {
@@ -134,10 +144,16 @@ class LibraryDocAnalyzer {
     if (gaps['gapCount'] == 0) { return; }
     Element classSection = new Element.section();
 
+    section.classes.remove('hidden');
+    int sum = (int.parse(classSum.dataset['value'])) + gaps['gapCount'];
+    classSum.dataset['value'] = sum.toString();
+    classSum.innerHtml = '<em>Coverage gap total: $sum points</em>';
+
     addToSortedSections(classSection, gaps['gapCount']);
     classSection.dataset['count'] = '${gaps['gapCount']}';
-    classSection.append(new HeadingElement.h2()..text = 'class ${gaps['name']}');
-    classSection.append(new HeadingElement.h3()..text = 'Gap Count: ${gaps['gapCount'].toString()}');
+    classSection.append(new HeadingElement.h2()
+        ..text = 'class ${gaps['name']}')
+        ..append(new SpanElement()..text = '(${gaps['gapCount']} points of coverage gaps)');
 
     reportOnTopLevelComment(gaps, classSection);
     reportOnMethods(gaps, classSection);
@@ -184,7 +200,8 @@ void reportOnTopLevelComment(Map<String,dynamic> gaps, [Element section]) {
     String x = linkToDartlang(gaps['qualifiedName']);
     section.append(new ParagraphElement()
         ..append(dartlangAnchor(gaps['qualifiedName']))
-        ..appendText('\'s comment is too short:')
+        ..appendText('''\'s comment is too short (under 2 paragraphs)
+                        (${DocCoverage.classCommentBrief} points each):''')
     );
     section.append(new ParagraphElement()
         ..innerHtml = gaps['comment']
@@ -193,7 +210,7 @@ void reportOnTopLevelComment(Map<String,dynamic> gaps, [Element section]) {
   }
 }
 
-reportOnMethods(Map<String,dynamic> gaps, [Element section]) {
+void reportOnMethods(Map<String,dynamic> gaps, [Element section]) {
   bool any = false;
   ['getters', 'setters', 'constructors', 'methods'].forEach((cat) {
     if (gaps[cat].length > 0) {
@@ -224,7 +241,8 @@ void reportOnCategory(String cat, Map<String,dynamic> gaps, [Element section]) {
   if (missing.length > 0) {
     String catMsg = missing.length == 1 ? '${singularize(cat)} is' : '$cat are';
     section.append(new ParagraphElement()
-        ..text = '${missing.length} ${catMsg} missing comments:'
+        ..text = '''${missing.length} $catMsg missing comments
+                    (${DocCoverage.memberCommentGap} points each):'''
     );
     UListElement l = new UListElement();
     section.append(l);
@@ -240,7 +258,8 @@ void reportOnCategory(String cat, Map<String,dynamic> gaps, [Element section]) {
   if (noOneLiner.length > 0) {
     String catMsg = noOneLiner.length == 1 ? '${singularize(cat)} has' : '$cat have';
     section.append(new ParagraphElement()
-        ..text = '${noOneLiner.length} ${catMsg} no one-liner (the first line is too long):'
+        ..text = '''${noOneLiner.length} $catMsg no one-liner (the first line is too
+                    long) (${DocCoverage.memberCommentIssue} point each):'''
     );
     UListElement l = new UListElement();
     section.append(l);
