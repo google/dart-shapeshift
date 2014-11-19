@@ -176,7 +176,7 @@ Q:{
 "^":"Gv;",
 uy:function(a,b){if(!!a.immutable$list)throw H.b(P.f(b))},
 PP:function(a,b){if(!!a.fixed$length)throw H.b(P.f(b))},
-h:function(a,b){if(!!a.fixed$length)H.Vj(P.f("add"))
+h:function(a,b){if(!!a.fixed$length)H.vh(P.f("add"))
 a.push(b)},
 Rz:function(a,b){var z
 this.PP(a,"remove")
@@ -250,8 +250,6 @@ else{z=b>31?31:b
 z=a>>z>>>0}return z},
 C:function(a,b){if(typeof b!=="number")throw H.b(P.u(b))
 return a<b},
-D:function(a,b){if(typeof b!=="number")throw H.b(P.u(b))
-return a>b},
 F:function(a,b){if(typeof b!=="number")throw H.b(P.u(b))
 return a>=b},
 $islf:true,
@@ -557,7 +555,7 @@ if(z!=null)$=z.gEn()
 if(this.Jd!=null)for(;u=this.Jd,!u.gl0(u);)this.Jd.Ux().$0()}return y},
 Zt:function(a){return this.A4.t(0,a)},
 co:function(a,b){var z=this.A4
-if(z.NZ(a))throw H.b(P.FM("Registry: ports must be registered only once."))
+if(z.x4(a))throw H.b(P.FM("Registry: ports must be registered only once."))
 z.u(0,a,b)},
 CX:function(){if(this.A4.hr-this.fW.hr>0||this.UF||!this.xF)init.globalState.i2.u(0,this.jO,this)
 else this.Dm()},
@@ -583,7 +581,7 @@ if(z.QN===z.Bq)return
 return z.Ux()},
 xB:function(){var z,y,x
 z=this.Jc()
-if(z==null){if(init.globalState.yc!=null&&init.globalState.i2.NZ(init.globalState.yc.jO)&&init.globalState.Ai===!0&&init.globalState.yc.A4.hr===0)H.Vj(P.FM("Program exited with open ReceivePorts."))
+if(z==null){if(init.globalState.yc!=null&&init.globalState.i2.x4(init.globalState.yc.jO)&&init.globalState.Ai===!0&&init.globalState.yc.A4.hr===0)H.vh(P.FM("Program exited with open ReceivePorts."))
 y=init.globalState
 if(y.EF===!0&&y.i2.hr===0&&y.Xz.yy===0){y=y.rj
 x=H.Gy(P.EF(["command","close"],null,null))
@@ -801,9 +799,9 @@ z.a=y
 this.dZ.u(0,a,y)
 a.aN(0,new H.OW(z,this))
 return z.a},
-Ms:function(a){return H.Vj(P.SY(null))},
-aC:function(a){return H.Vj(P.SY(null))},
-yf:function(a){return H.Vj(P.SY(null))}},
+Ms:function(a){return H.vh(P.SY(null))},
+aC:function(a){return H.vh(P.SY(null))},
+yf:function(a){return H.vh(P.SY(null))}},
 OW:{
 "^":"Tp:12;a,b",
 $2:function(a,b){var z=this.b
@@ -832,9 +830,9 @@ C.Nm.sB(x,y)
 for(w=0;w<y;++w){v=this.B3(z.t(a,w))
 if(w>=x.length)return H.e(x,w)
 x[w]=v}return x},
-aC:function(a){return H.Vj(P.SY(null))},
-yf:function(a){return H.Vj(P.SY(null))},
-Ms:function(a){return H.Vj(P.SY(null))}},
+aC:function(a){return H.vh(P.SY(null))},
+yf:function(a){return H.vh(P.SY(null))},
+Ms:function(a){return H.vh(P.SY(null))}},
 iY:{
 "^":"a;",
 QS:function(a){if(H.uu(a))return a
@@ -976,7 +974,7 @@ if("defineProperty" in Object){Object.defineProperty(z,"message",{get:H.Ju})
 z.name=""}else z.toString=H.Ju
 return z},
 Ju:function(){return J.AG(this.dartException)},
-Vj:function(a){throw H.b(a)},
+vh:function(a){throw H.b(a)},
 Ru:function(a){var z,y,x,w,v,u,t,s,r,q,p,o,n,m
 z=new H.Am(a)
 if(a==null)return
@@ -1048,7 +1046,7 @@ w.$initialize=w.constructor
 if(d)v=function(){this.$initialize()}
 else if(typeof dart_precompiled=="function"){u=function(g,h,i,j){this.$initialize(g,h,i,j)}
 v=u}else{u=$.yj
-$.yj=J.DE(u,1)
+$.yj=J.WB(u,1)
 u=new Function("a","b","c","d","this.$initialize(a,b,c,d);"+u)
 v=u}w.constructor=v
 v.prototype=w
@@ -1086,14 +1084,14 @@ if(y===0){w=$.mJ
 if(w==null){w=H.E2("self")
 $.mJ=w}w="return function(){return this."+H.d(w)+"."+H.d(z)+"();"
 v=$.yj
-$.yj=J.DE(v,1)
+$.yj=J.WB(v,1)
 return new Function(w+H.d(v)+"}")()}u="abcdefghijklmnopqrstuvwxyz".split("").splice(0,y).join(",")
 w="return function("+u+"){return this."
 v=$.mJ
 if(v==null){v=H.E2("self")
 $.mJ=v}v=w+H.d(v)+"."+H.d(z)+"("+u+");"
 w=$.yj
-$.yj=J.DE(w,1)
+$.yj=J.WB(w,1)
 return new Function(v+H.d(w)+"}")()},
 Z4:function(a,b,c,d){var z,y
 z=H.DV
@@ -1120,11 +1118,11 @@ t=b==null?u==null:b===u
 if(v||!t||w>=28)return H.Z4(w,!t,x,b)
 if(w===1){y="return function(){return this."+H.d(z)+"."+H.d(x)+"(this."+H.d(y)+");"
 t=$.yj
-$.yj=J.DE(t,1)
+$.yj=J.WB(t,1)
 return new Function(y+H.d(t)+"}")()}s="abcdefghijklmnopqrstuvwxyz".split("").splice(0,w-1).join(",")
 y="return function("+s+"){return this."+H.d(z)+"."+H.d(x)+"(this."+H.d(y)+", "+s+");"
 t=$.yj
-$.yj=J.DE(t,1)
+$.yj=J.WB(t,1)
 return new Function(y+H.d(t)+"}")()},
 qm:function(a,b,c,d,e,f){b.fixed$length=init
 c.fixed$length=init
@@ -1133,13 +1131,13 @@ aH:function(a){if(typeof a==="string"||a==null)return a
 throw H.b(H.aq(H.lh(a),"String"))},
 fJ:function(a){if(typeof a==="number"&&Math.floor(a)===a||a==null)return a
 throw H.b(H.aq(H.lh(a),"int"))},
-aE:function(a,b){var z=J.U6(b)
+SE:function(a,b){var z=J.U6(b)
 throw H.b(H.aq(H.lh(a),z.Nj(b,3,z.gB(b))))},
 Go:function(a,b){var z
 if(a!=null)z=typeof a==="object"&&J.x(a)[b]
 else z=!0
 if(z)return a
-H.aE(a,b)},
+H.SE(a,b)},
 ug:function(a){if(!!J.x(a).$iszM||a==null)return a
 throw H.b(H.aq(H.lh(a),"List"))},
 ag:function(a){throw H.b(P.Gz("Cyclic initialization for static "+H.d(a)))},
@@ -1591,7 +1589,7 @@ if(b>=0){y=this.gUD()
 if(typeof y!=="number")return H.s(y)
 y=z>=y}else y=!0
 if(y)throw H.b(P.TE(b,0,this.gB(this)))
-return J.i4(this.Hb,z)},
+return J.T9(this.Hb,z)},
 Hd:function(a,b,c,d){var z=this.ay
 if(z<0)throw H.b(P.N(z))},
 static:{j5:function(a,b,c,d){var z=H.VM(new H.bX(a,b,c),[d])
@@ -1634,7 +1632,7 @@ A8:{
 "^":"aL;ON,Oh",
 Mi:function(a){return this.Oh.$1(a)},
 gB:function(a){return J.q8(this.ON)},
-Zv:function(a,b){return this.Mi(J.i4(this.ON,b))},
+Zv:function(a,b){return this.Mi(J.T9(this.ON,b))},
 $asaL:function(a,b){return[b]},
 $asmW:function(a,b){return[b]},
 $isqC:true},
@@ -1654,8 +1652,8 @@ TN:{
 static:{Ck:function(a,b){var z
 for(z=new H.a7(a,a.length,0,null);z.G();)if(b.$1(z.lo)===!0)return!0
 return!1},qG:function(a,b,c,d,e){var z
-if(b<0||b>a.length)H.Vj(P.TE(b,0,a.length))
-if(c<b||c>a.length)H.Vj(P.TE(c,b,a.length))
+if(b<0||b>a.length)H.vh(P.TE(b,0,a.length))
+if(c<b||c>a.length)H.vh(P.TE(c,b,a.length))
 z=c-b
 if(z===0)return
 if(e<0)throw H.b(P.u(e))
@@ -2192,7 +2190,7 @@ $isEH:true}}],["","",,P,{
 EF:function(a,b,c){return H.B7(a,H.VM(new P.YB(0,null,null,null,null,null,0),[b,c]))},
 Fl:function(a,b){return H.VM(new P.YB(0,null,null,null,null,null,0),[a,b])},
 Ou:[function(a,b){return J.de(a,b)},"$2","iv",4,0,3],
-T9:[function(a){return J.kI(a)},"$1","py",2,0,4],
+vJ:[function(a){return J.kI(a)},"$1","Ed",2,0,4],
 Py:function(a,b,c,d,e){return H.VM(new P.k6(0,null,null,null,null),[d,e])},
 EP:function(a,b,c){var z,y
 if(P.nH(a)){if(b==="("&&c===")")return"(...)"
@@ -2268,9 +2266,9 @@ k6:{
 "^":"a;hr,Mb,cG,Cs,MV",
 gB:function(a){return this.hr},
 gl0:function(a){return this.hr===0},
-gvc:function(){return H.VM(new P.aO(this),[H.Kp(this,0)])},
-gUQ:function(a){return H.K1(H.VM(new P.aO(this),[H.Kp(this,0)]),new P.oi(this),H.Kp(this,0),H.Kp(this,1))},
-NZ:function(a){var z
+gvc:function(){return H.VM(new P.fG(this),[H.Kp(this,0)])},
+gUQ:function(a){return H.K1(H.VM(new P.fG(this),[H.Kp(this,0)]),new P.oi(this),H.Kp(this,0),H.Kp(this,1))},
+x4:function(a){var z
 if(a!=="__proto__"){z=this.Mb
 return z==null?!1:z[a]!=null}else return this.KY(a)},
 KY:function(a){var z=this.Cs
@@ -2348,7 +2346,7 @@ oi:{
 "^":"Tp:13;a",
 $1:function(a){return this.a.t(0,a)},
 $isEH:true},
-aO:{
+fG:{
 "^":"mW;ZD",
 gB:function(a){return this.ZD.hr},
 gl0:function(a){return this.ZD.hr===0},
@@ -2378,7 +2376,7 @@ gB:function(a){return this.hr},
 gl0:function(a){return this.hr===0},
 gvc:function(){return H.VM(new P.i5(this),[H.Kp(this,0)])},
 gUQ:function(a){return H.K1(H.VM(new P.i5(this),[H.Kp(this,0)]),new P.a1(this),H.Kp(this,0),H.Kp(this,1))},
-NZ:function(a){var z,y
+x4:function(a){var z,y
 if(typeof a==="string"&&a!=="__proto__"){z=this.Mb
 if(z==null)return!1
 return z[a]!=null}else if(typeof a==="number"&&(a&0x3ffffff)===a){y=this.cG
@@ -2413,10 +2411,10 @@ z=this.Cs
 if(z==null){z=P.Qs()
 this.Cs=z}y=this.rk(a)
 x=z[y]
-if(x==null)z[y]=[this.x4(a,b)]
+if(x==null)z[y]=[this.Oz(a,b)]
 else{w=this.DF(x,a)
 if(w>=0)x[w].scA(b)
-else x.push(this.x4(a,b))}},
+else x.push(this.Oz(a,b))}},
 Rz:function(a,b){if(typeof b==="string"&&b!=="__proto__")return this.H4(this.Mb,b)
 else if(typeof b==="number"&&(b&0x3ffffff)===b)return this.H4(this.cG,b)
 else return this.qg(b)},
@@ -2443,7 +2441,7 @@ for(;z!=null;){b.$2(z.gv8(),z.cA)
 if(y!==this.HU)throw H.b(P.a4(this))
 z=z.tL}},
 u9:function(a,b,c){var z=a[b]
-if(z==null)a[b]=this.x4(b,c)
+if(z==null)a[b]=this.Oz(b,c)
 else z.scA(c)},
 H4:function(a,b){var z
 if(a==null)return
@@ -2452,8 +2450,8 @@ if(z==null)return
 this.GS(z)
 delete a[b]
 return z.gcA()},
-x4:function(a,b){var z,y
-z=new P.vh(a,b,null,null)
+Oz:function(a,b){var z,y
+z=new P.db(a,b,null,null)
 if(this.In==null){this.Nz=z
 this.In=z}else{y=this.Nz
 z.n8=y
@@ -2485,7 +2483,7 @@ a1:{
 "^":"Tp:13;a",
 $1:function(a){return this.a.t(0,a)},
 $isEH:true},
-vh:{
+db:{
 "^":"a;v8<,cA@,tL@,n8@"},
 i5:{
 "^":"mW;ZD",
@@ -2637,7 +2635,7 @@ return!1}else{this.fD=z.gGc()
 this.Qx=this.Qx.gtL()
 return!0}}}},
 u3:{
-"^":"Yw;"},
+"^":"Vj;"},
 mW:{
 "^":"a;",
 aN:function(a,b){var z
@@ -2702,7 +2700,7 @@ z=this.Wf
 for(y=this.QN;y!==this.Bq;y=(y+1&this.mv.length-1)>>>0){x=this.mv
 if(y<0||y>=x.length)return H.e(x,y)
 b.$1(x[y])
-if(z!==this.Wf)H.Vj(P.a4(this))}},
+if(z!==this.Wf)H.vh(P.a4(this))}},
 gl0:function(a){return this.QN===this.Bq},
 gB:function(a){return(this.Bq-this.QN&this.mv.length-1)>>>0},
 h:function(a,b){this.B7(b)},
@@ -2760,7 +2758,7 @@ o0:{
 gl:function(){return this.fD},
 G:function(){var z,y,x
 z=this.xi
-if(this.Wf!==z.Wf)H.Vj(P.a4(z))
+if(this.Wf!==z.Wf)H.vh(P.a4(z))
 y=this.Dc
 if(y===this.Ji){this.fD=null
 return!1}z=z.mv
@@ -2788,7 +2786,7 @@ x=H.d(z.fD)
 y.IN+=x}}x=y.IN
 return x.charCodeAt(0)==0?x:x},
 $isqC:true},
-Yw:{
+Vj:{
 "^":"Ma;"}}],["","",,P,{
 "^":"",
 KH:function(a){var z
@@ -2828,11 +2826,11 @@ if(this.LK==null){z=this.Mq
 return z.gUQ(z)}return H.K1(this.Cf(),new P.A5(this),null,null)},
 u:function(a,b,c){var z,y
 if(this.LK==null)this.Mq.u(0,b,c)
-else if(this.NZ(b)){z=this.LK
+else if(this.x4(b)){z=this.LK
 z[b]=c
 y=this.EK
 if(y==null?z!=null:y!==z)y[b]=null}else this.XK().u(0,b,c)},
-NZ:function(a){if(this.LK==null)return this.Mq.NZ(a)
+x4:function(a){if(this.LK==null)return this.Mq.x4(a)
 if(typeof a!=="string")return!1
 return Object.prototype.hasOwnProperty.call(this.EK,a)},
 aN:function(a,b){var z,y,x,w
@@ -3001,9 +2999,8 @@ CP:{
 "+double":0,
 a6:{
 "^":"a;m5<",
-g:function(a,b){return P.k5(0,0,C.jn.g(this.m5,b.gm5()),0,0,0)},
-C:function(a,b){return C.jn.C(this.m5,b.gm5())},
-D:function(a,b){return this.m5>b.gm5()},
+g:function(a,b){return P.k5(0,0,this.m5+b.gm5(),0,0,0)},
+C:function(a,b){return this.m5<b.gm5()},
 F:function(a,b){return C.jn.F(this.m5,b.gm5())},
 n:function(a,b){if(b==null)return!1
 if(!J.x(b).$isa6)return!1
@@ -3082,13 +3079,13 @@ HG:{
 bu:function(a){var z=this.G1
 if(z==null)return"Exception"
 return"Exception: "+H.d(z)}},
-oe:{
+aE:{
 "^":"a;G1,FF,D7",
 bu:function(a){var z,y
 z=this.G1
 y=z!=null&&""!==z?"FormatException: "+H.d(z):"FormatException"
 return y},
-static:{rr:function(a,b,c){return new P.oe(a,b,c)}}},
+static:{rr:function(a,b,c){return new P.aE(a,b,c)}}},
 kM:{
 "^":"a;oc",
 bu:function(a){return"Expando:"+H.d(this.oc)},
@@ -3211,7 +3208,7 @@ fY:{
 "^":"qE;N:target=,y0:hostname=,LU:href},tp:port=,A8:protocol=",
 bu:function(a){return a.toString()},
 "%":"HTMLAreaElement"},
-nB:{
+xH:{
 "^":"qE;LU:href},N:target=",
 "%":"HTMLBaseElement"},
 Az:{
@@ -3247,7 +3244,7 @@ z.push(W.Bl())
 $.qD=y
 d=y}else d=z
 z=$.EU
-if(z==null){z=new W.MM(d)
+if(z==null){z=new W.YO(d)
 $.EU=z
 c=z}else{z.zl=d
 c=z}}if($.xo==null){z=document.implementation.createHTMLDocument("")
@@ -3295,7 +3292,7 @@ $isD0:true,
 as:{
 "^":"qE;oc:name=",
 "%":"HTMLFieldSetElement"},
-T5:{
+hH:{
 "^":"Az;",
 "%":"File"},
 XV:{
@@ -3309,7 +3306,7 @@ sB:function(a,b){throw H.b(P.f("Cannot resize immutable List."))},
 Zv:function(a,b){if(b<0||b>=a.length)return H.e(a,b)
 return a[b]},
 $iszM:true,
-$aszM:function(){return[W.T5]},
+$aszM:function(){return[W.hH]},
 $isqC:true,
 $isXj:true,
 "%":"FileList"},
@@ -3542,12 +3539,12 @@ $isEH:true},
 zL:{
 "^":"Gv+lD;",
 $iszM:true,
-$aszM:function(){return[W.T5]},
+$aszM:function(){return[W.hH]},
 $isqC:true},
 ec:{
 "^":"zL+Pb;",
 $iszM:true,
-$aszM:function(){return[W.T5]},
+$aszM:function(){return[W.hH]},
 $isqC:true},
 Kx:{
 "^":"Tp:13;",
@@ -3638,14 +3635,14 @@ $isZ0:true,
 $asZ0:function(){return[P.qU,P.qU]}},
 i7:{
 "^":"tJ;dA",
-NZ:function(a){return this.dA.hasAttribute(a)},
+x4:function(a){return this.dA.hasAttribute(a)},
 t:function(a,b){return this.dA.getAttribute(b)},
 u:function(a,b,c){this.dA.setAttribute(b,c)},
 gB:function(a){return this.gvc().length},
 Bs:function(a){return a.namespaceURI==null}},
 Sy:{
 "^":"a;w6",
-NZ:function(a){return this.w6.dA.hasAttribute("data-"+H.d(this.OU(a)))},
+x4:function(a){return this.w6.dA.hasAttribute("data-"+H.d(this.OU(a)))},
 t:function(a,b){return this.w6.dA.getAttribute("data-"+H.d(this.OU(b)))},
 u:function(a,b,c){this.w6.dA.setAttribute("data-"+H.d(this.OU(b)),c)},
 aN:function(a,b){this.w6.aN(0,new W.KS(this,b))},
@@ -3740,12 +3737,12 @@ if(x==null)return!1
 return x.$4(a,b,c,this)},
 qR:function(a){var z,y
 z=$.NJ()
-if(z.gl0(z)){for(y=new H.a7(C.Hk,261,0,null);y.G();)z.u(0,y.lo,W.Px())
+if(z.gl0(z)){for(y=new H.a7(C.Hk,261,0,null);y.G();)z.u(0,y.lo,W.nB())
 for(y=new H.a7(C.BI,12,0,null);y.G();)z.u(0,y.lo,W.tc())}},
 static:{"^":"zX,pR,YA,or",Tw:function(a){var z=new W.mk(W.J6(null),window.location)
 z=new W.JQ(z)
 z.qR(a)
-return z},yW:[function(a,b,c,d){return!0},"$4","Px",8,0,7],QW:[function(a,b,c,d){var z,y,x,w,v
+return z},cg:[function(a,b,c,d){return!0},"$4","nB",8,0,7],QW:[function(a,b,c,d){var z,y,x,w,v
 z=d.gKs()
 y=z.Yg
 x=J.RE(y)
@@ -3843,7 +3840,7 @@ kF:{
 "^":"a;"},
 mk:{
 "^":"a;Yg,wx"},
-MM:{
+YO:{
 "^":"a;zl",
 Pn:function(a){new W.fm(this).$1(a)},
 zk:function(a){var z,y,x,w,v,u,t,s
@@ -3891,7 +3888,7 @@ lv:{
 pf:{
 "^":"d5;yG:result=",
 "%":"SVGFEComponentTransferElement"},
-NV:{
+py:{
 "^":"d5;yG:result=",
 "%":"SVGFECompositeElement"},
 W1:{
@@ -3949,7 +3946,7 @@ d=new W.vD(z)
 z.push(W.Tw(null))
 z.push(W.Bl())
 z.push(new W.Ow())
-c=new W.MM(d)
+c=new W.YO(d)
 y="<svg version=\"1.1\">"+H.d(b)+"</svg>"
 x=J.kV(document.body,y,c)
 w=document.createDocumentFragment()
@@ -4052,28 +4049,50 @@ x=H.VM(new W.RO(y,"load",!1),[null])
 H.VM(new W.xC(0,x.J6,x.fA,W.VF(new E.Pv()),x.el),[H.Kp(x,0)]).DN()
 y.readAsText(z)},"$1","oa",2,0,8],
 ww:[function(a){W.Kn(H.Go(document.querySelector("#url"),"$isMi").value,null,null).ml(E.nv())},"$1","ra",2,0,8],
-PJ:[function(a){var z=H.Go(document.querySelector("#package"),"$isMi").value
-W.Kn($.Og+"/"+H.d(z)+"/latest/",null,null).ml(new E.bm(z))},"$1","kb",2,0,8],
+PJ:[function(a){var z,y,x,w
+z={}
+y=H.Go(document.querySelector("#package"),"$isMi").value
+z.a=y
+x=J.co(y,"dart:")
+w=z.a
+if(x){z.a=J.md(w,":","-")
+$.zm=$.Hv
+J.Qy($.a9(),"")
+new E.yg(z.a,W.r3("section",null),document.createElement("p",null),[]).a4()}else W.Kn($.Og+"/"+H.d(w)+"/latest/",null,null).ml(new E.bm(z))},"$1","kb",2,0,8],
 w0:[function(a){new V.Gu(null,P.L5(null,null,null,null,null),["getters","setters","constructors","methods"]).RG(a)
 J.Qy($.a9(),"")},"$1","nv",2,0,9],
-cD:[function(a){var z,y
+hX:[function(a){var z,y,x,w,v,u,t
 z=P.BS(a,null)
 y=J.x(z)
 if(!!y.$isZ0);else throw H.b(P.rr("JSON must be JSON, not "+H.d(a),null,null))
 J.Qy($.a9(),"")
-J.kH(H.ug(y.t(z,"libraries")),new E.ri())},"$1","Kr",2,0,9],
+x=y.t(z,"libraries")
+w=J.q8(y.t(z,"libraries"))
+if(typeof w!=="number")return w.W()
+v=J.UQ(x,w-1)
+u=W.J6(null)
+u.textContent="Using version "+H.d($.Ye)+" docs from dartdocs.org"
+J.pP(u).h(0,"version")
+w=J.U6(v)
+u.setAttribute("href",H.d($.V9)+"#"+H.d(w.t(v,"qualifiedName")))
+x=$.a9()
+t=document.createElement("h1",null)
+t.textContent="package "+H.d(w.t(v,"packageName"))
+x.appendChild(t)
+x.appendChild(u)
+J.kH(H.ug(y.t(z,"libraries")),new E.Si())},"$1","y9",2,0,9],
 LA:function(a,b){var z={}
 z.a=!1
 C.Nm.aN(["getters","setters","constructors","methods"],new E.Hb(z,a))
 if(!z.a)return
 C.Nm.aN(["getters","setters","constructors","methods"],new E.ma(a,b))},
 kW:function(a,b){var z
-if(!a.NZ("variables"))return
+if(!a.x4("variables"))return
 z=J.q8(a.t(0,"variables"))
 if(typeof z!=="number")return z.D()
 if(!(z>0&&!0))return
-E.k7("variables",a,b)},
-k7:function(a,b,c){var z,y,x,w,v,u
+E.yW("variables",a,b)},
+yW:function(a,b,c){var z,y,x,w,v,u
 z=J.UQ(b.t(0,a),"missing")
 y=J.UQ(b.t(0,a),"no-one-liner")
 x=J.U6(z)
@@ -4081,7 +4100,7 @@ w=x.gB(z)
 if(typeof w!=="number")return w.D()
 if(w>0){v=x.gB(z)===1?H.d(A.YE(a))+" is":H.d(a)+" are"
 w=document.createElement("p",null)
-w.textContent=H.d(x.gB(z))+" "+v+" missing comments:"
+w.textContent=H.d(x.gB(z))+" "+v+" missing comments\n                    (2 points each):"
 c.appendChild(w)
 u=document.createElement("ul",null)
 c.appendChild(u)
@@ -4090,7 +4109,7 @@ w=x.gB(y)
 if(typeof w!=="number")return w.D()
 if(w>0){v=x.gB(y)===1?H.d(A.YE(a))+" has":H.d(a)+" have"
 w=document.createElement("p",null)
-w.textContent=H.d(x.gB(y))+" "+v+" no one-liner (the first line is too long):"
+w.textContent=H.d(x.gB(y))+" "+v+" no one-liner (the first line is too\n                    long) (1 point each):"
 c.appendChild(w)
 u=document.createElement("ul",null)
 c.appendChild(u)
@@ -4102,7 +4121,7 @@ $isEH:true},
 bm:{
 "^":"Tp:13;a",
 $1:function(a){var z,y,x
-z=this.a
+z=this.a.a
 y="latestUrl='"+$.Og+"/"+H.d(z)+"/([^/]+)/index.html'"
 x=H.v4(y,!1,!0,!1)
 if(x.test(H.Yx(a))){y=new H.VR(y,x,null,null).ej(a).pX
@@ -4111,58 +4130,65 @@ $.Ye=y[1]
 $.V9=$.Og+"/"+H.d(z)+"/"+H.d($.Ye)+"/index.html"
 z=$.Og+"/"+H.d(z)+"/"+H.d($.Ye)+"/docs"
 $.zm=z
-W.Kn(z+"/library_list.json",null,null).ml(E.Kr())}else P.JS("Error! "+H.d(a))
+W.Kn(z+"/library_list.json",null,null).ml(E.y9())}else $.a9().textContent="Error! "+H.d(a)
 return},
 $isEH:true},
-ri:{
+Si:{
 "^":"Tp:26;",
-$1:function(a){var z,y,x,w,v
+$1:function(a){var z,y
 z=J.U6(a)
-if(!J.co(H.aH(z.t(a,"name")),"dart-pkg"))z=J.co(H.aH(z.t(a,"name")),"dart-")||J.co(H.aH(z.t(a,"name")),"dart:")
-else z=!1
-if(z)return
-z=[]
-y=new E.yg(a,null,z)
-C.Nm.sB(z,0)
-x=W.J6(null)
-x.textContent="version "+H.d($.Ye)
-J.pP(x).h(0,"version")
-z=J.U6(a)
-x.setAttribute("href",H.d($.V9)+"#"+H.d(z.t(a,"qualifiedName")))
-w=W.r3("section",null)
-v=document.createElement("h1",null)
-v.textContent="library "+H.d(z.t(a,"qualifiedName"))
-J.WB(w,v)
-w.appendChild(x)
-y.I5=w
-$.a9().appendChild(w)
-W.Kn(H.d($.zm)+"/"+H.d(z.t(a,"qualifiedName"))+".json",null,null).ml(y.ghX())},
+if(!J.co(H.aH(z.t(a,"name")),"dart-pkg"))y=J.co(H.aH(z.t(a,"name")),"dart-")||J.co(H.aH(z.t(a,"name")),"dart:")
+else y=!1
+if(y)return
+new E.yg(z.t(a,"qualifiedName"),W.r3("section",null),document.createElement("p",null),[]).a4()},
 $isEH:true},
 yg:{
-"^":"a;cI,I5,FX",
-SB:[function(a){J.kH(H.ug(J.UQ(J.UQ(P.BS(a,null),"classes"),"class")),new E.vl(this))},"$1","ghX",2,0,9],
+"^":"a;oc,I5,qj,FX",
+a4:function(){var z,y,x,w
+C.Nm.sB(this.FX,0)
+z=this.I5
+y=document.createElement("h1",null)
+x=this.oc
+y.textContent="library "+H.d(x)
+w=J.RE(z)
+w.jx(z,y)
+w.gDD(z).h(0,"hidden")
+$.a9().appendChild(z)
+w=this.qj
+w.toString
+w.setAttribute("data-"+H.d(new W.Sy(new W.i7(w)).OU("value")),"0")
+z.appendChild(w)
+W.Kn(H.d($.zm)+"/"+H.d(x)+".json",null,null).ml(this.giE())},
+al:[function(a){J.kH(H.ug(J.UQ(J.UQ(P.BS(a,null),"classes"),"class")),new E.Zs(this))},"$1","giE",2,0,9],
 Sr:[function(a){P.BS(a,null)
 this.fF(new V.Gu(null,P.L5(null,null,null,null,null),["getters","setters","constructors","methods"]).RG(a))},"$1","gCJ",2,0,9],
-fF:function(a){var z,y,x
+fF:function(a){var z,y,x,w
 if(J.de(a.t(0,"gapCount"),0))return
 z=W.r3("section",null)
+J.pP(this.I5).Rz(0,"hidden")
+y=this.qj
+y.toString
+x=J.WB(H.BU(y.getAttribute("data-"+H.d(new W.Sy(new W.i7(y)).OU("value"))),null,null),a.t(0,"gapCount"))
+w=J.AG(x)
+y.setAttribute("data-"+H.d(new W.Sy(new W.i7(y)).OU("value")),w)
+J.Qy(y,"<em>Coverage gap total: "+H.d(x)+" points</em>")
 this.I2(z,a.t(0,"gapCount"))
 y=J.P5(z)
-x=H.d(a.t(0,"gapCount"))
-y.w6.dA.setAttribute("data-"+H.d(y.OU("count")),x)
-x=document.createElement("h2",null)
-x.textContent="class "+H.d(a.t(0,"name"))
-z.appendChild(x)
-x=document.createElement("h3",null)
-x.textContent="Gap Count: "+H.d(J.AG(a.t(0,"gapCount")))
-z.appendChild(x)
-if(!a.NZ("comment")||J.FN(H.aH(a.t(0,"comment")))){y=document.createElement("p",null)
+w=H.d(a.t(0,"gapCount"))
+y.w6.dA.setAttribute("data-"+H.d(y.OU("count")),w)
+w=document.createElement("h2",null)
+w.textContent="class "+H.d(a.t(0,"name"))
+w=z.appendChild(w)
+y=document.createElement("span",null)
+y.textContent="("+H.d(a.t(0,"gapCount"))+" points of coverage gaps)"
+w.appendChild(y)
+if(!a.x4("comment")||J.FN(H.aH(a.t(0,"comment")))){y=document.createElement("p",null)
 y.appendChild(R.xZ(a.t(0,"qualifiedName"),null))
 y.appendChild(document.createTextNode(" has no comment!"))
-z.appendChild(y)}else if(H.aH(a.t(0,"comment")).split("\n").length<2){A.fG(a.t(0,"qualifiedName"),null)
+z.appendChild(y)}else if(H.aH(a.t(0,"comment")).split("\n").length<2){A.MM(a.t(0,"qualifiedName"),null)
 y=document.createElement("p",null)
 y.appendChild(R.xZ(a.t(0,"qualifiedName"),null))
-y.appendChild(document.createTextNode("'s comment is too short:"))
+y.appendChild(document.createTextNode("'s comment is too short (under 2 paragraphs)\n                        (7 points each):"))
 z.appendChild(y)
 y=document.createElement("p",null)
 J.Qy(y,a.t(0,"comment"))
@@ -4172,19 +4198,19 @@ E.kW(a,z)},
 I2:function(a,b){var z,y,x,w
 z=this.FX
 if(z.length===0){z.push(a)
-J.WB(this.I5,a)
+J.Kv(this.I5,a)
 return}y=J.Wx(b)
 x=0
 while(!0){if(x<z.length){w=J.P5(z[x])
-w=y.D(b,H.BU(w.w6.dA.getAttribute("data-"+H.d(w.OU("count"))),null,null))}else w=!1
+w=y.C(b,H.BU(w.w6.dA.getAttribute("data-"+H.d(w.OU("count"))),null,null))}else w=!1
 if(!w)break;++x}y=z.length
 w=this.I5
-if(x===y)J.WB(w,a)
+if(x===y)J.Kv(w,a)
 else{if(x>=y)return H.e(z,x)
-J.EE(w,a,z[x])}if(x>z.length)H.Vj(P.N(x))
+J.EE(w,a,z[x])}if(x>z.length)H.vh(P.N(x))
 C.Nm.PP(z,"insert")
 z.splice(x,0,a)}},
-vl:{
+Zs:{
 "^":"Tp:13;a",
 $1:function(a){W.Kn(H.d($.zm)+"/"+H.d(J.UQ(a,"qualifiedName"))+".json",null,null).ml(this.a.gCJ())},
 $isEH:true},
@@ -4196,7 +4222,7 @@ if(z>0)this.a.a=!0},
 $isEH:true},
 ma:{
 "^":"Tp:13;c,d",
-$1:function(a){return E.k7(a,this.c,this.d)},
+$1:function(a){return E.yW(a,this.c,this.d)},
 $isEH:true},
 zt:{
 "^":"Tp:27;a",
@@ -4214,7 +4240,7 @@ $1:function(a){var z,y,x,w
 z=J.U6(a)
 y=H.aH(z.t(a,"name"))
 if(J.FN(y))y="(default constructor)"
-A.fG(H.aH(z.t(a,"qualifiedName")),y)
+A.MM(H.aH(z.t(a,"qualifiedName")),y)
 x=document.createElement("li",null)
 x.appendChild(R.xZ(H.aH(z.t(a,"qualifiedName")),y))
 w=document.createElement("p",null)
@@ -4235,11 +4261,11 @@ y.u(0,"gapCount",0)
 y.u(0,"qualifiedName",this.DR.t(0,"qualifiedName"))
 y.u(0,"name",this.DR.t(0,"name"))
 y.u(0,"comment",this.DR.t(0,"comment"))
-if(this.DR.t(0,"packageName")!=null){if(this.DR.NZ("comment")!==!0||J.FN(H.aH(this.DR.t(0,"comment")))){x=H.fJ(y.t(0,"gapCount"))
+if(this.DR.t(0,"packageName")!=null){if(this.DR.x4("comment")!==!0||J.FN(H.aH(this.DR.t(0,"comment")))){x=H.fJ(y.t(0,"gapCount"))
 if(typeof x!=="number")return x.g()
 y.u(0,"gapCount",x+24)}else if(H.aH(this.DR.t(0,"comment")).split("\n").length<2){x=H.fJ(y.t(0,"gapCount"))
 if(typeof x!=="number")return x.g()
-y.u(0,"gapCount",x+21)}y.u(0,"packageName",this.DR.t(0,"qualifiedName"))}else{if(this.DR.NZ("comment")!==!0||J.FN(H.aH(this.DR.t(0,"comment")))){x=H.fJ(y.t(0,"gapCount"))
+y.u(0,"gapCount",x+21)}y.u(0,"packageName",this.DR.t(0,"qualifiedName"))}else{if(this.DR.x4("comment")!==!0||J.FN(H.aH(this.DR.t(0,"comment")))){x=H.fJ(y.t(0,"gapCount"))
 if(typeof x!=="number")return x.g()
 y.u(0,"gapCount",x+8)}else if(H.aH(this.DR.t(0,"comment")).split("\n").length<2){x=H.fJ(y.t(0,"gapCount"))
 if(typeof x!=="number")return x.g()
@@ -4258,15 +4284,15 @@ KC:function(a){var z=P.EF(["missing",[],"no-one-liner",[]],null,null)
 J.kH(H.Go(this.DR.t(0,"methods"),"$isZ0").t(0,a),new V.XC(this,z))
 return z},
 Jf:function(a,b){var z,y
-if(a.NZ("comment")!==!0)P.JS("ACK!")
+if(a.x4("comment")!==!0)P.JS("ACK!")
 else{z=a.t(0,"comment")
 y=J.U6(z)
-if(y.gl0(z)===!0)J.bi(b.t(0,"missing"),a)
+if(y.gl0(z)===!0)J.i4(b.t(0,"missing"),a)
 else{y=y.Fr(z,"\n")
 if(0>=y.length)return H.e(y,0)
 y=J.q8(y[0])
 if(typeof y!=="number")return y.D()
-if(y>160)J.bi(b.t(0,"no-one-liner"),a)}}},
+if(y>160)J.i4(b.t(0,"no-one-liner"),a)}}},
 static:{"^":"fZ,Yi,Hd,hI,Uu,J5,yU"}},
 m4:{
 "^":"Tp:0;a",
@@ -4305,6 +4331,11 @@ gl0:function(a){return this.DG().hr===0},
 gB:function(a){return this.DG().hr},
 Zt:function(a){return this.DG().tg(0,a)?a:null},
 h:function(a,b){return this.OS(new P.GE(b))},
+Rz:function(a,b){var z,y
+z=this.DG()
+y=z.Rz(0,b)
+this.p5(z)
+return y},
 OS:function(a){var z,y
 z=this.DG()
 y=a.$1(z)
@@ -4319,7 +4350,7 @@ $isEH:true}}],["","",,A,{
 JR:function(a){var z=J.md(J.JA(a,"_","\\_"),"dart-core.","")
 H.Yx("-")
 return J.JA(H.ys(z,"-dom-","-"),"-",":")},
-fG:function(a,b){var z
+MM:function(a,b){var z
 C.xB.g("https://api.dartlang.org/apidocs/channels/dev/dartdoc-viewer/",P.jW(C.NN,a,C.dy,!1))
 z="<a href=\""+C.xB.g("https://api.dartlang.org/apidocs/channels/dev/dartdoc-viewer/",P.jW(C.NN,a,C.dy,!1))+"\">"
 return z+H.d(b!=null?b:A.JR(a))+"</a>"},
@@ -4344,7 +4375,7 @@ y.$isa=z
 y=W.KV
 y.$isKV=z
 y.$isa=z
-W.T5.$isa=z
+W.hH.$isa=z
 y=P.qU
 y.$isqU=z
 y.$isa=z
@@ -4352,11 +4383,11 @@ P.lf.$isa=z
 P.a6.$isa=z
 P.zM.$isa=z
 W.zU.$isa=z
-y=W.kF
-y.$iskF=z
-y.$isa=z
 y=P.a2
 y.$isa2=z
+y.$isa=z
+y=W.kF
+y.$iskF=z
 y.$isa=z
 H.yo.$isa=z
 H.IY.$isa=z
@@ -4364,11 +4395,11 @@ H.aX.$isa=z
 y=P.wv
 y.$iswv=z
 y.$isa=z
-y=P.Z0
-y.$isZ0=z
-y.$isa=z
 y=P.mE
 y.$ismE=z
+y.$isa=z
+y=P.Z0
+y.$isZ0=z
 y.$isa=z
 P.a.$isa=z
 y=W.ea
@@ -4441,32 +4472,32 @@ return J.ks(a)}
 J.AG=function(a){return J.x(a).bu(a)}
 J.C9=function(a){return J.RE(a).goc(a)}
 J.CA=function(a){return J.RE(a).gil(a)}
-J.DE=function(a,b){if(typeof a=="number"&&typeof b=="number")return a+b
-return J.Qc(a).g(a,b)}
 J.EE=function(a,b,c){return J.RE(a).mK(a,b,c)}
 J.F8=function(a,b,c,d){return J.RE(a).v0(a,b,c,d)}
 J.FN=function(a){return J.U6(a).gl0(a)}
 J.GP=function(a){return J.w1(a).gA(a)}
 J.JA=function(a,b,c){return J.rY(a).h8(a,b,c)}
 J.KC=function(a){return J.RE(a).gyG(a)}
+J.Kv=function(a,b){return J.RE(a).jx(a,b)}
 J.Mp=function(a){return J.w1(a).wg(a)}
 J.Mz=function(a){return J.rY(a).hc(a)}
 J.Nu=function(a,b,c,d){return J.RE(a).Ci(a,b,c,d)}
 J.P5=function(a){return J.RE(a).gEt(a)}
 J.Q7=function(a){return J.rY(a).bS(a)}
 J.Qy=function(a,b){return J.RE(a).shf(a,b)}
+J.T9=function(a,b){return J.w1(a).Zv(a,b)}
 J.UQ=function(a,b){if(a.constructor==Array||typeof a=="string"||H.wV(a,a[init.dispatchPropertyName]))if(b>>>0===b&&b<a.length)return a[b]
 return J.U6(a).t(a,b)}
 J.V1=function(a,b){return J.w1(a).Rz(a,b)}
 J.Vg=function(a){return J.RE(a).gVl(a)}
 J.Vm=function(a){return J.RE(a).gP(a)}
-J.WB=function(a,b){return J.RE(a).jx(a,b)}
-J.bi=function(a,b){return J.w1(a).h(a,b)}
+J.WB=function(a,b){if(typeof a=="number"&&typeof b=="number")return a+b
+return J.Qc(a).g(a,b)}
 J.co=function(a,b){return J.rY(a).nC(a,b)}
 J.de=function(a,b){if(a==null)return b==null
 if(typeof a!="object")return b!=null&&a===b
 return J.x(a).n(a,b)}
-J.i4=function(a,b){return J.w1(a).Zv(a,b)}
+J.i4=function(a,b){return J.w1(a).h(a,b)}
 J.jV=function(a,b){return J.RE(a).wR(a,b)}
 J.jd=function(a){return J.RE(a).gni(a)}
 J.kE=function(a,b){return J.U6(a).tg(a,b)}
@@ -4662,6 +4693,7 @@ $.xo=null
 $.BO=null
 $.qD=null
 $.EU=null
+$.Hv="https://api.dartlang.org/apidocs/channels/stable/docs"
 $.Og="http://www.dartdocs.org/documentation"
 $.Ye=null
 $.zm=null
