@@ -39,15 +39,18 @@ void main() {
 
   router = new Router()
         ..addHandler(baseUrl, (_) => null)
-        ..addHandler(libraryUrl, showLibrary)
+        ..addHandler(libraryUrl, showLibraries)
         ..addHandler(packageUrl, showPackage)
         ..listen()
         ..handle(window.location.toString());
 }
 
-void showLibrary(String path) {
-  String name = libraryUrl.parse(path)[1];
-  getLibrary(name);
+void showLibraries(String path) {
+  String names = libraryUrl.parse(path)[1];
+  gapsDiv.innerHtml = '';
+  names.split(',').forEach((String name) {
+    getLibrary(name);
+  });
 }
 
 void showPackage(String path) {
@@ -78,9 +81,8 @@ String versionUrl;
 void getLibrary(String name) {
   // https://api.dartlang.org/apidocs/channels/stable/docs/dart-collection.json
   // https://api.dartlang.org/apidocs/channels/stable/docs/dart-collection.DoubleLinkedQueue.json
-  base = '$apidocs';
-  gapsDiv.innerHtml = '';
-  new LibraryDocAnalyzer(name.replaceFirst(':', '-'))..go();
+  //base = '$apidocs';
+  new LibraryDocAnalyzer(name.replaceFirst(':', '-'), apidocs)..go();
 }
 
 void getPackage(String name) {
@@ -153,18 +155,18 @@ void reportPackage(String json) {
         ((lib['name'] as String).startsWith('dart-') ||
          (lib['name'] as String).startsWith('dart:'))) return;
 
-    new LibraryDocAnalyzer(lib['qualifiedName'])..go();
+    new LibraryDocAnalyzer(lib['qualifiedName'], base)..go();
   });
 }
 
 class LibraryDocAnalyzer {
 
-  String name;
+  String name, base;
   final Element section = new Element.section();
   final ParagraphElement classSum = new ParagraphElement();
   List<Element> sortedSections = new List();
 
-  LibraryDocAnalyzer(this.name);
+  LibraryDocAnalyzer(this.name, this.base);
 
   void go() {
     sortedSections.clear();
