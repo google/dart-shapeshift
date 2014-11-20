@@ -11,9 +11,16 @@ import 'package:shapeshift/shapeshift_frontend.dart';
 Element gapsDiv = querySelector('#gaps');
 
 void main() {
-  querySelector('#upload').onChange.listen(readFile);
-  querySelector('#getUrl').onClick.listen(getUrl);
-  querySelector('#getPackage').onClick.listen(getPackage);
+  //querySelector('#upload').onChange.listen(readFile);
+  //querySelector('#getUrl').onClick.listen(getUrl);
+  Element getPackageButton = querySelector('#getPackage');
+  getPackageButton.onClick.listen(getPackage);
+  querySelector('#package').onKeyUp.listen((keyboardEvent) {
+    var keyEvent = new KeyEvent.wrap(keyboardEvent);
+    if (keyEvent.keyCode == KeyCode.ENTER) {
+      getPackageButton.click();
+    }
+  });
   String p = window.location.pathname;
   String dir = p.substring(0, p.lastIndexOf('/'));
 }

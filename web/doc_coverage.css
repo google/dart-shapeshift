@@ -48,11 +48,6 @@ body {
   padding: 8px;
 }
 
-input[type="text"] {
-  width: 50%;
-  max-width: 400px;
-}
-
 #or {
   color: #666;
   padding: 0 12px;
