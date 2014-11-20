@@ -4,25 +4,48 @@
 import 'dart:convert';
 import 'dart:html';
 
+import 'package:route/client.dart';
+import 'package:route/url_pattern.dart';
+
 import 'package:shapeshift/doc_coverage_common.dart';
 import 'package:shapeshift/shapeshift_common.dart';
 import 'package:shapeshift/shapeshift_frontend.dart';
 
-Element gapsDiv = querySelector('#gaps');
+Element gapsDiv;
+Element getPackageButton;
+InputElement packageInput;
+UrlPattern baseUrl = new UrlPattern(r'(.*).html');
+UrlPattern packageUrl = new UrlPattern(r'(.*)#/package/(\w+)');
+Router router;
 
 void main() {
   //querySelector('#upload').onChange.listen(readFile);
   //querySelector('#getUrl').onClick.listen(getUrl);
-  Element getPackageButton = querySelector('#getPackage');
-  getPackageButton.onClick.listen(getPackage);
-  querySelector('#package').onKeyUp.listen((keyboardEvent) {
+  gapsDiv = querySelector('#gaps');
+  getPackageButton = querySelector('#getPackage');
+  getPackageButton.onClick.listen((_) {
+    window.location.hash = '/package/${packageInput.value}';
+  });
+  packageInput = querySelector('#package');
+  packageInput.onKeyUp.listen((keyboardEvent) {
     var keyEvent = new KeyEvent.wrap(keyboardEvent);
-    if (keyEvent.keyCode == KeyCode.ENTER) {
+    if (keyEvent.keyCode == KeyCode.ENTER && packageInput.value.isNotEmpty) {
       getPackageButton.click();
     }
   });
-  String p = window.location.pathname;
-  String dir = p.substring(0, p.lastIndexOf('/'));
+
+  router = new Router()
+        ..addHandler(baseUrl, (_) => null)
+        ..addHandler(packageUrl, showPackage)
+        ..listen()
+        ..handle(window.location.toString());
+}
+
+void showPackage(String path) {
+  print('path is $path');
+  String name = packageUrl.parse(path)[1];
+  print('name is $name');
+  getPackage(name);
 }
 
 void readFile(Event event) {
@@ -45,15 +68,13 @@ String version;
 String base;
 String versionUrl;
 
-void getPackage(Event event) {
-  String name = (querySelector("#package") as InputElement).value;
+void getPackage(String name) {
   if (name.startsWith('dart:')) {
-    name = name.replaceFirst(':', '-');
     // https://api.dartlang.org/apidocs/channels/stable/docs/dart-collection.json
     // https://api.dartlang.org/apidocs/channels/stable/docs/dart-collection.DoubleLinkedQueue.json
     base = '$apidocs';
     gapsDiv.innerHtml = '';
-    new LibraryDocAnalyzer(name)..go();
+    new LibraryDocAnalyzer(name.replaceFirst(':', '-'))..go();
   }
   else {
     // http://www.dartdocs.org/documentation/args/0.12.1/index.html
@@ -64,7 +85,7 @@ void getPackage(Event event) {
     HttpRequest.getString(url)
         .then((data) => redirectToPackageVersion(data, name))
         .catchError((err) {
-          dynamic target = err.currentTarget;
+          var target = err.currentTarget;
           gapsDiv.innerHtml = '';
           gapsDiv.append(new DivElement()
               ..classes.add('error')
