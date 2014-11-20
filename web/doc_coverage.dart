@@ -54,7 +54,16 @@ void getPackage(Event event) {
     // http://www.dartdocs.org/documentation/args/0.12.1/docs/args/args.json
     // http://www.dartdocs.org/documentation/args/0.12.1/docs/args/args.ArgParser.json
     String url = '$dartdocs/$name/latest/';
-    HttpRequest.getString(url).then((data) => redirectToPackageVersion(data, name));
+    HttpRequest.getString(url)
+        .then((data) => redirectToPackageVersion(data, name))
+        .catchError((err) {
+          dynamic target = err.currentTarget;
+          gapsDiv.innerHtml = '';
+          gapsDiv.append(new DivElement()
+              ..classes.add('error')
+              ..text = 'Error from ${target.responseUrl}: ${target.status} ${target.statusText}'
+          );
+        });
   }
 }
 
