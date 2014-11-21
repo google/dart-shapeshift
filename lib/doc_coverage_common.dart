@@ -5,4 +5,6 @@ library doc_coverage_common;
 
 import 'dart:convert';
 
+import 'package:shapeshift/shapeshift_common.dart';
+
 part 'src/common/doc_coverage.dart';

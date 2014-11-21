@@ -70,20 +70,21 @@ class DocCoverage {
 
     return gaps;
   }
-  
+
   Map searchCategory(String category) {
     Map<String,List> g = { 'missing': new List(), 'no-one-liner': new List() };
     Map methods = (api['methods'] as Map)[category];
     methods.forEach((String name, Map thing) => judgeThing(thing, g));
     return g;
   }
-  
+
   void judgeThing(Map thing, Map g) {
     if (!thing.containsKey('comment')) {
       print('ACK!');
     }
     else {
-      String comment = thing['comment'];
+      String comment = resolveCommentText(thing['comment']);
+      thing['comment'] = comment;
       if (comment.isEmpty) {
         g['missing'].add(thing);
       } else if (comment.split('\n')[0].length > maxOneLinerLength) {
@@ -91,4 +92,10 @@ class DocCoverage {
       }
     }
   }
+
+  String resolveCommentText(String rawComment) =>
+    rawComment.replaceAllMapped(
+        new RegExp(r'<a>([^<]+)</a>'),
+        (Match match) => '<a>${new DocsLocation(match[1]).lastName}</a>'
+    );
 }

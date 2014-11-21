@@ -6,4 +6,5 @@ library shapeshift_common;
 import 'dart:convert';
 
 part 'src/common/dartdoc_viewer_utils.dart';
+part 'src/common/docs_location.dart';
 part 'src/common/utils.dart';

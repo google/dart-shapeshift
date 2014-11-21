@@ -274,7 +274,7 @@ void reportOnMethods(Map<String,dynamic> gaps, [Element section]) {
     }
   });
   if (!any) { return; }
-  
+
   ['getters', 'setters', 'constructors', 'methods'].forEach((cat) => reportOnCategory(cat, gaps, section));
 }
 
@@ -310,7 +310,7 @@ void reportOnCategory(String cat, Map<String,dynamic> gaps, [Element section]) {
       );
     });
   }
-      
+
   if (noOneLiner.length > 0) {
     String catMsg = noOneLiner.length == 1 ? '${singularize(cat)} has' : '$cat have';
     section.append(new ParagraphElement()
