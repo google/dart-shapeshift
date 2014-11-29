@@ -40,7 +40,7 @@ class PackageReporter {
 
     rightLs.forEach((String file) {
       file = file.replaceFirst(rightPath, '');
-      if (file == '/docgen/index.json' || file == '/docgen/library_list.json' || !file.endsWith('.json')) {
+      if (file.endsWith('/index.json') || file.endsWith('/library_list.json') || !file.endsWith('.json')) {
         print('Skipping $file');
         return;
       }
