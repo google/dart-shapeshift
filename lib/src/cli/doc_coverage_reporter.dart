@@ -44,7 +44,7 @@ class DocCoverageReporter {
     // Skip dom- classes.
     sortedGaps = sortedGaps.where((gap) => !(gap['qualifiedName'] as String).contains('-dom-')).toList();
     sortedGaps..sort((a, b) => b['gapCount'] - a['gapCount']);
-    sortedGaps.getRange(0, 10).forEach(
+    sortedGaps.getRange(0, min(sortedGaps.length, 10)).forEach(
         (gap) => print('${gap['qualifiedName']} has ${gap['gapCount']} gaps.'));
     int moreThan10 = sortedGaps.where((gap) => gap['gapCount'] >= 10).length;
     print('\nThere are $moreThan10 classes with >= 10 gaps.\n');
