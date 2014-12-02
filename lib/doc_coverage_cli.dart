@@ -4,6 +4,7 @@
 library doc_coverage_cli;
 
 import 'dart:io';
+import 'dart:math';
 
 import './shapeshift_common.dart';
 import './shapeshift_cli.dart';
