@@ -10,10 +10,10 @@ class DocCoverage {
   static const int classCommentGap = 8;
   static const int libraryCommentBrief = 21;
   static const int libraryCommentGap = 24;
-  static const int maxOneLinerLength = 160;
-  
+  static const int maxOneLinerLength = 140;
+
   Map<String,Object> api;
-  
+
   // Poor man's class for now.
   final Map<String,Object> gaps = new Map();
   final List<String> methodCategories = ['getters', 'setters', 'constructors', 'methods'];
@@ -58,7 +58,7 @@ class DocCoverage {
             catGaps['missing'].length * memberCommentGap +
             catGaps['no-one-liner'].length * memberCommentIssue;
       });
-      
+
       Map<String,List> g = { 'missing': new List(), 'no-one-liner': new List() };
       Map variables = api['variables'];
       variables.forEach((String name, Map thing) => judgeThing(thing, g));
@@ -89,17 +89,14 @@ class DocCoverage {
     }
     else {
       // This is a class.
-      if (!api.containsKey('comment') || (api['comment'] as String).isEmpty ) {
+      if (!api.containsKey('comment') || (api['comment'] as String).isEmpty )
         topLevelScore = 0.0;
-      }
-      else if ((api['comment'] as String).split('\n').length < 2 ) {
+      else if ((api['comment'] as String).split('\n').length < 2 )
         topLevelScore = 0.5;
-      }
 
       double scoreSum = 0.0;
       int methodCount = 0;
       methodCategories.forEach((String c) {
-        print("c is $c");
         Map methods = (api['methods'] as Map)[c];
         if (methods == null) return;
         Iterable<double> scores = methods.values.map((Map thing) {
@@ -109,17 +106,28 @@ class DocCoverage {
           }
 
           String comment = resolveCommentText(thing['comment']);
-          if (comment.isEmpty) {
+          int score = 1.0;
+          if (comment.isEmpty)
             return 0.0;
-          }
-          return 1.0;
+
+          print(comment.split('\n')[0].length);
+          if (comment.split('\n')[0].length > maxOneLinerLength)
+            score -= 0.2;
+
+          if (comment[comment.length-1] != '.')
+            score -= 0.1;
+
+          return score;
         });
+
         if (scores.length > 0) {
           scoreSum += scores.reduce((value, el) => value + el);
         }
         methodCount += methods.length;
       });
-      if (methodCount > 0) memberLevelScore = scoreSum/methodCount;
+
+      if (methodCount > 0)
+        memberLevelScore = scoreSum/methodCount;
     }
     return topLevelScore*topLevelWeight + memberLevelScore*memberLevelWeight;
   }
