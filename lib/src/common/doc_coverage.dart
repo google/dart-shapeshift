@@ -71,6 +71,59 @@ class DocCoverage {
     return gaps;
   }
 
+  double calculateScore(String apiString) {
+    Object _api = new JsonDecoder().convert(apiString);
+    if (_api is Map) {
+      api = _api;
+    } else {
+      throw new FormatException('JSON must be a single object');
+    }
+
+    double topLevelWeight = 0.5;
+    double memberLevelWeight = 0.5;
+    double topLevelScore = 1.0;
+    double memberLevelScore = 1.0;
+
+    if (api['packageName'] != null) {
+      // This is a package.
+    }
+    else {
+      // This is a class.
+      if (!api.containsKey('comment') || (api['comment'] as String).isEmpty ) {
+        topLevelScore = 0.0;
+      }
+      else if ((api['comment'] as String).split('\n').length < 2 ) {
+        topLevelScore = 0.5;
+      }
+
+      double scoreSum = 0.0;
+      int methodCount = 0;
+      methodCategories.forEach((String c) {
+        print("c is $c");
+        Map methods = (api['methods'] as Map)[c];
+        if (methods == null) return;
+        Iterable<double> scores = methods.values.map((Map thing) {
+          if (!thing.containsKey('comment')) {
+            print('ACK!');
+            return 0.0;
+          }
+
+          String comment = resolveCommentText(thing['comment']);
+          if (comment.isEmpty) {
+            return 0.0;
+          }
+          return 1.0;
+        });
+        if (scores.length > 0) {
+          scoreSum += scores.reduce((value, el) => value + el);
+        }
+        methodCount += methods.length;
+      });
+      if (methodCount > 0) memberLevelScore = scoreSum/methodCount;
+    }
+    return topLevelScore*topLevelWeight + memberLevelScore*memberLevelWeight;
+  }
+
   Map searchCategory(String category) {
     Map<String,List> g = { 'missing': new List(), 'no-one-liner': new List() };
     Map methods = (api['methods'] as Map)[category];
