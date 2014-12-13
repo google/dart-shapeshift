@@ -106,7 +106,7 @@ class DocCoverage {
           }
 
           String comment = resolveCommentText(thing['comment']);
-          int score = 1.0;
+          double score = 1.0;
           if (comment.isEmpty)
             return 0.0;
 
