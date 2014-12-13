@@ -53,6 +53,49 @@ void main() {
     double score = new DocCoverage().calculateScore(jsonFrom(cls));
     expect(score, equals(0.95));
   });
+
+  test('1 method with good docs', () {
+    Map<String,dynamic> cls = newClassWithComments(
+        'A comment\n\nwith a nice and detailed paragraph.',
+        ['Another comment.\n\nWith a nice and detailed paragraph.']);
+    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    expect(score, equals(1.0));
+  });
+
+  test('1 method with good docs, 1 without', () {
+    Map<String,dynamic> cls = newClassWithComments(
+        'A comment\n\nwith a nice and detailed paragraph.',
+        ['Another comment.\n\nWith a nice and detailed paragraph.', '']);
+    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    expect(score, equals(0.75));
+  });
+
+  test('2 methods with good docs', () {
+    Map<String,dynamic> cls = newClassWithComments(
+        'A comment\n\nwith a nice and detailed paragraph.',
+        ['Another comment.\n\nWith a nice and detailed paragraph.',
+         'Another another comment.\n\nWith a nice and detailed paragraph.']);
+    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    expect(score, equals(1.0));
+  });
+
+  test('1 method with good docs, 2 without', () {
+    Map<String,dynamic> cls = newClassWithComments(
+        'A comment\n\nwith a nice and detailed paragraph.',
+        ['Another comment.\n\nWith a nice and detailed paragraph.', '', '']);
+    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    expect(score, closeTo(0.66666, 0.00001));
+  });
+
+  test('2 methods with good docs, 1 without', () {
+    Map<String,dynamic> cls = newClassWithComments(
+        'A comment\n\nwith a nice and detailed paragraph.',
+        ['Another comment.\n\nWith a nice and detailed paragraph.',
+         'Another another comment.\n\nWith a nice and detailed paragraph.',
+         '']);
+    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    expect(score, closeTo(0.83333, 0.00001));
+  });
 }
 
 

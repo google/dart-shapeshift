@@ -110,7 +110,6 @@ class DocCoverage {
           if (comment.isEmpty)
             return 0.0;
 
-          print(comment.split('\n')[0].length);
           if (comment.split('\n')[0].length > maxOneLinerLength)
             score -= 0.2;
 
