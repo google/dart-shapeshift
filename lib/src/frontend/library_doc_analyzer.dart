@@ -5,7 +5,7 @@ part of doc_coverage_frontend;
 
 class LibraryDocAnalyzer {
 
-  String name, base;
+  final String name, base;
   final Element section = new Element.section();
   final ParagraphElement classShield = new ParagraphElement();
   List<Element> sortedSections = new List();
@@ -16,7 +16,7 @@ class LibraryDocAnalyzer {
     sortedSections.clear();
 
     section
-        ..append(new HeadingElement.h1()..text = 'library ${name}')
+        ..append(new HeadingElement.h1()..text = 'library $name')
         ..classes.add('hidden');
     gapsDiv.append(section);
     classShield.dataset['value'] = '0';
@@ -25,6 +25,13 @@ class LibraryDocAnalyzer {
 
   void analyzeScore() {
     prepareElements();
+    AnchorElement linkToGaps = new AnchorElement()
+        ..attributes['href'] = '#/library/${name.replaceFirst('-', ':')}/gaps'
+        ..text = 'See';
+    ParagraphElement p = new ParagraphElement()
+        ..append(linkToGaps)
+        ..appendText(' the gaps in doc coverage.');
+    section.append(p);
     getJsonAndReport(reportClassScore);
   }
 

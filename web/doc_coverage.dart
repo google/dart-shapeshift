@@ -12,7 +12,7 @@ import 'package:shapeshift/doc_coverage_frontend.dart';
 
 UrlPattern baseUrl = new UrlPattern(r'(.*).html');
 UrlPattern libraryScoreUrl = new UrlPattern(r'(.*)#/library/([^/]*)/');
-UrlPattern packageScoreUrl = new UrlPattern(r'(.*)#/package/([^/]*)');
+UrlPattern packageScoreUrl = new UrlPattern(r'(.*)#/package/([^/]*)/');
 UrlPattern libraryGapsUrl  = new UrlPattern(r'(.*)#/library/([^/]*)/gaps');
 UrlPattern packageGapsUrl  = new UrlPattern(r'(.*)#/package/([^/]*)/gaps');
 Router router = new Router();
@@ -25,8 +25,6 @@ String versionUrl;
 
 
 void main() {
-  //querySelector('#upload').onChange.listen(readFile);
-  //querySelector('#getUrl').onClick.listen(getUrl);
   gapsDiv = querySelector('#gaps');
   getPackageButton = querySelector('#getPackage');
   getPackageButton.onClick.listen((_) {
@@ -34,6 +32,7 @@ void main() {
     window.location.hash = name.startsWith('dart:') ?
         '/library/$name/' : '/package/$name';
   });
+
   packageInput = querySelector('#package');
   packageInput.onKeyUp.listen((keyboardEvent) {
     var keyEvent = new KeyEvent.wrap(keyboardEvent);
