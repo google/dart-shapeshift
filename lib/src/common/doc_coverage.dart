@@ -18,7 +18,7 @@ class DocCoverage {
   final Map<String,Object> gaps = new Map();
   final List<String> methodCategories = ['getters', 'setters', 'constructors', 'methods'];
 
-  Map<String,List> calculateCoverage(String apiString) {
+  Map<String,dynamic> calculateCoverage(String apiString) {
     Object _api = new JsonDecoder().convert(apiString);
     if (_api is Map) {
       api = _api;
@@ -129,6 +129,16 @@ class DocCoverage {
         memberLevelScore = scoreSum/methodCount;
     }
     return topLevelScore*topLevelWeight + memberLevelScore*memberLevelWeight;
+  }
+
+  String shieldUrl(String apiString) {
+    double s = calculateScore(apiString);
+    int score = (100*s).toInt();
+    String color;
+    if (score < 60) color = 'orange';
+    else if (score < 85) color = 'yellow';
+    else color = 'brightgreen';
+    return 'http://img.shields.io/badge/doc%20coverage-$score%25-$color.svg';
   }
 
   Map searchCategory(String category) {

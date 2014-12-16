@@ -12,5 +12,5 @@ import 'package:shapeshift/shapeshift_frontend.dart';
 import './doc_coverage_common.dart';
 //import '../web/doc_coverage.dart';
 
-part 'src/frontend/elements.dart';
+part 'src/frontend/doc_coverage_elements.dart';
 part 'src/frontend/library_doc_analyzer.dart';

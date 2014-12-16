@@ -11,11 +11,18 @@ import 'package:shapeshift/doc_coverage_common.dart';
 import 'package:shapeshift/doc_coverage_frontend.dart';
 
 UrlPattern baseUrl = new UrlPattern(r'(.*).html');
-UrlPattern libraryScoreUrl = new UrlPattern(r'(.*)#/library/([^/]*)');
+UrlPattern libraryScoreUrl = new UrlPattern(r'(.*)#/library/([^/]*)/');
 UrlPattern packageScoreUrl = new UrlPattern(r'(.*)#/package/([^/]*)');
-UrlPattern libraryGapsUrl = new UrlPattern(r'(.*)#/library/([^/]*)/gaps');
-UrlPattern packageGapsUrl = new UrlPattern(r'(.*)#/package/([^/]*)/gaps');
-Router router;
+UrlPattern libraryGapsUrl  = new UrlPattern(r'(.*)#/library/([^/]*)/gaps');
+UrlPattern packageGapsUrl  = new UrlPattern(r'(.*)#/package/([^/]*)/gaps');
+Router router = new Router();
+
+String apidocs = 'https://api.dartlang.org/apidocs/channels/stable/docs';
+String dartdocs = 'http://www.dartdocs.org/documentation';
+String version;
+String base;
+String versionUrl;
+
 
 void main() {
   //querySelector('#upload').onChange.listen(readFile);
@@ -25,7 +32,7 @@ void main() {
   getPackageButton.onClick.listen((_) {
     String name = packageInput.value;
     window.location.hash = name.startsWith('dart:') ?
-        '/library/$name' : '/package/$name';
+        '/library/$name/' : '/package/$name';
   });
   packageInput = querySelector('#package');
   packageInput.onKeyUp.listen((keyboardEvent) {
@@ -37,17 +44,30 @@ void main() {
 
   router = new Router()
         ..addHandler(baseUrl, (_) => null)
+        ..addHandler(libraryScoreUrl, showLibraryScore)
         ..addHandler(libraryGapsUrl, showLibraryGaps)
         ..addHandler(packageGapsUrl, showPackageGaps)
         ..listen()
         ..handle(window.location.toString());
 }
 
+void showLibraryScore(String path) {
+  String names = libraryScoreUrl.parse(path)[1];
+  gapsDiv.innerHtml = '';
+  names.split(',').forEach((String name) {
+    // https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-collection.json
+    // https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-collection.DoubleLinkedQueue.json
+    new LibraryDocAnalyzer(name.replaceFirst(':', '-'), apidocs)..analyzeScore();
+  });
+}
+
 void showLibraryGaps(String path) {
   String names = libraryGapsUrl.parse(path)[1];
   gapsDiv.innerHtml = '';
   names.split(',').forEach((String name) {
-    getLibrary(name);
+    // https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-collection.json
+    // https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-collection.DoubleLinkedQueue.json
+    new LibraryDocAnalyzer(name.replaceFirst(':', '-'), apidocs)..analyzeGaps();
   });
 }
 
@@ -67,19 +87,6 @@ void readFile(Event event) {
 void getUrl(Event event) {
   String url = (querySelector("#url") as InputElement).value;
   HttpRequest.getString(url).then(report);
-}
-
-
-String apidocs = 'https://api.dartlang.org/apidocs/channels/stable/docs';
-String dartdocs = 'http://www.dartdocs.org/documentation';
-String version;
-String base;
-String versionUrl;
-
-void getLibrary(String name) {
-  // https://api.dartlang.org/apidocs/channels/stable/docs/dart-collection.json
-  // https://api.dartlang.org/apidocs/channels/stable/docs/dart-collection.DoubleLinkedQueue.json
-  new LibraryDocAnalyzer(name.replaceFirst(':', '-'), apidocs)..go();
 }
 
 void getPackage(String name) {
@@ -152,7 +159,7 @@ void reportPackage(String json) {
         ((lib['name'] as String).startsWith('dart-') ||
          (lib['name'] as String).startsWith('dart:'))) return;
 
-    new LibraryDocAnalyzer(lib['qualifiedName'], base)..go();
+    new LibraryDocAnalyzer(lib['qualifiedName'], base)..analyzeGaps();
   });
 }
 

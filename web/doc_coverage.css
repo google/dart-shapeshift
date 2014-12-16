@@ -163,3 +163,8 @@ footer {
   color: rgb(96,0,0);
   padding: 2px;
 }
+
+img.shield {
+  margin-left: 6px;
+  margin-bottom: -3px;
+}
