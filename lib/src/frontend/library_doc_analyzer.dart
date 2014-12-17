@@ -5,12 +5,12 @@ part of doc_coverage_frontend;
 
 class LibraryDocAnalyzer {
 
-  final String name, base;
+  final String name, base, package;
   final Element section = new Element.section();
   final ParagraphElement gapSummary = new ParagraphElement();
   List<Element> sortedSections = new List();
 
-  LibraryDocAnalyzer(this.name, this.base);
+  LibraryDocAnalyzer(this.name, this.base, {this.package: null});
 
   void prepareElements() {
     sortedSections.clear();
@@ -25,8 +25,12 @@ class LibraryDocAnalyzer {
 
   void analyzeScore() {
     prepareElements();
+    String gapsUrl = (package == null) ?
+        '#/library/${name.replaceFirst('-', ':')}/gaps' :
+        '#/package/${package}/gaps';
+
     AnchorElement linkToGaps = new AnchorElement()
-        ..attributes['href'] = '#/library/${name.replaceFirst('-', ':')}/gaps'
+        ..attributes['href'] = gapsUrl
         ..text = 'See';
     ParagraphElement p = new ParagraphElement()
         ..append(linkToGaps)
@@ -54,12 +58,14 @@ class LibraryDocAnalyzer {
 
   void addToSortedSections(Element classSection, int gapCount, {bool reverse: false}) {
     // This is craziness. There has to be a better way.
-    int i = 0;
+    section.classes.remove('hidden');
     if (sortedSections.isEmpty) {
       sortedSections.add(classSection);
       section.append(classSection);
       return;
     }
+
+    int i = 0;
 
     bool keepGoing() {
       int count = int.parse(sortedSections[i].dataset['count']);
@@ -75,6 +81,12 @@ class LibraryDocAnalyzer {
       section.insertBefore(classSection, sortedSections[i]);
     }
     sortedSections.insert(i, classSection);
+  }
+
+  void bumpCount(int gapCount) {
+    int sum = (int.parse(gapSummary.dataset['value'])) + gapCount;
+    gapSummary.dataset['value'] = sum.toString();
+    gapSummary.innerHtml = '<em>Coverage gap total: $sum points</em>';
   }
 
 }

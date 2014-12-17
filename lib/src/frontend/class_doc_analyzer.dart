@@ -27,7 +27,6 @@ class ClassDocAnalyzer {
     int score = (100*dc.calculateScore(json)).toInt();
     Element classSection = new Element.section();
 
-    libraryDocAnalyzer.section.classes.remove('hidden');
     libraryDocAnalyzer.addToSortedSections(classSection, score.toInt(), reverse: true);
     ImageElement shieldImg = new ImageElement()
         ..attributes['src'] = dc.shieldUrl(json)
@@ -45,11 +44,7 @@ class ClassDocAnalyzer {
     int gapCount = gaps['gapCount'];
     Element classSection = new Element.section();
 
-    libraryDocAnalyzer.section.classes.remove('hidden');
-    int sum = (int.parse(libraryDocAnalyzer.gapSummary.dataset['value'])) + gapCount;
-    libraryDocAnalyzer.gapSummary.dataset['value'] = sum.toString();
-    libraryDocAnalyzer.gapSummary.innerHtml = '<em>Coverage gap total: $sum points</em>';
-
+    libraryDocAnalyzer.bumpCount(gapCount);
     libraryDocAnalyzer.addToSortedSections(classSection, gapCount);
     classSection.dataset['count'] = '$gapCount';
     classSection.append(new HeadingElement.h2()
