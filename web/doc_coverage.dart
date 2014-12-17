@@ -73,7 +73,6 @@ void showLibraryGaps(String path) {
 
 void showPackageScore(String path) {
   String name = packageScoreUrl.parse(path)[1];
-  //getPackage(name);
   new PackageDiscovery(name, 'score').discover();
 }
 
