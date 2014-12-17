@@ -7,7 +7,7 @@ class LibraryDocAnalyzer {
 
   final String name, base;
   final Element section = new Element.section();
-  final ParagraphElement classShield = new ParagraphElement();
+  final ParagraphElement gapSummary = new ParagraphElement();
   List<Element> sortedSections = new List();
 
   LibraryDocAnalyzer(this.name, this.base);
@@ -19,8 +19,8 @@ class LibraryDocAnalyzer {
         ..append(new HeadingElement.h1()..text = 'library $name')
         ..classes.add('hidden');
     gapsDiv.append(section);
-    classShield.dataset['value'] = '0';
-    section.append(classShield);
+    gapSummary.dataset['value'] = '0';
+    section.append(gapSummary);
   }
 
   void analyzeScore() {
@@ -32,69 +32,24 @@ class LibraryDocAnalyzer {
         ..append(linkToGaps)
         ..appendText(' the gaps in doc coverage.');
     section.append(p);
-    getJsonAndReport(reportClassScore);
+    getJsonAndReport( 'score');
   }
 
   void analyzeGaps() {
     prepareElements();
-    getJsonAndReport(reportClassGaps);
+    getJsonAndReport('gaps');
   }
 
-  void getJsonAndReport(Function callback) {
-    // TODO: Refactor into a ClassDocAnalyzer class!
+  void getJsonAndReport(String screen) {
     HttpRequest.getString('$base/${name}.json').then((String json) {
       Map<String,dynamic> package = new JsonDecoder().convert(json);
       //classes[class[], error[], typedef[]], comment, functions, variables
       ['class', 'error'].forEach((classType) =>
         (package['classes'][classType] as List).forEach((klass) {
-          String className = klass['qualifiedName'].replaceFirst(':', '-');
-          HttpRequest.getString('$base/$className.json').then(
-              (String json) => callback.call(json, classType)
-          );
+          new ClassDocAnalyzer(this, classType, klass).go(screen);
         })
       );
     });
-  }
-
-  void reportClassScore(String json, String classType) {
-    Map<String,dynamic> klass = new JsonDecoder().convert(json);
-    String className = klass['name'];
-    DocCoverage dc = new DocCoverage();
-    int score = (100*dc.calculateScore(json)).toInt();
-    Element classSection = new Element.section();
-
-    section.classes.remove('hidden');
-    addToSortedSections(classSection, score.toInt(), reverse: true);
-    ImageElement shieldImg = new ImageElement()
-        ..attributes['src'] = dc.shieldUrl(json)
-        ..classes.add('shield');
-    classSection.dataset['count'] = '${score.toInt()}';
-    classSection.append(new ParagraphElement()
-            ..text = '$classType $className')
-            ..append(shieldImg);
-  }
-
-  void reportClassGaps(String json, String classType) {
-    Map<String,dynamic> klass = new JsonDecoder().convert(json);
-    Map<String,dynamic> gaps = new DocCoverage().calculateCoverage(json);
-    if (gaps['gapCount'] == 0) { return; }
-    int gapCount = gaps['gapCount'];
-    Element classSection = new Element.section();
-
-    section.classes.remove('hidden');
-    int sum = (int.parse(classShield.dataset['value'])) + gapCount;
-    classShield.dataset['value'] = sum.toString();
-    classShield.innerHtml = '<em>Coverage gap total: $sum points</em>';
-
-    addToSortedSections(classSection, gapCount);
-    classSection.dataset['count'] = '$gapCount';
-    classSection.append(new HeadingElement.h2()
-        ..text = '$classType ${gaps['name']}')
-        ..append(new SpanElement()..text = '($gapCount points of coverage gaps)');
-
-    reportOnTopLevelComment(gaps, classSection);
-    reportOnMethods(gaps, classSection);
-    reportOnVariables(gaps, classSection);
   }
 
   void addToSortedSections(Element classSection, int gapCount, {bool reverse: false}) {
