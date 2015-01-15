@@ -17,7 +17,6 @@ UrlPattern libraryGapsUrl  = new UrlPattern(r'(.*)#/library/([^/]*)/gaps');
 UrlPattern packageGapsUrl  = new UrlPattern(r'(.*)#/package/([^/]*)/gaps');
 Router router = new Router();
 
-String apidocs = 'https://api.dartlang.org/apidocs/channels/stable/docs';
 String dartdocs = 'http://www.dartdocs.org/documentation';
 String version;
 String base;
@@ -57,7 +56,7 @@ void showLibraryScore(String path) {
   names.split(',').forEach((String name) {
     // https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-collection.json
     // https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-collection.DoubleLinkedQueue.json
-    new LibraryDocAnalyzer(name.replaceFirst(':', '-'), apidocs)..analyzeScore();
+    new SdkLibraryDocAnalyzer(name.replaceFirst(':', '-'))..analyzeScore();
   });
 }
 
@@ -67,7 +66,7 @@ void showLibraryGaps(String path) {
   names.split(',').forEach((String name) {
     // https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-collection.json
     // https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-collection.DoubleLinkedQueue.json
-    new LibraryDocAnalyzer(name.replaceFirst(':', '-'), apidocs)..analyzeGaps();
+    new SdkLibraryDocAnalyzer(name.replaceFirst(':', '-'))..analyzeGaps();
   });
 }
 
