@@ -25,16 +25,19 @@ class ClassDocAnalyzer {
     String className = klass['name'];
     DocCoverage dc = new DocCoverage();
     int score = (100*dc.calculateScore(json)).toInt();
-    Element classSection = new Element.section();
+    TableRowElement classRow = new TableRowElement();
+    new TableCellElement();
+    new TableRowElement();
 
-    libraryDocAnalyzer.addToSortedSections(classSection, score.toInt(), reverse: true);
+    libraryDocAnalyzer.addToSortedRows(classRow, score.toInt(), reverse: true);
     ImageElement shieldImg = new ImageElement()
         ..attributes['src'] = dc.shieldUrl(json)
         ..classes.add('shield');
-    classSection.dataset['count'] = '${score.toInt()}';
-    classSection.append(new ParagraphElement()
-        ..text = '$classType $className')
-        ..append(shieldImg);
+    SpanElement text = new SpanElement()..text = '$classType $className';
+    classRow.dataset['count'] = '${score.toInt()}';
+    classRow
+        ..addCell().append(text)
+        ..addCell().append(shieldImg);
   }
 
   void reportClassGaps(String json, String classType) {

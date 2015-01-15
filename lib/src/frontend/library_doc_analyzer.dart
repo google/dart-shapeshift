@@ -7,6 +7,7 @@ class LibraryDocAnalyzer {
 
   final String name, base, package;
   final Element section = new Element.section();
+  final TableElement scoresTable = new TableElement();
   final ParagraphElement gapSummary = new ParagraphElement();
   List<Element> sortedSections = new List();
 
@@ -16,8 +17,7 @@ class LibraryDocAnalyzer {
     sortedSections.clear();
 
     section
-        ..append(new HeadingElement.h1()..text = 'library $name')
-        ..classes.add('hidden');
+        ..append(new HeadingElement.h1()..text = 'library $name');
     gapsDiv.append(section);
     gapSummary.dataset['value'] = '0';
     section.append(gapSummary);
@@ -36,11 +36,14 @@ class LibraryDocAnalyzer {
         ..append(linkToGaps)
         ..appendText(' the gaps in doc coverage.');
     section.append(p);
+    section.append(scoresTable);
+    scoresTable.classes..add('hidden')..add('scores-table');
     getJsonAndReport( 'score');
   }
 
   void analyzeGaps() {
     prepareElements();
+    section.classes.add('hidden');
     getJsonAndReport('gaps');
   }
 
@@ -56,31 +59,43 @@ class LibraryDocAnalyzer {
     });
   }
 
+  void addToSortedRows(Element classRow, int gapCount, {bool reverse: false}) {
+    addToSortedList(classRow, scoresTable, sortedSections, gapCount, reverse: reverse);
+  }
+
   void addToSortedSections(Element classSection, int gapCount, {bool reverse: false}) {
+    addToSortedList(classSection, section, sortedSections, gapCount, reverse: reverse);
+  }
+
+  void addToSortedList(Element element,
+                       Element listElement,
+                       List<Element> list,
+                       int value,
+                       {bool reverse: false}) {
     // This is craziness. There has to be a better way.
-    section.classes.remove('hidden');
-    if (sortedSections.isEmpty) {
-      sortedSections.add(classSection);
-      section.append(classSection);
+    listElement.classes.remove('hidden');
+    if (list.isEmpty) {
+      list.add(element);
+      listElement.append(element);
       return;
     }
 
     int i = 0;
 
     bool keepGoing() {
-      int count = int.parse(sortedSections[i].dataset['count']);
-      return reverse ? gapCount > count : gapCount < count;
+      int count = int.parse(list[i].dataset['count']);
+      return reverse ? value > count : value < count;
     }
 
-    while (i < sortedSections.length && keepGoing()) { i++; }
+    while (i < list.length && keepGoing()) { i++; }
 
-    if (i == sortedSections.length) {
-      section.append(classSection);
+    if (i == list.length) {
+      listElement.append(element);
     }
     else {
-      section.insertBefore(classSection, sortedSections[i]);
+      listElement.insertBefore(element, list[i]);
     }
-    sortedSections.insert(i, classSection);
+    list.insert(i, element);
   }
 
   void bumpCount(int gapCount) {

@@ -18,6 +18,6 @@ class SdkLibraryDocAnalyzer extends LibraryDocAnalyzer {
         ..appendText('View $name docs at ')
         ..append(linkToDocs)
         ..appendText('.');
-    section.append(p);
+    section.insertBefore(p, section.lastChild);
   }
 }
