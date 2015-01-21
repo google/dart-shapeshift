@@ -18,6 +18,14 @@ class DocCoverage {
   final Map<String,Object> gaps = new Map();
   final List<String> methodCategories = ['getters', 'setters', 'constructors', 'methods'];
 
+  static String shieldUrlForScore(int score) {
+    String color;
+    if (score < 60) color = 'orange';
+    else if (score < 85) color = 'yellow';
+    else color = 'brightgreen';
+    return 'http://img.shields.io/badge/doc%20coverage-$score%25-$color.svg';
+  }
+
   Map<String,dynamic> calculateCoverage(String apiString) {
     Object _api = new JsonDecoder().convert(apiString);
     if (_api is Map) {
@@ -131,14 +139,20 @@ class DocCoverage {
     return topLevelScore*topLevelWeight + memberLevelScore*memberLevelWeight;
   }
 
+  int calculateSize(String apiString) {
+    Object _api = new JsonDecoder().convert(apiString);
+    if (_api is Map) {
+      api = _api;
+    } else {
+      throw new FormatException('JSON must be a single object');
+    }
+
+    return methodCategories.fold(0, (memo, el) =>
+        memo + ((api['methods'] as Map)[el] == null ? 0 : (api['methods'] as Map)[el].length));
+  }
+
   String shieldUrl(String apiString) {
-    double s = calculateScore(apiString);
-    int score = (100*s).toInt();
-    String color;
-    if (score < 60) color = 'orange';
-    else if (score < 85) color = 'yellow';
-    else color = 'brightgreen';
-    return 'http://img.shields.io/badge/doc%20coverage-$score%25-$color.svg';
+    return shieldUrlForScore((100*calculateScore(apiString)).toInt());
   }
 
   Map searchCategory(String category) {

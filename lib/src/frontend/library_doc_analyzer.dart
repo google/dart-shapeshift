@@ -5,19 +5,29 @@ part of doc_coverage_frontend;
 
 class LibraryDocAnalyzer {
 
-  final String name, base, package;
+  final String name, nameWithColon, base, package;
   final Element section = new Element.section();
+  final Element sectionHeading = new HeadingElement.h1();
+  final ImageElement sectionShield = new ImageElement();
   final TableElement scoresTable = new TableElement();
   final ParagraphElement gapSummary = new ParagraphElement();
   List<Element> sortedSections = new List();
+  String htmlUrl;
 
-  LibraryDocAnalyzer(this.name, this.base, {this.package: null});
+  LibraryDocAnalyzer(name, this.base, {this.package: null})
+      : name = name,
+        nameWithColon = name.replaceFirst('-', ':');
 
   void prepareElements() {
     sortedSections.clear();
 
+
+    sectionShield
+        ..attributes['src'] = DocCoverage.shieldUrlForScore(0)
+        ..classes.add('shield');
     section
-        ..append(new HeadingElement.h1()..text = 'library $name');
+        ..append(sectionHeading..text = 'library $name'
+            ..append(sectionShield));
     gapsDiv.append(section);
     gapSummary.dataset['value'] = '0';
     section.append(gapSummary);
@@ -38,7 +48,17 @@ class LibraryDocAnalyzer {
     section.append(p);
     section.append(scoresTable);
     scoresTable.classes..add('hidden')..add('scores-table');
-    getJsonAndReport( 'score');
+    getJsonAndReport('score');
+  }
+  
+  void updateLibraryBadge() {
+    int size = sortedSections.fold(0, (memo, Element el) =>
+        memo + int.parse(el.dataset['size']));
+    int mass =
+        sortedSections.fold(0, (memo, Element el) =>
+            memo + int.parse(el.dataset['size']) * int.parse(el.dataset['count']));
+    int score = mass ~/ size;
+    sectionShield.attributes['src'] = DocCoverage.shieldUrlForScore(score);
   }
 
   void analyzeGaps() {

@@ -8,9 +8,10 @@ class SdkLibraryDocAnalyzer extends LibraryDocAnalyzer {
   SdkLibraryDocAnalyzer(String name) : super(name, '$apiDartlang/docs');
 
   void analyzeScore() {
+    htmlUrl = '$apiDartlang/dartdoc-viewer/$nameWithColon';
+
     super.analyzeScore();
 
-    String htmlUrl = '$apiDartlang/dartdoc-viewer/$name';
     AnchorElement linkToDocs = new AnchorElement()
         ..attributes['href'] = htmlUrl
         ..text = 'api.dartlang.org';
