@@ -207,11 +207,17 @@ img.shield {
 }
 
 .button {
-  border: solid 1px #0084c5;
+  background-color: #428bca;
+  border: solid 1px #555599;
   border-radius: 3px;
-  color: #428bca;
+  color: white;
   cursor: default;
-  padding: 1px 2px 2px;
+  padding: 1px 3px 2px;
+}
+
+.button:hover {
+  background-color: white;
+  color: #428bca;
 }
 
 .button .arrow {

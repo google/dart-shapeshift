@@ -10,7 +10,6 @@ class DocCoverage {
   static const int classCommentGap = 8;
   static const int libraryCommentBrief = 21;
   static const int libraryCommentGap = 24;
-  static const int maxOneLinerLength = 140;
 
   Map<String,Object> api;
 
@@ -60,7 +59,7 @@ class DocCoverage {
       }
 
       methodCategories.forEach((String c) {
-        Map<String,List> catGaps = searchCategory(c);
+        Map<String,List> catGaps = categoryGaps(c);
         gaps[c] = catGaps;
         gaps['gapCount'] = (gaps['gapCount'] as int) +
             catGaps['missing'].length * memberCommentGap +
@@ -69,7 +68,7 @@ class DocCoverage {
 
       Map<String,List> g = { 'missing': new List(), 'no-one-liner': new List() };
       Map variables = api['variables'];
-      variables.forEach((String name, Map thing) => judgeThing(thing, g));
+      variables.forEach((String name, Map thing) => annotateGaps(thing, g));
       gaps['variables'] = g;
       gaps['gapCount'] = (gaps['gapCount'] as int) +
           g['missing'].length * memberCommentGap +
@@ -77,6 +76,30 @@ class DocCoverage {
     }
 
     return gaps;
+  }
+
+  Map categoryGaps(String category) {
+    Map<String,List> g = { 'missing': new List(), 'no-one-liner': new List() };
+    Map methods = (api['methods'] as Map)[category];
+    methods.forEach((String name, Map thing) => annotateGaps(thing, g));
+    return g;
+  }
+
+  void annotateGaps(Map thing, Map g) {
+    if (!thing.containsKey('comment')) {
+      print('ACK!');
+      return;
+    }
+
+    String commentUnparsed = resolveCommentText(thing['comment']);
+    CommentAnalyses analyses = new CommentAnalyses(commentUnparsed);
+    thing['comment'] = commentUnparsed;
+
+    if (analyses.commentIsEmpty)
+      g['missing'].add(thing);
+
+    if (analyses.summaryTooLong)
+      g['no-one-liner'].add(thing);
   }
 
   double calculateScore(String apiString) {
@@ -91,52 +114,73 @@ class DocCoverage {
     double memberLevelWeight = 0.5;
     double topLevelScore = 1.0;
     double memberLevelScore = 1.0;
+    int methodWeight = 2;
+    int variableWeight = 1;
 
     if (api['packageName'] != null) {
       // This is a package.
     }
     else {
       // This is a class.
-      if (!api.containsKey('comment') || (api['comment'] as String).isEmpty )
+      if (!api.containsKey('comment'))
         topLevelScore = 0.0;
-      else if ((api['comment'] as String).split('\n').length < 2 )
-        topLevelScore = 0.5;
+      else {
+        CommentAnalyses analyses = new CommentAnalyses(api['comment']);
+        if (analyses.commentIsEmpty)
+          topLevelScore = 0.0;
 
-      double scoreSum = 0.0;
+        if (analyses.commentIsOneLine)
+          topLevelScore = 0.5;
+      }
+
+      double methodScoreSum = 0.0;
       int methodCount = 0;
       methodCategories.forEach((String c) {
         Map methods = (api['methods'] as Map)[c];
         if (methods == null) return;
-        Iterable<double> scores = methods.values.map((Map thing) {
-          if (!thing.containsKey('comment')) {
-            print('ACK!');
-            return 0.0;
-          }
+        Iterable<double> scores = methods.values.map(scoreThing);
 
-          String comment = resolveCommentText(thing['comment']);
-          double score = 1.0;
-          if (comment.isEmpty)
-            return 0.0;
-
-          if (comment.split('\n')[0].length > maxOneLinerLength)
-            score -= 0.2;
-
-          if (comment[comment.length-1] != '.')
-            score -= 0.1;
-
-          return score;
-        });
-
-        if (scores.length > 0) {
-          scoreSum += scores.reduce((value, el) => value + el);
-        }
+        if (scores.isNotEmpty)
+          methodScoreSum += scores.reduce((value, el) => value + el);
         methodCount += methods.length;
       });
 
-      if (methodCount > 0)
-        memberLevelScore = scoreSum/methodCount;
+      Map variables = api['variables'] as Map;
+      double variableScoreSum = 0.0;
+      Iterable<double> scores = variables.values.map(scoreThing);
+      if (scores.isNotEmpty)
+        variableScoreSum = scores.reduce((value, el) => value + el);
+      int variableCount = variables.length;
+
+      methodScoreSum *= methodWeight;
+      methodCount *= methodWeight;
+      variableScoreSum *= variableWeight;
+      variableCount *= variableWeight;
+
+      if (methodCount + variableCount > 0)
+        memberLevelScore = (methodScoreSum + variableScoreSum) / (methodCount + variableCount);
     }
     return topLevelScore*topLevelWeight + memberLevelScore*memberLevelWeight;
+  }
+
+  double scoreThing(Map thing) {
+    if (!thing.containsKey('comment')) {
+      print('ACK!');
+      return 0.0;
+    }
+
+    double score = 1.0;
+    CommentAnalyses analyses = new CommentAnalyses(resolveCommentText(thing['comment']));
+    if (analyses.commentIsEmpty)
+      return 0.0;
+ 
+    if (analyses.summaryTooLong)
+      score -= 0.2;
+
+    if (analyses.commentEndsWithPeriod)
+      score -= 0.1;
+
+    return score;
   }
 
   int calculateSize(String apiString) {
@@ -155,31 +199,37 @@ class DocCoverage {
     return shieldUrlForScore((100*calculateScore(apiString)).toInt());
   }
 
-  Map searchCategory(String category) {
-    Map<String,List> g = { 'missing': new List(), 'no-one-liner': new List() };
-    Map methods = (api['methods'] as Map)[category];
-    methods.forEach((String name, Map thing) => judgeThing(thing, g));
-    return g;
-  }
-
-  void judgeThing(Map thing, Map g) {
-    if (!thing.containsKey('comment')) {
-      print('ACK!');
-    }
-    else {
-      String comment = resolveCommentText(thing['comment']);
-      thing['comment'] = comment;
-      if (comment.isEmpty) {
-        g['missing'].add(thing);
-      } else if (comment.split('\n')[0].length > maxOneLinerLength) {
-        g['no-one-liner'].add(thing);
-      }
-    }
-  }
-
   String resolveCommentText(String rawComment) =>
     rawComment.replaceAllMapped(
         new RegExp(r'<a>([^<]+)</a>'),
         (Match match) => '<a>${new DocsLocation(match[1]).lastName}</a>'
     );
+}
+
+class CommentAnalyses {
+  static const int maxOneLinerLength = 140;
+
+  final String commentUnparsed;
+  final Document comment;
+
+  CommentAnalyses(_commentUnparsed)
+      : commentUnparsed = _commentUnparsed,
+        comment = parse(_commentUnparsed);
+
+  bool get commentEndsWithPeriod {
+    String endingText = comment.children.last.text;
+    return endingText[endingText.length-1] != '.';
+  }
+
+  bool get commentIsEmpty {
+    return commentUnparsed.isEmpty;
+  }
+
+  bool get commentIsOneLine {
+    return comment.children.length < 2;
+  }
+
+  bool get summaryTooLong {
+    return commentUnparsed.split('\n')[0].length > maxOneLinerLength;
+  }
 }

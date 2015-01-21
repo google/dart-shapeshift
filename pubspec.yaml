@@ -4,6 +4,7 @@ dependencies:
   args: '>=0.12.0'
   browser: any
   diff_match_patch: '>=0.2.1'
+  html5lib: any
   json_diff:
     path: /Users/srawlins/dart/json_diff
   route: any

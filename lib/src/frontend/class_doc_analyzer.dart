@@ -72,12 +72,12 @@ class ClassDocAnalyzer {
         ..classes.add('hidden')
         ..classes.add('gaps-row');
     TableCellElement classGaps = classGapsRow.addCell()
-        ..append(classGapsSection(json, classType))
+        ..append(classGapsSection())
         ..attributes['colspan'] = '4';
   }
 
   void reportClassGaps() {
-    Element classSection = classGapsSection(json, classType);
+    Element classSection = classGapsSection();
     int gapCount = int.parse(classSection.dataset['count']);
     libraryDocAnalyzer.bumpCount(gapCount);
     libraryDocAnalyzer.addToSortedSections(classSection, gapCount);
@@ -98,11 +98,14 @@ class ClassDocAnalyzer {
     }
   }
 
-  Element classGapsSection(String json, String classType) {
+  Element classGapsSection() {
     Map<String,dynamic> klass = new JsonDecoder().convert(json);
     Map<String,dynamic> gaps = new DocCoverage().calculateCoverage(json);
     Element classSection = new Element.section();
-    if (gaps['gapCount'] == 0) { return classSection; }
+    if (gaps['gapCount'] == 0) {
+      classSection.appendHtml('<em>No gaps</em>');
+      return classSection;
+    }
     int gapCount = gaps['gapCount'];
 
     classSection.dataset['count'] = '$gapCount';
