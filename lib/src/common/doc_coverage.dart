@@ -15,7 +15,7 @@ class DocCoverage {
 
   // Poor man's class for now.
   final Map<String,Object> gaps = new Map();
-  final List<String> methodCategories = ['getters', 'setters', 'constructors', 'methods'];
+  final List<String> methodCategories = ['getters', 'setters', 'constructors', 'methods', 'operators'];
 
   static String shieldUrlForScore(int score) {
     String color;
@@ -129,8 +129,10 @@ class DocCoverage {
         if (analyses.commentIsEmpty)
           topLevelScore = 0.0;
 
-        if (analyses.commentIsOneLine)
-          topLevelScore = 0.5;
+        // This analysis is too strict for now... I should re-add when I can make
+        // the analysis configurable.
+        /*if (analyses.commentIsOneLine)
+          topLevelScore = 0.5;*/
       }
 
       double methodScoreSum = 0.0;
@@ -204,32 +206,4 @@ class DocCoverage {
         new RegExp(r'<a>([^<]+)</a>'),
         (Match match) => '<a>${new DocsLocation(match[1]).lastName}</a>'
     );
-}
-
-class CommentAnalyses {
-  static const int maxOneLinerLength = 140;
-
-  final String commentUnparsed;
-  final Document comment;
-
-  CommentAnalyses(_commentUnparsed)
-      : commentUnparsed = _commentUnparsed,
-        comment = parse(_commentUnparsed);
-
-  bool get commentEndsWithPeriod {
-    String endingText = comment.children.last.text;
-    return endingText[endingText.length-1] != '.';
-  }
-
-  bool get commentIsEmpty {
-    return commentUnparsed.isEmpty;
-  }
-
-  bool get commentIsOneLine {
-    return comment.children.length < 2;
-  }
-
-  bool get summaryTooLong {
-    return commentUnparsed.split('\n')[0].length > maxOneLinerLength;
-  }
 }

@@ -10,4 +10,5 @@ import 'package:html5lib/parser.dart' show parse;
 
 import 'package:shapeshift/shapeshift_common.dart';
 
+part 'src/common/comment_analyses.dart';
 part 'src/common/doc_coverage.dart';
