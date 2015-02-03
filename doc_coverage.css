@@ -26,7 +26,7 @@ body {
 
 .container {
   border-top: solid 3px #CCC;
-  padding: 15px 15px 30px 15px;
+  padding: 15px 15px 80px 15px;
 }
 
 .container:first-child {
@@ -177,6 +177,11 @@ footer {
   width: 100%;
   border-top: solid 1px #CCC;
   padding: 4px 0;
+}
+
+footer p {
+  margin: 0.3em 0.2em 0.3em 0;
+  font-size: 14px;
 }
 
 .hidden {
