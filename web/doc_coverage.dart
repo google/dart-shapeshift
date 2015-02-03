@@ -25,7 +25,6 @@ String versionUrl;
 
 
 void main() {
-  jsWindow = context['window'];
   gapsDiv = querySelector('#gaps');
   getPackageButton = querySelector('#getPackage');
   getPackageButton.onClick.listen((_) {
@@ -56,8 +55,8 @@ void sendGaPageview(String path) {
   // Dart JS interop to call:
   //     ga('set', 'page', '/some-path');
   //     ga('send', 'pageview');
-  jsWindow.callMethod('ga', ['set', 'page', path]);
-  jsWindow.callMethod('ga', ['send', 'pageview']);
+  context.callMethod('ga', ['set', 'page', path]);
+  context.callMethod('ga', ['send', 'pageview']);
 }
 
 void showLibraryScore(String path) {
