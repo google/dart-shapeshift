@@ -3,6 +3,7 @@
 
 import 'dart:convert';
 import 'dart:html';
+import 'dart:js';
 
 import 'package:route/client.dart';
 import 'package:route/url_pattern.dart';
@@ -24,6 +25,7 @@ String versionUrl;
 
 
 void main() {
+  jsWindow = context['window'];
   gapsDiv = querySelector('#gaps');
   getPackageButton = querySelector('#getPackage');
   getPackageButton.onClick.listen((_) {
@@ -50,10 +52,19 @@ void main() {
         ..handle(window.location.toString());
 }
 
+void sendGaPageview(String path) {
+  // Dart JS interop to call:
+  //     ga('set', 'page', '/some-path');
+  //     ga('send', 'pageview');
+  jsWindow.callMethod('ga', ['set', 'page', path]);
+  jsWindow.callMethod('ga', ['send', 'pageview']);
+}
+
 void showLibraryScore(String path) {
   String names = libraryScoreUrl.parse(path)[1];
   gapsDiv.innerHtml = '';
   names.split(',').forEach((String name) {
+    sendGaPageview('/library/$name');
     // https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-collection.json
     // https://api.dartlang.org/apidocs/channels/stable/dartdoc-viewer/dart-collection.DoubleLinkedQueue.json
     new SdkLibraryDocAnalyzer(name.replaceFirst(':', '-'))..analyzeScore();
@@ -72,6 +83,7 @@ void showLibraryGaps(String path) {
 
 void showPackageScore(String path) {
   String name = packageScoreUrl.parse(path)[1];
+  sendGaPageview('/package/$name');
   new PackageDiscovery(name, 'score').discover();
 }
 

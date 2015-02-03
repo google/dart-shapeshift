@@ -193,8 +193,11 @@ class DocCoverage {
       throw new FormatException('JSON must be a single object');
     }
 
-    return methodCategories.fold(0, (memo, el) =>
-        memo + ((api['methods'] as Map)[el] == null ? 0 : (api['methods'] as Map)[el].length));
+    Function numMethodThings = (memo, el) =>
+        memo + ((api['methods'] as Map)[el] == null ? 0 : (api['methods'] as Map)[el].length);
+
+    return (api['variables'] as Map).length +
+        methodCategories.fold(0, numMethodThings);
   }
 
   String shieldUrl(String apiString) {
