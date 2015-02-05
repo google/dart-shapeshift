@@ -78,15 +78,11 @@ class LibraryDocAnalyzer {
           })
         );
       })
-      .catchError((ProgressEvent error) {
-        var target = error.currentTarget;
-        section.innerHtml = '';
-        section.append(new DivElement()
-            ..classes.add('error')
-            ..text = 'Error from ${target.responseUrl}: ${target.status} ${target.statusText}'
-        );
-      });
+      .catchError(_handleError);
   }
+
+  void _handleError(ProgressEvent error) =>
+      handleError(error, section, name: name);
 
   void addToSortedRows(Element classRow, int gapCount, {bool reverse: false}) {
     addToSortedList(classRow, scoresTable, sortedSections, gapCount, reverse: reverse);

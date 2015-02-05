@@ -14,5 +14,6 @@ import './doc_coverage_common.dart';
 
 part 'src/frontend/class_doc_analyzer.dart';
 part 'src/frontend/doc_coverage_elements.dart';
+part 'src/frontend/error_handlers.dart';
 part 'src/frontend/library_doc_analyzer.dart';
 part 'src/frontend/sdk_library_doc_analyzer.dart';
