@@ -68,15 +68,24 @@ class LibraryDocAnalyzer {
   }
 
   void getJsonAndReport(String screen) {
-    HttpRequest.getString('$base/${name}.json').then((String json) {
-      Map<String,dynamic> package = new JsonDecoder().convert(json);
-      //classes[class[], error[], typedef[]], comment, functions, variables
-      ['class', 'error'].forEach((classType) =>
-        (package['classes'][classType] as List).forEach((klass) {
-          new ClassDocAnalyzer(this, classType, klass).go(screen);
-        })
-      );
-    });
+    HttpRequest.getString('$base/${name}.json')
+      .then((String json) {
+        Map<String,dynamic> package = new JsonDecoder().convert(json);
+        //classes[class[], error[], typedef[]], comment, functions, variables
+        ['class', 'error'].forEach((classType) =>
+          (package['classes'][classType] as List).forEach((klass) {
+            new ClassDocAnalyzer(this, classType, klass).go(screen);
+          })
+        );
+      })
+      .catchError((ProgressEvent error) {
+        var target = error.currentTarget;
+        section.innerHtml = '';
+        section.append(new DivElement()
+            ..classes.add('error')
+            ..text = 'Error from ${target.responseUrl}: ${target.status} ${target.statusText}'
+        );
+      });
   }
 
   void addToSortedRows(Element classRow, int gapCount, {bool reverse: false}) {

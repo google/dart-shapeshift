@@ -104,7 +104,7 @@ class PackageDiscovery {
     String url = '$dartdocs/$name/latest/';
     HttpRequest.getString(url)
         .then(redirectToPackageVersion)
-        .catchError((err) {
+        .catchError((ProgressEvent err) {
           var target = err.currentTarget;
           gapsDiv.innerHtml = '';
           gapsDiv.append(new DivElement()
