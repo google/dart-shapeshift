@@ -8,17 +8,17 @@ class ClassDocAnalyzer {
   final String classType;
   final Map klass;
 
-  String className, classQualifiedName, docUrl, json;
-  TableSectionElement classScoreSection;
+  String name, qualifiedName, docUrl, json;
+  TableSectionElement scoreSection;
 
   ClassDocAnalyzer(this.libraryDocAnalyzer, this.classType, this.klass);
 
   void go(String screen) {
-    className = klass['name'];
-    classQualifiedName = klass['qualifiedName'].replaceFirst(':', '-');
+    name = klass['name'];
+    qualifiedName = klass['qualifiedName'].replaceFirst(':', '-');
     docUrl = libraryDocAnalyzer.htmlUrl != null ?
-        '${libraryDocAnalyzer.htmlUrl}.$className' : null;
-    HttpRequest.getString('${libraryDocAnalyzer.base}/$classQualifiedName.json').then((String _json) {
+        '${libraryDocAnalyzer.htmlUrl}.$name' : null;
+    HttpRequest.getString('${libraryDocAnalyzer.base}/$qualifiedName.json').then((String _json) {
       json = _json;
       if (screen == 'score')
         reportClassScore();
@@ -32,10 +32,10 @@ class ClassDocAnalyzer {
     String className = klass['name'];
     DocCoverage dc = new DocCoverage();
     int score = (100*dc.calculateScore(json)).toInt();
-    classScoreSection = libraryDocAnalyzer.scoresTable.createTBody();
-    TableRowElement classRow = classScoreSection.addRow();
+    scoreSection = libraryDocAnalyzer.scoresTable.createTBody();
+    TableRowElement classRow = scoreSection.addRow();
 
-    libraryDocAnalyzer.addToSortedRows(classScoreSection, score.toInt(), reverse: true);
+    libraryDocAnalyzer.addToSortedRows(scoreSection, score.toInt(), reverse: true);
     ImageElement shieldImg = new ImageElement()
         ..attributes['src'] = dc.shieldUrl(json)
         ..classes.add('shield');
@@ -60,8 +60,8 @@ class ClassDocAnalyzer {
         ..classes.add('button')
         ..onClick.listen(toggleClassGaps);
 
-    classScoreSection.dataset['count'] = '${score.toInt()}';
-    classScoreSection.dataset['size'] = '${dc.calculateSize(json)}';
+    scoreSection.dataset['count'] = '${score.toInt()}';
+    scoreSection.dataset['size'] = '${dc.calculateSize(json)}';
     libraryDocAnalyzer.updateLibraryBadge();
     classRow
         ..addCell().append(gapsToggle)
@@ -72,7 +72,7 @@ class ClassDocAnalyzer {
             ..innerHtml = '&nbsp;'
             ..classes.add('expando');
 
-    TableRowElement classGapsRow = classScoreSection.addRow()
+    TableRowElement classGapsRow = scoreSection.addRow()
         ..classes.add('hidden')
         ..classes.add('gaps-row');
     TableCellElement classGaps = classGapsRow.addCell()
