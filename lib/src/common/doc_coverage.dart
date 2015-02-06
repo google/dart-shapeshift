@@ -25,6 +25,32 @@ class DocCoverage {
     return 'http://img.shields.io/badge/doc%20coverage-$score%25-$color.svg';
   }
 
+  static double scoreThing(Map thing) {
+    if (!thing.containsKey('comment')) {
+      print('ACK!');
+      return 0.0;
+    }
+
+    double score = 1.0;
+    CommentAnalyses analyses = new CommentAnalyses(resolveCommentText(thing['comment']));
+    if (analyses.commentIsEmpty)
+      return 0.0;
+
+    if (analyses.summaryTooLong)
+      score -= 0.2;
+
+    if (analyses.commentEndsWithPeriod)
+      score -= 0.1;
+
+    return score;
+  }
+
+  static String resolveCommentText(String rawComment) =>
+    rawComment.replaceAllMapped(
+        new RegExp(r'<a>([^<]+)</a>'),
+        (Match match) => '<a>${new DocsLocation(match[1]).lastName}</a>'
+    );
+
   Map<String,dynamic> calculateCoverage(String apiString) {
     Object _api = new JsonDecoder().convert(apiString);
     if (_api is Map) {
@@ -165,26 +191,6 @@ class DocCoverage {
     return topLevelScore*topLevelWeight + memberLevelScore*memberLevelWeight;
   }
 
-  double scoreThing(Map thing) {
-    if (!thing.containsKey('comment')) {
-      print('ACK!');
-      return 0.0;
-    }
-
-    double score = 1.0;
-    CommentAnalyses analyses = new CommentAnalyses(resolveCommentText(thing['comment']));
-    if (analyses.commentIsEmpty)
-      return 0.0;
- 
-    if (analyses.summaryTooLong)
-      score -= 0.2;
-
-    if (analyses.commentEndsWithPeriod)
-      score -= 0.1;
-
-    return score;
-  }
-
   int calculateSize(String apiString) {
     Object _api = new JsonDecoder().convert(apiString);
     if (_api is Map) {
@@ -203,10 +209,4 @@ class DocCoverage {
   String shieldUrl(String apiString) {
     return shieldUrlForScore((100*calculateScore(apiString)).toInt());
   }
-
-  String resolveCommentText(String rawComment) =>
-    rawComment.replaceAllMapped(
-        new RegExp(r'<a>([^<]+)</a>'),
-        (Match match) => '<a>${new DocsLocation(match[1]).lastName}</a>'
-    );
 }

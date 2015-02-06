@@ -11,8 +11,13 @@ handleError(ProgressEvent error, HtmlElement el, { String name: 'That library' }
       ..text ='$name could not be found. Did you misspell it?';
     el.append(p);
   }
-  el.append(new DivElement()
-      ..classes.add('error')
+
+  DivElement errorDiv = new DivElement()
+      ..classes.add('error');
+  errorDiv.append(new HeadingElement.h1()..text = 'Error details');
+  errorDiv.append(new ParagraphElement()
       ..text = 'Error from ${target.responseUrl}: ${target.status} ${target.statusText}'
   );
+
+  el.append(errorDiv);
 }

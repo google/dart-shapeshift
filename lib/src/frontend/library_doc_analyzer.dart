@@ -3,6 +3,8 @@
 
 part of doc_coverage_frontend;
 
+const methodTypes = const ['getters', 'setters', 'constructors', 'methods', 'operators'];
+
 class LibraryDocAnalyzer {
 
   final String name, nameWithColon, base, package;
@@ -70,19 +72,25 @@ class LibraryDocAnalyzer {
   void getJsonAndReport(String screen) {
     HttpRequest.getString('$base/${name}.json')
       .then((String json) {
-        Map<String,dynamic> package = new JsonDecoder().convert(json);
+        Map<String,dynamic> library = new JsonDecoder().convert(json);
         //classes[class[], error[], typedef[]], comment, functions, variables
         ['class', 'error'].forEach((classType) =>
-          (package['classes'][classType] as List).forEach((klass) {
-            new ClassDocAnalyzer(this, classType, klass).go(screen);
-          })
+            (library['classes'][classType] as List).forEach((klass) {
+              new ClassDocAnalyzer(this, classType, klass).go(screen);
+            })
+        );
+
+        methodTypes.forEach((methodType) =>
+            (library['functions'][methodType] as Map).forEach((String name, Map method) {
+              new FunctionDocAnalyzer(this, methodType, method).go(screen);
+            })
         );
       })
       .catchError(_handleError);
   }
 
   void _handleError(ProgressEvent error) =>
-      handleError(error, section, name: name);
+      handleError(error, section, name: 'Dart library "${name.replaceFirst('dart-', '')}"');
 
   void addToSortedRows(Element classRow, int gapCount, {bool reverse: false}) {
     addToSortedList(classRow, scoresTable, sortedSections, gapCount, reverse: reverse);
@@ -155,14 +163,14 @@ void reportOnTopLevelComment(Map<String,dynamic> gaps, [Element section]) {
 
 void reportOnMethods(Map<String,dynamic> gaps, [Element section]) {
   bool any = false;
-  ['getters', 'setters', 'constructors', 'methods'].forEach((cat) {
+  methodTypes.forEach((cat) {
     if (gaps[cat].length > 0) {
       any = true;
     }
   });
   if (!any) { return; }
 
-  ['getters', 'setters', 'constructors', 'methods'].forEach((cat) => reportOnCategory(cat, gaps, section));
+  methodTypes.forEach((cat) => reportOnCategory(cat, gaps, section));
 }
 
 void reportOnVariables(Map<String,dynamic> gaps, [Element section]) {

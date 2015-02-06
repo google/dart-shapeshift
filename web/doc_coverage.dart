@@ -104,15 +104,11 @@ class PackageDiscovery {
     String url = '$dartdocs/$name/latest/';
     HttpRequest.getString(url)
         .then(redirectToPackageVersion)
-        .catchError((ProgressEvent err) {
-          var target = err.currentTarget;
-          gapsDiv.innerHtml = '';
-          gapsDiv.append(new DivElement()
-              ..classes.add('error')
-              ..text = 'Error from ${target.responseUrl}: ${target.status} ${target.statusText}'
-          );
-        });
+        .catchError(_handleError);
   }
+
+  void _handleError(ProgressEvent error) =>
+      handleError(error, gapsDiv, name: 'Package "$name"');
 
   void redirectToPackageVersion(String html) {
     // This is wacky. dartdocs.org doesn't offer a URL that reports back the

@@ -7,6 +7,7 @@ class ClassDocAnalyzer {
   final LibraryDocAnalyzer libraryDocAnalyzer;
   final String classType;
   final Map klass;
+
   String className, classQualifiedName, docUrl, json;
   TableSectionElement classScoreSection;
 
