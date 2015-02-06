@@ -50,7 +50,7 @@ class ClassDocAnalyzer {
     else {
       text = new AnchorElement()
           ..attributes['href'] = docUrl
-          ..text = '$nameHtml '
+          ..innerHtml = '$nameHtml '
           ..append(new SpanElement()..innerHtml = '&#x2197;'..classes.add('sup'));
     }
 
