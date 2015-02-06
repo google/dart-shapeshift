@@ -40,14 +40,17 @@ class ClassDocAnalyzer {
         ..attributes['src'] = dc.shieldUrl(json)
         ..classes.add('shield');
 
+    String nameHtml = '$classType $className';
+    if (classType == 'class')
+        nameHtml = '<strong>$nameHtml</strong>';
     Element text;
     if (docUrl == null) {
-      text = new SpanElement()..innerHtml = '$classType $className';
+      text = new SpanElement()..innerHtml = nameHtml;
     }
     else {
       text = new AnchorElement()
           ..attributes['href'] = docUrl
-          ..text = '$classType $className '
+          ..text = '$nameHtml '
           ..append(new SpanElement()..innerHtml = '&#x2197;'..classes.add('sup'));
     }
 

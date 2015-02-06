@@ -5,13 +5,15 @@ part of doc_coverage_frontend;
 
 class FunctionDocAnalyzer {
   final LibraryDocAnalyzer libraryDocAnalyzer;
-  final String classType;
+  final String methodType;
   final Map method;
 
   String name, classQualifiedName, docUrl;
   TableSectionElement scoreSection;
 
-  FunctionDocAnalyzer(this.libraryDocAnalyzer, this.classType, this.method);
+  FunctionDocAnalyzer(this.libraryDocAnalyzer, _methodType, this.method) :
+    // For some reason, the method types are delivered plural.
+    methodType = _methodType.replaceFirst(new RegExp('s\$'), '');
 
   void go(String screen) {
     name = method['name'];
@@ -37,12 +39,12 @@ class FunctionDocAnalyzer {
 
     Element text;
     if (docUrl == null) {
-      text = new SpanElement()..innerHtml = '$classType $name';
+      text = new SpanElement()..innerHtml = '$methodType $name';
     }
     else {
       text = new AnchorElement()
         ..attributes['href'] = docUrl
-        ..text = '$classType $name '
+        ..text = '$methodType $name '
         ..append(new SpanElement()..innerHtml = '&#x2197;'..classes.add('sup'));
     }
 
