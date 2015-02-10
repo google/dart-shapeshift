@@ -206,16 +206,6 @@ class DocCoverage {
     return topLevelScore*topLevelWeight + memberLevelScore*memberLevelWeight;
   }
 
-  int calculateSize0(String apiString) {
-    Object _api = new JsonDecoder().convert(apiString);
-    if (_api is Map) {
-      api = _api;
-    } else {
-      throw new FormatException('JSON must be a single object');
-    }
-    return calculateSize();
-  }
-
   int calculateSize() {
     Function numMethodThings = (memo, el) =>
         memo + ((api['methods'] as Map)[el] == null ? 0 : (api['methods'] as Map)[el].length);

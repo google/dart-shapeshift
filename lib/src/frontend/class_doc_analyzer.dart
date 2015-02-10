@@ -61,7 +61,7 @@ class ClassDocAnalyzer {
         ..onClick.listen(toggleClassGaps);
 
     scoreSection.dataset['count'] = '${score.toInt()}';
-    scoreSection.dataset['size'] = '${dc.calculateSize0(json)}';
+    scoreSection.dataset['size'] = '${dc.calculateSize()}';
     libraryDocAnalyzer.updateLibraryBadge();
     classRow
         ..addCell().append(gapsToggle)
