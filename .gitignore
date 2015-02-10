@@ -2,6 +2,7 @@ build/
 packages/
 bin/packages
 test/packages
+test/doc_coverage/packages
 web/packages
 pubspec.lock
 .buildlog

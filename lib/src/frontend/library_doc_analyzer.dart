@@ -54,12 +54,13 @@ class LibraryDocAnalyzer {
   }
   
   void updateLibraryBadge() {
-    int size = sortedSections.fold(0, (memo, Element el) =>
-        memo + int.parse(el.dataset['size']));
-    int mass =
-        sortedSections.fold(0, (memo, Element el) =>
-            memo + int.parse(el.dataset['size']) * int.parse(el.dataset['count']));
-    int score = mass ~/ size;
+    List<Map> memberData = sortedSections.map((Element el) =>
+        {
+          'size': int.parse(el.dataset['size']),
+          'score': int.parse(el.dataset['count']) / 100
+        }
+    ).toList();
+    int score = (100*DocCoverage.weightedScore(memberData)).toInt();
     sectionShield.attributes['src'] = DocCoverage.shieldUrlForScore(score);
   }
 

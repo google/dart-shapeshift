@@ -1,7 +1,7 @@
 // Copyright 2014 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-/// Unit tests for json_diff.
+/// Unit tests for Shapeshift's Doc Coverage tool.
 library doc_coverage_tests;
 
 import 'dart:convert';
@@ -33,14 +33,12 @@ void main() {
   });
   
   test('DocCoverage calculates gaps for package w/ long monoline comment', () {
-    print('<p>comment</p>'*20);
     api = '{"name":"foo","qualifiedName":"foo","comment":"${'<p>comment</p>'*20}","packageName":""}';
     gaps = new DocCoverage().calculateCoverage(api);
     expect(gaps['gapCount'], equals(DocCoverage.libraryCommentBrief));
   });
   
   test('DocCoverage calculates gaps for package w/ multiline comment', () {
-    print('<p>comment</p>'*20);
     api = '{"name":"foo","qualifiedName":"foo","comment":"${'<p>comment</p>\\n\\n'*20}","packageName":""}';
     gaps = new DocCoverage().calculateCoverage(api);
     expect(gaps['gapCount'], equals(0));

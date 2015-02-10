@@ -1,7 +1,7 @@
 // Copyright 2014 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-/// Unit tests for json_diff.
+/// Unit tests for shapeshift's Doc Coverage tool.
 library doc_score_tests;
 
 import 'dart:convert';

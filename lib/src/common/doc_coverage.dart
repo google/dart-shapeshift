@@ -16,11 +16,13 @@ class DocCoverage {
   static const int methodWeight = 2;
   static const int variableWeight = 1;
 
+  static const List<String> methodCategories =
+      const ['getters', 'setters', 'constructors', 'methods', 'operators'];
+
   Map<String,Object> api;
 
   // Poor man's class for now.
   final Map<String,Object> gaps = new Map();
-  final List<String> methodCategories = ['getters', 'setters', 'constructors', 'methods', 'operators'];
 
   static String shieldUrlForScore(int score) {
     String color;
@@ -55,6 +57,15 @@ class DocCoverage {
         new RegExp(r'<a>([^<]+)</a>'),
         (Match match) => '<a>${new DocsLocation(match[1]).lastName}</a>'
     );
+
+  /// members is a List of Maps with keys 'size' and 'score' with numeric values.
+  static double weightedScore(List<Map> members) {
+    int weight = members.fold(0, (memo, Map member) => memo + member['size']);
+    double mass = members.fold(0.0, (memo, Map member) => memo + member['size'] * member['score']);
+    // If no members, then we say 100%.
+    if (weight == 0) return 1.00;
+    return mass / weight;
+  }
 
   Map<String,dynamic> calculateCoverage(String apiString) {
     Object _api = new JsonDecoder().convert(apiString);
@@ -195,14 +206,17 @@ class DocCoverage {
     return topLevelScore*topLevelWeight + memberLevelScore*memberLevelWeight;
   }
 
-  int calculateSize(String apiString) {
+  int calculateSize0(String apiString) {
     Object _api = new JsonDecoder().convert(apiString);
     if (_api is Map) {
       api = _api;
     } else {
       throw new FormatException('JSON must be a single object');
     }
+    return calculateSize();
+  }
 
+  int calculateSize() {
     Function numMethodThings = (memo, el) =>
         memo + ((api['methods'] as Map)[el] == null ? 0 : (api['methods'] as Map)[el].length);
 
