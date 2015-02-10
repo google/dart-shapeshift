@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
 /// Unit tests for shapeshift's Doc Coverage tool.
-library doc_score_tests;
+library class_score_tests;
 
 import 'dart:convert';
 import 'package:shapeshift/doc_coverage_common.dart';
