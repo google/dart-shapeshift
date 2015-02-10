@@ -11,6 +11,11 @@ class DocCoverage {
   static const int libraryCommentBrief = 21;
   static const int libraryCommentGap = 24;
 
+  static const double topLevelWeight = 0.5;
+  static const double memberLevelWeight = 0.5;
+  static const int methodWeight = 2;
+  static const int variableWeight = 1;
+
   Map<String,Object> api;
 
   // Poor man's class for now.
@@ -39,7 +44,7 @@ class DocCoverage {
     if (analyses.summaryTooLong)
       score -= 0.2;
 
-    if (analyses.commentEndsWithPeriod)
+    if (analyses.commentMissingPeriod)
       score -= 0.1;
 
     return score;
@@ -136,12 +141,8 @@ class DocCoverage {
       throw new FormatException('JSON must be a single object');
     }
 
-    double topLevelWeight = 0.5;
-    double memberLevelWeight = 0.5;
     double topLevelScore = 1.0;
     double memberLevelScore = 1.0;
-    int methodWeight = 2;
-    int variableWeight = 1;
 
     if (api['packageName'] != null) {
       // This is a package.
@@ -159,6 +160,9 @@ class DocCoverage {
         // the analysis configurable.
         /*if (analyses.commentIsOneLine)
           topLevelScore = 0.5;*/
+
+        if (analyses.summaryTooLong)
+          topLevelScore -= 0.2;
       }
 
       double methodScoreSum = 0.0;

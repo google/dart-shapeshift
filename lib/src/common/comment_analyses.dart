@@ -13,13 +13,11 @@ class CommentAnalyses {
       : commentUnparsed = _commentUnparsed,
         comment = parse(_commentUnparsed);
 
-  bool get commentEndsWithPeriod {
+  bool get commentMissingPeriod {
     Element lastPara = comment.querySelector('body >p');
-    if (lastPara == null) {
-      // Can't tell. No paragraphs?
-      return true;
-    }
-    String endingText = lastPara.text;
+    String endingText = (lastPara == null)
+      ? comment.querySelector('body').text
+      : lastPara.text;
     return endingText[endingText.length-1] != '.';
   }
 

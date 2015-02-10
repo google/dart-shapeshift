@@ -8,6 +8,20 @@ import 'dart:convert';
 import 'package:shapeshift/doc_coverage_common.dart';
 import 'package:unittest/unittest.dart';
 
+Map<String,dynamic> classTemplate = {
+  "name": "Foo",
+  "qualifiedName": "foo.Foo",
+  "comment": "",
+  "methods": {
+    "getters": {},
+    "setters": {},
+    "constructors": {},
+    "operators": {},
+    "methods": {}
+  },
+  "variables": {},
+};
+
 void main() {
   test('scores a class without a comment, and without methods', () {
     Map<String,dynamic> cls = new Map.from(classTemplate);
@@ -19,7 +33,16 @@ void main() {
     Map<String,dynamic> cls = new Map.from(classTemplate)
         ..['comment'] = 'brief';
     double score = new DocCoverage().calculateScore(jsonFrom(cls));
-    expect(score, equals(0.75));
+    expect(score, equals(1.0));
+  });
+
+  test('scores a class with a long comment summary, and without methods', () {
+    Map<String,dynamic> cls = new Map.from(classTemplate)
+        ..['comment'] = 'This first line is the summary and should be short ' +
+            'but its so long wow no one could ever think that this ' +
+            'summarizes the behavior of a method.';
+    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    expect(score, equals(0.9));
   });
 
   test('scores a class with a good comment, and without methods', () {
@@ -49,9 +72,17 @@ void main() {
   test('1 method with docs w/o period', () {
     Map<String,dynamic> cls = newClassWithComments(
         'A comment\n\nwith a nice and detailed paragraph.',
-        ['Wheres the period']);
+        ['Where\'s the period']);
     double score = new DocCoverage().calculateScore(jsonFrom(cls));
     expect(score, equals(0.95));
+  });
+
+  test('1 method with docs w/ period and code', () {
+    Map<String,dynamic> cls = newClassWithComments(
+        'A comment\n\nwith a nice and detailed paragraph.',
+        ['<p>Here\'s a period.</p>\n\n<pre>// And code.\n\nvar a = 1;</pre>']);
+    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    expect(score, equals(1.0));
   });
 
   test('1 method with good docs', () {
@@ -98,7 +129,6 @@ void main() {
   });
 }
 
-
 Map<String,dynamic> newClassWithComments(String clsComment, List<String> comments) {
   int counter = 0;
   Map<String,dynamic> cls = new Map.from(classTemplate)
@@ -118,17 +148,3 @@ Map<String,dynamic> newClassWithComments(String clsComment, List<String> comment
 String jsonFrom(Map<String,Object> obj) {
   return new JsonEncoder().convert(obj);
 }
-
-Map<String,dynamic> classTemplate = {
-  "name": "Foo",
-  "qualifiedName": "foo.Foo",
-  "comment": "",
-  "methods": {
-    "getters": {},
-    "setters": {},
-    "constructors": {},
-    "operators": {},
-    "methods": {}
-  },
-  "variables": {},
-};
