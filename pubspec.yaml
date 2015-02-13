@@ -5,8 +5,7 @@ dependencies:
   browser: any
   diff_match_patch: '>=0.2.1'
   html5lib: any
-  json_diff:
-    path: /Users/srawlins/dart/json_diff
+  json_diff: '>=0.1.0 <1.0.0'
   route: any
 dev_dependencies:
   unittest: '>=0.11.0'
