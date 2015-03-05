@@ -86,6 +86,10 @@ class LibraryDocAnalyzer {
               new FunctionDocAnalyzer(this, methodType, method).go(screen);
             })
         );
+
+        (library['variables'] as Map).forEach((String name, Map variable) {
+          new VariableDocAnalyzer(this, variable).go(screen);
+        });
       })
       .catchError(_handleError);
   }

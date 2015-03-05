@@ -16,5 +16,7 @@ part 'src/frontend/class_doc_analyzer.dart';
 part 'src/frontend/doc_coverage_elements.dart';
 part 'src/frontend/error_handlers.dart';
 part 'src/frontend/function_doc_analyzer.dart';
+part 'src/frontend/member_doc_analyzer.dart';
 part 'src/frontend/library_doc_analyzer.dart';
 part 'src/frontend/sdk_library_doc_analyzer.dart';
+part 'src/frontend/variable_doc_analyzer.dart';
