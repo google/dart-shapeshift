@@ -28,8 +28,11 @@ class ClassDocAnalyzer {
     .catchError(_reportError);
   }
 
-  void _reportError(ProgressEvent err) {
-    HttpRequest target = err.target;
+  void _reportError(Error err) {
+    if (err is! ProgressEvent)
+      throw err;
+
+    HttpRequest target = (err as ProgressEvent).target;
 
     scoreSection = libraryDocAnalyzer.scoresTable.createTBody();
     TableRowElement classRow = scoreSection.addRow()
@@ -113,7 +116,7 @@ class ClassDocAnalyzer {
         ..classes.add('hidden')
         ..classes.add('gaps-row');
     TableCellElement classGaps = classGapsRow.addCell()
-        ..append(classGapsSection())
+        ..append(classGapsSection(detailed: false))
         ..attributes['colspan'] = '4';
   }
 
@@ -139,20 +142,24 @@ class ClassDocAnalyzer {
     }
   }
 
-  Element classGapsSection() {
+  Element classGapsSection({detailed: true}) {
     Map<String,dynamic> klass = new JsonDecoder().convert(json);
     Map<String,dynamic> gaps = new DocCoverage().calculateCoverage(json);
     Element classSection = new Element.section();
+    int gapCount = gaps['gapCount'];
+    classSection.dataset['count'] = '$gapCount';
+    if (detailed) {
+      classSection.append(new HeadingElement.h2()
+        ..text = '$classType ${gaps['name']}');
+    }
+
     if (gaps['gapCount'] == 0) {
       classSection.appendHtml('<em>No gaps</em>');
       return classSection;
     }
-    int gapCount = gaps['gapCount'];
 
-    classSection.dataset['count'] = '$gapCount';
-    classSection.append(new HeadingElement.h2()
-        ..text = '$classType ${gaps['name']}')
-        ..append(new SpanElement()..text = '($gapCount points of coverage gaps)');
+    classSection
+      ..append(new SpanElement()..text = '($gapCount points of coverage gaps)');
 
     reportOnTopLevelComment(gaps, classSection);
     reportOnMethods(gaps, classSection);
