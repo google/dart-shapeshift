@@ -10,6 +10,11 @@ body {
   font: 400 15px/19px 'Roboto', sans-serif;
 }
 
+strong {
+  font-weight: 500;
+  color: rgb(48, 48, 48);
+}
+
 .the-body {
   background-color: #FFF;
   border: solid 1px #CCC;
@@ -63,14 +68,18 @@ body {
 
 table td {
   padding: 0;
-  vertical-align: top;
+  vertical-align: middle;
 }
 table td:first-child {
   padding-right: 30px;
 }
 
+.scores-table tbody {
+  border-bottom: 1px solid #eee;
+}
+
 .scores-table tbody:nth-child(odd) {
-  background-color: #F8F8FF;
+  background-color: #f8f8ff;
 }
 
 .scores-table td {
@@ -139,6 +148,7 @@ table td:first-child {
 #gaps table.scores-table {
   margin: 10px 0;
   border-collapse: collapse;
+  border-top: 1px solid #eee;
 }
 
 #gaps table.scores-table td {
@@ -228,12 +238,14 @@ img.shield {
 }
 
 .button {
-  background-color: #428bca;
-  border: solid 1px #555599;
+  background-color: #eeeeee;
+  border: solid 1px #dddddd;
   border-radius: 3px;
-  color: white;
+  color: #428bca;
+  display: inline-block;
   cursor: default;
-  padding: 1px 3px 2px;
+  margin: 1px;
+  padding: 2px 4px;
 }
 
 .button:hover {
