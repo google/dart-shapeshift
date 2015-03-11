@@ -20,16 +20,19 @@ class LibraryDocAnalyzer {
       : name = name,
         nameWithColon = name.replaceFirst('-', ':');
 
-  void prepareElements() {
+  void prepareElements({shield: true}) {
     sortedSections.clear();
 
+    sectionHeading.text = 'library $name';
+    section.append(sectionHeading);
 
-    sectionShield
+    if (shield) {
+      sectionShield
         ..attributes['src'] = DocCoverage.shieldUrlForScore(0)
         ..classes.add('shield');
-    section
-        ..append(sectionHeading..text = 'library $name'
-            ..append(sectionShield));
+      sectionHeading.append(sectionShield);
+    }
+
     gapsDiv.append(section);
     gapSummary.dataset['value'] = '0';
     section.append(gapSummary);
@@ -65,18 +68,21 @@ class LibraryDocAnalyzer {
   }
 
   void analyzeGaps() {
-    prepareElements();
+    prepareElements(shield: false);
     section.classes.add('hidden');
     getJsonAndReport('gaps');
   }
 
+  /// Fetches the Json form of the library's docs, and analyzes the comments for:
+  ///
+  /// * the library's "classes" (each class, error, and typedef)
+  /// * the library itself
+  /// * the library's top-level functions
+  /// * the library's top-level properties
   void getJsonAndReport(String screen) {
     HttpRequest.getString('$base/${name}.json')
       .then((String json) {
         Map<String,dynamic> library = new JsonDecoder().convert(json);
-
-        // A library consists of:
-        //   classes[class[], error[], typedef{}], comment, functions, variables
         (library['classes']['class'] as List).forEach((klass) =>
           new ClassDocAnalyzer(this, 'class', klass).go(screen));
         (library['classes']['error'] as List).forEach((klass) =>
