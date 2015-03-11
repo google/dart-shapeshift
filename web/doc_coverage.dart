@@ -8,7 +8,6 @@ import 'dart:js';
 import 'package:route/client.dart';
 import 'package:route/url_pattern.dart';
 
-import 'package:shapeshift/doc_coverage_common.dart';
 import 'package:shapeshift/doc_coverage_frontend.dart';
 
 UrlPattern baseUrl = new UrlPattern(r'(.*).html');
@@ -161,25 +160,4 @@ class PackageDiscovery {
         lda.analyzeGaps();
     });
   }
-}
-
-void readFile(Event event) {
-  FileList fs = (event.target as InputElement).files;
-  File f = fs.item(0);
-  FileReader reader = new FileReader();
-  reader.onLoad.listen((fe) => report(fe.target.result) );
-  reader.readAsText(f);
-}
-
-void getUrl(Event event) {
-  String url = (querySelector("#url") as InputElement).value;
-  HttpRequest.getString(url).then(report);
-}
-
-void report(String json) {
-  Map<String,dynamic> gaps = new DocCoverage().calculateCoverage(json);
-  gapsDiv.innerHtml = '';
-  
-  /*if (gaps['packageName'] != null) reportLibraryGaps(gaps);
-  else reportClassGaps(gaps);*/
 }

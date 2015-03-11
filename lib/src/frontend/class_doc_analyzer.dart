@@ -21,13 +21,50 @@ class ClassDocAnalyzer {
     HttpRequest.getString('${libraryDocAnalyzer.base}/$qualifiedName.json').then((String _json) {
       json = _json;
       if (screen == 'score')
-        reportClassScore();
+        _reportClassScore();
       else
         reportClassGaps();
-    });
+    })
+    .catchError(_reportError);
   }
 
-  void reportClassScore() {
+  void _reportError(ProgressEvent err) {
+    HttpRequest target = err.target;
+
+    scoreSection = libraryDocAnalyzer.scoresTable.createTBody();
+    TableRowElement classRow = scoreSection.addRow()
+        ..classes.add('error');
+
+    libraryDocAnalyzer.addToSortedRows(scoreSection, 0, reverse: true);
+
+    String nameHtml = '$classType $name';
+    if (classType == 'class')
+        nameHtml = '<strong>$nameHtml</strong>';
+    Element errorText = new AnchorElement()
+      ..attributes['href'] = target.responseUrl
+      ..innerHtml = 'Error fetching docs: Error ${target.status}: ${target.statusText}'
+      ..append(new SpanElement()..innerHtml = '&#x2197;'..classes.add('sup'));
+
+    scoreSection.dataset['count'] = '0';
+    scoreSection.dataset['size'] = '1';
+    classRow
+        ..addCell().appendText(' ')
+        ..addCell().appendText(nameHtml)
+        ..addCell().append(errorText);
+
+    classRow.addCell()
+            ..innerHtml = '&nbsp;'
+            ..classes.add('expando');
+
+    TableRowElement classGapsRow = scoreSection.addRow()
+        ..classes.add('hidden')
+        ..classes.add('gaps-row');
+    TableCellElement classGaps = classGapsRow.addCell()
+        ..append(classGapsSection())
+        ..attributes['colspan'] = '4';
+  }
+
+  void _reportClassScore() {
     Map<String,dynamic> klass = new JsonDecoder().convert(json);
     String className = klass['name'];
     DocCoverage dc = new DocCoverage();

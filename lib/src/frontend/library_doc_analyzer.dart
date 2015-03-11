@@ -74,12 +74,16 @@ class LibraryDocAnalyzer {
     HttpRequest.getString('$base/${name}.json')
       .then((String json) {
         Map<String,dynamic> library = new JsonDecoder().convert(json);
-        //classes[class[], error[], typedef[]], comment, functions, variables
-        ['class', 'error'].forEach((classType) =>
-            (library['classes'][classType] as List).forEach((klass) {
-              new ClassDocAnalyzer(this, classType, klass).go(screen);
-            })
-        );
+
+        // A library consists of:
+        //   classes[class[], error[], typedef{}], comment, functions, variables
+        (library['classes']['class'] as List).forEach((klass) =>
+          new ClassDocAnalyzer(this, 'class', klass).go(screen));
+        (library['classes']['error'] as List).forEach((klass) =>
+          new ClassDocAnalyzer(this, 'error', klass).go(screen));
+        // Typedefs don't have their own files; it's all inline.
+        (library['classes']['typedef'] as Map).values.forEach((klass) =>
+          new TypedefDocAnalyzer(this, klass).go(screen));
 
         methodTypes.forEach((methodType) =>
             (library['functions'][methodType] as Map).forEach((String name, Map method) {

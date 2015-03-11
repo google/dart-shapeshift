@@ -82,6 +82,11 @@ table td:first-child {
   width: 100%;
 }
 
+.scores-table .error {
+  background-color: rgba(255,0,0,0.2);
+  color: rgb(96,0,0);
+}
+
 #gaps {
   background-color: #FFF;
   margin: 10px 0;
@@ -198,7 +203,7 @@ a .sup:hover {
   text-decoration: none;
 }
 
-#gaps .error {
+#gaps section section .error {
   background-color: rgba(255,0,0,0.2);
   border: solid 1px rgba(96,0,0,0.4);
   color: rgb(96,0,0);
@@ -206,13 +211,13 @@ a .sup:hover {
   padding: 2px;
 }
 
-#gaps .error h1 {
+#gaps section section .error h1 {
   margin: 0;
   font: 400 17px/20px 'Montserrat', sans-serif;
   border-bottom-color: rgb(96,0,0);
 }
 
-#gaps .error p {
+#gaps section section .error p {
   margin: 0.5em 0;
   font-size: 13px;
 }

@@ -19,4 +19,5 @@ part 'src/frontend/function_doc_analyzer.dart';
 part 'src/frontend/member_doc_analyzer.dart';
 part 'src/frontend/library_doc_analyzer.dart';
 part 'src/frontend/sdk_library_doc_analyzer.dart';
+part 'src/frontend/typedef_doc_analyzer.dart';
 part 'src/frontend/variable_doc_analyzer.dart';
