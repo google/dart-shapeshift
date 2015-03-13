@@ -81,7 +81,7 @@ List<Map> allScores(Map lib) {
 }
 
 void main() {
-  test('scores a library without a comment, and without classes or members', () {
+  test('DocCoverage scores a library without a comment, and without classes or members', () {
     Map<String,dynamic> lib = new Map.from(libraryTemplate);
     
     List<Map> scores = new List();
@@ -90,7 +90,7 @@ void main() {
     expect(score, equals(0.0));
   });
 
-  test('scores a library with a brief comment, and without classes or members', () {
+  test('DocCoverage scores a library with a brief comment, and without classes or members', () {
     Map<String,dynamic> lib = new Map.from(libraryTemplate)
       ..['comment'] = 'brief';
 
@@ -98,7 +98,7 @@ void main() {
     expect(score, equals(0.9));
   });
 
-  test('scores a library with a good comment, and without classes or members', () {
+  test('DocCoverage scores a library with a good comment, and without classes or members', () {
     Map<String,dynamic> lib = new Map.from(libraryTemplate)
       ..['comment'] = 'A comment\n\nwith a nice and detailed paragraph.';
 
@@ -106,7 +106,7 @@ void main() {
     expect(score, equals(1.0));
   });
 
-  group('scores a library with a good comment and', () {
+  group('DocCoverage scores a library with a good comment and', () {
     String libraryComment =  'A comment\n\nwith a nice and detailed paragraph.';
 
     test('1 undocumented function', () {

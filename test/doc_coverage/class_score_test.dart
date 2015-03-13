@@ -23,20 +23,20 @@ Map<String,dynamic> classTemplate = {
 };
 
 void main() {
-  test('scores a class without a comment, and without methods', () {
+  test('DocCoverage scores a class without a comment, and without methods', () {
     Map<String,dynamic> cls = new Map.from(classTemplate);
     double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(0.5));
   });
 
-  test('scores a class with a brief comment, and without methods', () {
+  test('DocCoverage scores a class with a brief comment, and without methods', () {
     Map<String,dynamic> cls = new Map.from(classTemplate)
         ..['comment'] = 'brief';
     double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(1.0));
   });
 
-  test('scores a class with a long comment summary, and without methods', () {
+  test('DocCoverage scores a class with a long comment summary, and without methods', () {
     Map<String,dynamic> cls = new Map.from(classTemplate)
         ..['comment'] = 'This first line is the summary and should be short ' +
             'but its so long wow no one could ever think that this ' +
@@ -45,87 +45,90 @@ void main() {
     expect(score, equals(0.9));
   });
 
-  test('scores a class with a good comment, and without methods', () {
+  test('DocCoverage scores a class with a good comment, and without methods', () {
     Map<String,dynamic> cls = new Map.from(classTemplate)
         ..['comment'] = 'A comment\n\nwith a nice and detailed paragraph.';
     double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(1.0));
   });
 
-  test('1 undocumented method', () {
-    Map<String,dynamic> cls = newClassWithComments(
-        'A comment\n\nwith a nice and detailed paragraph.', ['']);
-    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
-    expect(score, equals(0.5));
-  });
+  group('DocCoverage scores a class with a good comment and', () {
+    String docComment = 'A comment\n\nwith a nice and detailed paragraph.';
+    test('1 undocumented method', () {
+      Map<String,dynamic> cls = newClassWithComments(
+          docComment, ['']);
+      double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
+      expect(score, equals(0.5));
+    });
 
-  test('1 method doc with long summary', () {
-    Map<String,dynamic> cls = newClassWithComments(
-        'A comment\n\nwith a nice and detailed paragraph.',
-        ['This first line is the summary and should be short but its so ' +
-         'long wow no one could ever think that this summarizes the ' +
-         'behavior of a method.']);
-    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
-    expect(score, equals(0.9));
-  });
+    test('1 method doc with long summary', () {
+      Map<String,dynamic> cls = newClassWithComments(
+          docComment,
+          ['This first line is the summary and should be short but its so ' +
+           'long wow no one could ever think that this summarizes the ' +
+           'behavior of a method.']);
+      double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
+      expect(score, equals(0.9));
+    });
 
-  test('1 method with docs w/o period', () {
-    Map<String,dynamic> cls = newClassWithComments(
-        'A comment\n\nwith a nice and detailed paragraph.',
-        ['Where\'s the period']);
-    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
-    expect(score, equals(0.95));
-  });
+    test('1 method with docs w/o period', () {
+      Map<String,dynamic> cls = newClassWithComments(
+          docComment,
+          ['Where\'s the period']);
+      double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
+      expect(score, equals(0.95));
+    });
 
-  test('1 method with docs w/ period and code', () {
-    Map<String,dynamic> cls = newClassWithComments(
-        'A comment\n\nwith a nice and detailed paragraph.',
-        ['<p>Here\'s a period.</p>\n\n<pre>// And code.\n\nvar a = 1;</pre>']);
-    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
-    expect(score, equals(1.0));
-  });
+    test('1 method with docs w/ period and code', () {
+      Map<String,dynamic> cls = newClassWithComments(
+          docComment,
+          ['<p>Here\'s a period.</p>\n\n<pre>// And code.\n\nvar a = 1;</pre>']);
+      double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
+      expect(score, equals(1.0));
+    });
 
-  test('1 method with good docs', () {
-    Map<String,dynamic> cls = newClassWithComments(
-        'A comment\n\nwith a nice and detailed paragraph.',
-        ['Another comment.\n\nWith a nice and detailed paragraph.']);
-    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
-    expect(score, equals(1.0));
-  });
+    test('1 method with good docs', () {
+      Map<String,dynamic> cls = newClassWithComments(
+          docComment,
+          ['Another comment.\n\nWith a nice and detailed paragraph.']);
+      double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
+      expect(score, equals(1.0));
+    });
 
-  test('1 method with good docs, 1 without', () {
-    Map<String,dynamic> cls = newClassWithComments(
-        'A comment\n\nwith a nice and detailed paragraph.',
-        ['Another comment.\n\nWith a nice and detailed paragraph.', '']);
-    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
-    expect(score, equals(0.75));
-  });
+    test('1 method with good docs, 1 without', () {
+      Map<String,dynamic> cls = newClassWithComments(
+          docComment,
+          ['Another comment.\n\nWith a nice and detailed paragraph.', '']);
+      double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
+      expect(score, equals(0.75));
+    });
 
-  test('2 methods with good docs', () {
-    Map<String,dynamic> cls = newClassWithComments(
-        'A comment\n\nwith a nice and detailed paragraph.',
-        ['Another comment.\n\nWith a nice and detailed paragraph.',
-         'Another another comment.\n\nWith a nice and detailed paragraph.']);
-    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
-    expect(score, equals(1.0));
-  });
+    test('2 methods with good docs', () {
+      Map<String,dynamic> cls = newClassWithComments(
+          docComment,
+          ['Another comment.\n\nWith a nice and detailed paragraph.',
+           'Another another comment.\n\nWith a nice and detailed paragraph.']);
+      double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
+      expect(score, equals(1.0));
+    });
 
-  test('1 method with good docs, 2 without', () {
-    Map<String,dynamic> cls = newClassWithComments(
-        'A comment\n\nwith a nice and detailed paragraph.',
-        ['Another comment.\n\nWith a nice and detailed paragraph.', '', '']);
-    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
-    expect(score, closeTo(0.66666, 0.00001));
-  });
+    test('1 method with good docs, 2 without', () {
+      Map<String,dynamic> cls = newClassWithComments(
+          docComment,
+          ['Another comment.\n\nWith a nice and detailed paragraph.', '', '']);
+      double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
+      expect(score, closeTo(0.66666, 0.00001));
+    });
 
-  test('2 methods with good docs, 1 without', () {
-    Map<String,dynamic> cls = newClassWithComments(
-        'A comment\n\nwith a nice and detailed paragraph.',
-        ['Another comment.\n\nWith a nice and detailed paragraph.',
-         'Another another comment.\n\nWith a nice and detailed paragraph.',
-         '']);
-    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
-    expect(score, closeTo(0.83333, 0.00001));
+    test('2 methods with good docs, 1 without', () {
+      Map<String,dynamic> cls = newClassWithComments(
+          docComment,
+          ['Another comment.\n\nWith a nice and detailed paragraph.',
+           'Another another comment.\n\nWith a nice and detailed paragraph.',
+           '']);
+      double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
+      expect(score, closeTo(0.83333, 0.00001));
+    });
   });
 }
 

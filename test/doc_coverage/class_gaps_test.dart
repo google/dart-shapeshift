@@ -20,57 +20,57 @@ void main() {
     expect(gaps['comment'], equals('<p>comment</p>'));
   });
   
-  test('DocCoverage calculates gaps for package w/ no comment', () {
+  test('DocCoverage calculates gaps for a package w/ no comment', () {
     api = '{"name":"foo","qualifiedName":"foo","comment":"","packageName":""}';
     gaps = new DocCoverage.fromJson(api).calculateCoverage();
     expect(gaps['gapCount'], equals(DocCoverage.libraryCommentGap));
   });
   
-  test('DocCoverage calculates gaps for package w/ brief comment', () {
+  test('DocCoverage calculates gaps for a package w/ brief comment', () {
     api = '{"name":"foo","qualifiedName":"foo","comment":"<p>comment</p>","packageName":""}';
     gaps = new DocCoverage.fromJson(api).calculateCoverage();
     expect(gaps['gapCount'], equals(DocCoverage.libraryCommentBrief));
   });
   
-  test('DocCoverage calculates gaps for package w/ long monoline comment', () {
+  test('DocCoverage calculates gaps for a package w/ long monoline comment', () {
     api = '{"name":"foo","qualifiedName":"foo","comment":"${'<p>comment</p>'*20}","packageName":""}';
     gaps = new DocCoverage.fromJson(api).calculateCoverage();
     expect(gaps['gapCount'], equals(DocCoverage.libraryCommentBrief));
   });
   
-  test('DocCoverage calculates gaps for package w/ multiline comment', () {
+  test('DocCoverage calculates gaps for a package w/ multiline comment', () {
     api = '{"name":"foo","qualifiedName":"foo","comment":"${'<p>comment</p>\\n\\n'*20}","packageName":""}';
     gaps = new DocCoverage.fromJson(api).calculateCoverage();
     expect(gaps['gapCount'], equals(0));
   });
   
-  test('DocCoverage calculates gaps for class w/ no comment', () {
+  test('DocCoverage calculates gaps for a class w/ no comment', () {
     gaps = new DocCoverage.fromJson(jsonFrom(classTemplate)).calculateCoverage();
     expect(gaps['gapCount'], equals(DocCoverage.classCommentGap));
   });
   
-  test('DocCoverage calculates gaps for class w/ brief comment', () {
+  test('DocCoverage calculates gaps for a class w/ brief comment', () {
     gaps = new DocCoverage.fromJson(jsonFrom(
         classTemplate..['comment'] = '<p>brief</p>'
     )).calculateCoverage();
     expect(gaps['gapCount'], equals(DocCoverage.classCommentBrief));
   });
   
-  test('DocCoverage calculates gaps for class w/ long monoline comment', () {
+  test('DocCoverage calculates gaps for a class w/ long monoline comment', () {
     gaps = new DocCoverage.fromJson(jsonFrom(
         classTemplate..['comment'] = '<p>longer</p>'*20
     )).calculateCoverage();
     expect(gaps['gapCount'], equals(DocCoverage.classCommentBrief));
   });
   
-  test('DocCoverage calculates gaps for class w/ brief multiline comment', () {
+  test('DocCoverage calculates gaps for a class w/ brief multiline comment', () {
     gaps = new DocCoverage.fromJson(jsonFrom(
         classTemplate..['comment'] = '<p>brief</p>\\n\\n'*20
     )).calculateCoverage();
     expect(gaps['gapCount'], equals(DocCoverage.classCommentBrief));
   });
   
-  test('DocCoverage calculates gaps for class w/ brief multiline comment', () {
+  test('DocCoverage calculates gaps for a class w/ brief multiline comment', () {
     gaps = new DocCoverage.fromJson(jsonFrom(
         classTemplate..['comment'] = '<p>longer</p>'*20 + '\n\n<p>line</p>'
     )).calculateCoverage();
