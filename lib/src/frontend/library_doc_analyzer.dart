@@ -75,14 +75,15 @@ class LibraryDocAnalyzer {
 
   /// Fetches the Json form of the library's docs, and analyzes the comments for:
   ///
-  /// * the library's "classes" (each class, error, and typedef)
   /// * the library itself
+  /// * the library's "classes" (each class, error, and typedef)
   /// * the library's top-level functions
   /// * the library's top-level properties
   void getJsonAndReport(String screen) {
     HttpRequest.getString('$base/${name}.json')
       .then((String json) {
         Map<String,dynamic> library = new JsonDecoder().convert(json);
+        new LibraryCommentDocAnalyzer(this, library).go(screen);
         (library['classes']['class'] as List).forEach((klass) =>
           new ClassDocAnalyzer(this, 'class', klass).go(screen));
         (library['classes']['error'] as List).forEach((klass) =>

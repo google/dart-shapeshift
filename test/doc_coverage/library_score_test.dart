@@ -66,34 +66,39 @@ List<Map> variableScores(Map lib) {
   return scores;
 }
 
+Map libraryCommentScore(Map lib) {
+  return {
+    'size': 1,
+    'score': DocCoverage.scoreThing(lib)
+  };
+}
+
 List<Map> allScores(Map lib) {
   return new List()
+    ..add(libraryCommentScore(lib))
     ..addAll(classScores(lib))
     ..addAll(functionScores(lib))
     ..addAll(variableScores(lib));
 }
 
 void main() {
-  // TODO: This.
   test('scores a library without a comment, and without classes or members', () {
     Map<String,dynamic> lib = new Map.from(libraryTemplate);
     
     List<Map> scores = new List();
     scores.addAll(allScores(lib));
     double score = DocCoverage.weightedScore(scores);
-    expect(score, equals(1.0));
+    expect(score, equals(0.0));
   });
 
-  // TODO: This.
   test('scores a library with a brief comment, and without classes or members', () {
     Map<String,dynamic> lib = new Map.from(libraryTemplate)
       ..['comment'] = 'brief';
 
     double score = DocCoverage.weightedScore(allScores(lib));
-    expect(score, equals(1.0));
+    expect(score, equals(0.9));
   });
 
-  // TODO: This.
   test('scores a library with a good comment, and without classes or members', () {
     Map<String,dynamic> lib = new Map.from(libraryTemplate)
       ..['comment'] = 'A comment\n\nwith a nice and detailed paragraph.';
@@ -102,40 +107,44 @@ void main() {
     expect(score, equals(1.0));
   });
 
-  test('1 undocumented function', () {
-    Map<String,dynamic> lib = newLibraryWith(
-        'A comment\n\nwith a nice and detailed paragraph.', funcComments: ['']);
+  group('scores a library with a good comment and', () {
+    String libraryComment =  'A comment\n\nwith a nice and detailed paragraph.';
 
-    double score = DocCoverage.weightedScore(allScores(lib));
-    expect(score, equals(0.0));
-  });
+    test('1 undocumented function', () {
+      Map<String,dynamic> lib = newLibraryWith(
+         libraryComment, funcComments: ['']);
 
-  test('1 function doc with long summary', () {
-    Map<String,dynamic> lib = newLibraryWith(
-        'A comment\n\nwith a nice and detailed paragraph.',
-        funcComments: ['This first line is the summary and should be short but its so ' +
-         'long wow no one could ever think that this summarizes the ' +
-         'behavior of a method.']);
+      double score = DocCoverage.weightedScore(allScores(lib));
+      expect(score, equals(0.5));
+    });
 
-    double score = DocCoverage.weightedScore(allScores(lib));
-    expect(score, equals(0.8));
-  });
+    test('1 function doc with long summary', () {
+      Map<String,dynamic> lib = newLibraryWith(
+          libraryComment,
+          funcComments: ['This first line is the summary and should be short but its so ' +
+           'long wow no one could ever think that this summarizes the ' +
+           'behavior of a method.']);
 
-  test('1 function with docs w/o period', () {
-    Map<String,dynamic> lib = newLibraryWith(
-        'A comment\n\nwith a nice and detailed paragraph.',
-        funcComments: ['Where\'s the period']);
+      double score = DocCoverage.weightedScore(allScores(lib));
+      expect(score, equals(0.9));
+    });
 
-    double score = DocCoverage.weightedScore(allScores(lib));
-    expect(score, equals(0.9));
-  });
+    test('1 function with docs w/o period', () {
+      Map<String,dynamic> lib = newLibraryWith(
+          libraryComment,
+          funcComments: ['Where\'s the period']);
 
-  test('1 undocumented variable', () {
-    Map<String,dynamic> lib = newLibraryWith(
-        'A comment\n\nwith a nice and detailed paragraph.', varComments: ['']);
+      double score = DocCoverage.weightedScore(allScores(lib));
+      expect(score, equals(0.95));
+    });
 
-    double score = DocCoverage.weightedScore(allScores(lib));
-    expect(score, equals(0.0));
+    test('1 undocumented variable', () {
+      Map<String,dynamic> lib = newLibraryWith(
+          libraryComment, varComments: ['']);
+
+      double score = DocCoverage.weightedScore(allScores(lib));
+      expect(score, equals(0.5));
+    });
   });
 }
 
@@ -148,18 +157,18 @@ Map<String,dynamic> newLibraryWith(String libComment,
   funcComments.forEach((String c) {
     counter++;
     lib['functions']['methods']['m$counter'] = {
-        'name': 'm$counter',
-        'qualifiedName': 'foo.Foo.m$counter',
-        'comment': c
+      'name': 'm$counter',
+      'qualifiedName': 'foo.Foo.m$counter',
+      'comment': c
     };
   });
 
   varComments.forEach((String c) {
     counter++;
     lib['variables']['v$counter'] = {
-        'name': 'v$counter',
-        'qualifiedName': 'foo.Foo.v$counter',
-        'comment': c
+      'name': 'v$counter',
+      'qualifiedName': 'foo.Foo.v$counter',
+      'comment': c
     };
   });
 
