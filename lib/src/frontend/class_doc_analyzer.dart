@@ -10,18 +10,17 @@ class ClassDocAnalyzer {
 
   Map<String,dynamic> klass;
   DocCoverage dc;
-  String name, qualifiedName, docUrl, json;
+  String name, docUrl;
   TableSectionElement scoreSection;
 
   ClassDocAnalyzer(this.libraryDocAnalyzer, this.classType, this.klassBrief);
 
   void go(String screen) {
     name = klassBrief['name'];
-    qualifiedName = klassBrief['qualifiedName'].replaceFirst(':', '-');
+    String qualifiedName = klassBrief['qualifiedName'].replaceFirst(':', '-');
     docUrl = libraryDocAnalyzer.htmlUrl != null ?
         '${libraryDocAnalyzer.htmlUrl}.$name' : null;
-    HttpRequest.getString('${libraryDocAnalyzer.base}/$qualifiedName.json').then((String _json) {
-      json = _json;
+    HttpRequest.getString('${libraryDocAnalyzer.base}/$qualifiedName.json').then((String json) {
       klass = new JsonDecoder().convert(json);
       dc = new DocCoverage(klass);
       if (screen == 'score')
@@ -40,7 +39,7 @@ class ClassDocAnalyzer {
 
     scoreSection = libraryDocAnalyzer.scoresTable.createTBody();
     TableRowElement classRow = scoreSection.addRow()
-        ..classes.add('error');
+      ..classes.add('error');
 
     libraryDocAnalyzer.addToSortedRows(scoreSection, 0, reverse: true);
 
@@ -55,20 +54,20 @@ class ClassDocAnalyzer {
     scoreSection.dataset['count'] = '0';
     scoreSection.dataset['size'] = '1';
     classRow
-        ..addCell().appendText(' ')
-        ..addCell().appendText(nameHtml)
-        ..addCell().append(errorText);
+      ..addCell().appendText(' ')
+      ..addCell().appendText(nameHtml)
+      ..addCell().append(errorText);
 
     classRow.addCell()
-            ..innerHtml = '&nbsp;'
-            ..classes.add('expando');
+      ..innerHtml = '&nbsp;'
+      ..classes.add('expando');
 
     TableRowElement classGapsRow = scoreSection.addRow()
-        ..classes.add('hidden')
-        ..classes.add('gaps-row');
+      ..classes.add('hidden')
+      ..classes.add('gaps-row');
     TableCellElement classGaps = classGapsRow.addCell()
-        ..append(classGapsSection())
-        ..attributes['colspan'] = '4';
+      ..append(classGapsSection())
+      ..attributes['colspan'] = '4';
   }
 
   void _reportClassScore() {
@@ -79,8 +78,8 @@ class ClassDocAnalyzer {
 
     libraryDocAnalyzer.addToSortedRows(scoreSection, score.toInt(), reverse: true);
     ImageElement shieldImg = new ImageElement()
-        ..attributes['src'] = dc.shieldUrl()
-        ..classes.add('shield');
+      ..attributes['src'] = dc.shieldUrl()
+      ..classes.add('shield');
 
     String nameHtml = '$classType $className';
     if (classType == 'class')
@@ -91,35 +90,35 @@ class ClassDocAnalyzer {
     }
     else {
       text = new AnchorElement()
-          ..attributes['href'] = docUrl
-          ..innerHtml = '$nameHtml '
-          ..append(new SpanElement()..innerHtml = '&#x2197;'..classes.add('sup'));
+        ..attributes['href'] = docUrl
+        ..innerHtml = '$nameHtml '
+        ..append(new SpanElement()..innerHtml = '&#x2197;'..classes.add('sup'));
     }
 
     SpanElement gapsToggle = new SpanElement()
-        ..append(new SpanElement()..innerHtml = '&#x25ba;'..classes.add('arrow'))
-        ..appendText(' gaps')
-        ..classes.add('button')
-        ..onClick.listen(toggleClassGaps);
+      ..append(new SpanElement()..innerHtml = '&#x25ba;'..classes.add('arrow'))
+      ..appendText(' gaps')
+      ..classes.add('button')
+      ..onClick.listen(toggleClassGaps);
 
     scoreSection.dataset['count'] = '${score.toInt()}';
     scoreSection.dataset['size'] = '${dc.calculateSize()}';
     libraryDocAnalyzer.updateLibraryBadge();
     classRow
-        ..addCell().append(gapsToggle)
-        ..addCell().append(text)
-        ..addCell().append(shieldImg);
+      ..addCell().append(gapsToggle)
+      ..addCell().append(text)
+      ..addCell().append(shieldImg);
 
     classRow.addCell()
-            ..innerHtml = '&nbsp;'
-            ..classes.add('expando');
+      ..innerHtml = '&nbsp;'
+      ..classes.add('expando');
 
     TableRowElement classGapsRow = scoreSection.addRow()
-        ..classes.add('hidden')
-        ..classes.add('gaps-row');
+      ..classes.add('hidden')
+      ..classes.add('gaps-row');
     TableCellElement classGaps = classGapsRow.addCell()
-        ..append(classGapsSection(detailed: false))
-        ..attributes['colspan'] = '4';
+      ..append(classGapsSection(detailed: false))
+      ..attributes['colspan'] = '4';
   }
 
   void reportClassGaps() {
