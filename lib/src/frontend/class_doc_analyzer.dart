@@ -6,20 +6,24 @@ part of doc_coverage_frontend;
 class ClassDocAnalyzer {
   final LibraryDocAnalyzer libraryDocAnalyzer;
   final String classType;
-  final Map klass;
+  final Map klassBrief;
 
+  Map<String,dynamic> klass;
+  DocCoverage dc;
   String name, qualifiedName, docUrl, json;
   TableSectionElement scoreSection;
 
-  ClassDocAnalyzer(this.libraryDocAnalyzer, this.classType, this.klass);
+  ClassDocAnalyzer(this.libraryDocAnalyzer, this.classType, this.klassBrief);
 
   void go(String screen) {
-    name = klass['name'];
-    qualifiedName = klass['qualifiedName'].replaceFirst(':', '-');
+    name = klassBrief['name'];
+    qualifiedName = klassBrief['qualifiedName'].replaceFirst(':', '-');
     docUrl = libraryDocAnalyzer.htmlUrl != null ?
         '${libraryDocAnalyzer.htmlUrl}.$name' : null;
     HttpRequest.getString('${libraryDocAnalyzer.base}/$qualifiedName.json').then((String _json) {
       json = _json;
+      klass = new JsonDecoder().convert(json);
+      dc = new DocCoverage(klass);
       if (screen == 'score')
         _reportClassScore();
       else
@@ -68,16 +72,14 @@ class ClassDocAnalyzer {
   }
 
   void _reportClassScore() {
-    Map<String,dynamic> klass = new JsonDecoder().convert(json);
     String className = klass['name'];
-    DocCoverage dc = new DocCoverage();
-    int score = (100*dc.calculateScore(json)).toInt();
+    int score = (100*dc.score).toInt();
     scoreSection = libraryDocAnalyzer.scoresTable.createTBody();
     TableRowElement classRow = scoreSection.addRow();
 
     libraryDocAnalyzer.addToSortedRows(scoreSection, score.toInt(), reverse: true);
     ImageElement shieldImg = new ImageElement()
-        ..attributes['src'] = dc.shieldUrl(json)
+        ..attributes['src'] = dc.shieldUrl()
         ..classes.add('shield');
 
     String nameHtml = '$classType $className';
@@ -143,8 +145,7 @@ class ClassDocAnalyzer {
   }
 
   Element classGapsSection({detailed: true}) {
-    Map<String,dynamic> klass = new JsonDecoder().convert(json);
-    Map<String,dynamic> gaps = new DocCoverage().calculateCoverage(json);
+    Map<String,dynamic> gaps = dc.calculateCoverage();
     Element classSection = new Element.section();
     int gapCount = gaps['gapCount'];
     classSection.dataset['count'] = '$gapCount';

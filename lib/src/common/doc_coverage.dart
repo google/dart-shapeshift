@@ -19,10 +19,11 @@ class DocCoverage {
   static const List<String> methodCategories =
       const ['getters', 'setters', 'constructors', 'methods', 'operators'];
 
-  Map<String,Object> api;
-
   // Poor man's class for now.
   final Map<String,Object> gaps = new Map();
+
+  Map<String,Object> api;
+  double _score;
 
   static String shieldUrlForScore(int score) {
     String color;
@@ -34,6 +35,7 @@ class DocCoverage {
 
   static double scoreThing(Map thing) {
     if (!thing.containsKey('comment')) {
+      // TODO: something else...
       print('ACK!');
       return 0.0;
     }
@@ -67,14 +69,18 @@ class DocCoverage {
     return mass / weight;
   }
 
-  Map<String,dynamic> calculateCoverage(String apiString) {
+  DocCoverage(this.api);
+
+  DocCoverage.fromJson(String apiString) {
     Object _api = new JsonDecoder().convert(apiString);
     if (_api is Map) {
       api = _api;
     } else {
       throw new FormatException('JSON must be a single object');
     }
+  }
 
+  Map<String,dynamic> calculateCoverage() {
     gaps['gapCount'] = 0;
     gaps['qualifiedName'] = api['qualifiedName'];
     gaps['name'] = api['name'];
@@ -144,13 +150,8 @@ class DocCoverage {
       g['no-one-liner'].add(thing);
   }
 
-  double calculateScore(String apiString) {
-    Object _api = new JsonDecoder().convert(apiString);
-    if (_api is Map) {
-      api = _api;
-    } else {
-      throw new FormatException('JSON must be a single object');
-    }
+  double get score {
+    if (_score != null) return _score;
 
     double topLevelScore = 1.0;
     double memberLevelScore = 1.0;
@@ -203,7 +204,8 @@ class DocCoverage {
       if (methodCount + variableCount > 0)
         memberLevelScore = (methodScoreSum + variableScoreSum) / (methodCount + variableCount);
     }
-    return topLevelScore*topLevelWeight + memberLevelScore*memberLevelWeight;
+    _score = topLevelScore*topLevelWeight + memberLevelScore*memberLevelWeight;
+    return _score;
   }
 
   int calculateSize() {
@@ -214,7 +216,7 @@ class DocCoverage {
         methodCategories.fold(0, numMethodThings);
   }
 
-  String shieldUrl(String apiString) {
-    return shieldUrlForScore((100*calculateScore(apiString)).toInt());
+  String shieldUrl() {
+    return shieldUrlForScore((100*score).toInt());
   }
 }

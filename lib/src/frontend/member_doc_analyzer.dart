@@ -26,7 +26,6 @@ abstract class MemberDocAnalyzer {
   String get decoratedName;
 
   void reportScore() {
-    DocCoverage dc = new DocCoverage();
     int score = (100*DocCoverage.scoreThing(member)).toInt();
     scoreSection = libraryDocAnalyzer.scoresTable.createTBody();
     TableRowElement classRow = scoreSection.addRow();

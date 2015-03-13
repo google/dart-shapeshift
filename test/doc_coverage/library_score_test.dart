@@ -4,7 +4,6 @@
 /// Unit tests for shapeshift's Doc Coverage tool.
 library library_score_tests;
 
-import 'dart:convert';
 import 'package:shapeshift/doc_coverage_common.dart';
 import 'package:unittest/unittest.dart';
 
@@ -30,8 +29,8 @@ Map<String,dynamic> get libraryTemplate => {
 List<Map> classScores(Map lib) {
   List<Map> scores = new List();
   scores.addAll(lib['classes']['class'].map((Map cls) {
-      DocCoverage dc = new DocCoverage();
-      double score = dc.calculateScore(jsonFrom(cls));
+      DocCoverage dc = new DocCoverage(cls);
+      double score = dc.score;
       return {
         'size': dc.calculateSize(),
         'score': score
@@ -173,8 +172,4 @@ Map<String,dynamic> newLibraryWith(String libComment,
   });
 
   return lib;
-}
-
-String jsonFrom(Map<String,Object> obj) {
-  return new JsonEncoder().convert(obj);
 }

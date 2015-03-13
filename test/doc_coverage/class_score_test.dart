@@ -25,14 +25,14 @@ Map<String,dynamic> classTemplate = {
 void main() {
   test('scores a class without a comment, and without methods', () {
     Map<String,dynamic> cls = new Map.from(classTemplate);
-    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(0.5));
   });
 
   test('scores a class with a brief comment, and without methods', () {
     Map<String,dynamic> cls = new Map.from(classTemplate)
         ..['comment'] = 'brief';
-    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(1.0));
   });
 
@@ -41,21 +41,21 @@ void main() {
         ..['comment'] = 'This first line is the summary and should be short ' +
             'but its so long wow no one could ever think that this ' +
             'summarizes the behavior of a method.';
-    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(0.9));
   });
 
   test('scores a class with a good comment, and without methods', () {
     Map<String,dynamic> cls = new Map.from(classTemplate)
         ..['comment'] = 'A comment\n\nwith a nice and detailed paragraph.';
-    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(1.0));
   });
 
   test('1 undocumented method', () {
     Map<String,dynamic> cls = newClassWithComments(
         'A comment\n\nwith a nice and detailed paragraph.', ['']);
-    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(0.5));
   });
 
@@ -65,7 +65,7 @@ void main() {
         ['This first line is the summary and should be short but its so ' +
          'long wow no one could ever think that this summarizes the ' +
          'behavior of a method.']);
-    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(0.9));
   });
 
@@ -73,7 +73,7 @@ void main() {
     Map<String,dynamic> cls = newClassWithComments(
         'A comment\n\nwith a nice and detailed paragraph.',
         ['Where\'s the period']);
-    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(0.95));
   });
 
@@ -81,7 +81,7 @@ void main() {
     Map<String,dynamic> cls = newClassWithComments(
         'A comment\n\nwith a nice and detailed paragraph.',
         ['<p>Here\'s a period.</p>\n\n<pre>// And code.\n\nvar a = 1;</pre>']);
-    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(1.0));
   });
 
@@ -89,7 +89,7 @@ void main() {
     Map<String,dynamic> cls = newClassWithComments(
         'A comment\n\nwith a nice and detailed paragraph.',
         ['Another comment.\n\nWith a nice and detailed paragraph.']);
-    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(1.0));
   });
 
@@ -97,7 +97,7 @@ void main() {
     Map<String,dynamic> cls = newClassWithComments(
         'A comment\n\nwith a nice and detailed paragraph.',
         ['Another comment.\n\nWith a nice and detailed paragraph.', '']);
-    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(0.75));
   });
 
@@ -106,7 +106,7 @@ void main() {
         'A comment\n\nwith a nice and detailed paragraph.',
         ['Another comment.\n\nWith a nice and detailed paragraph.',
          'Another another comment.\n\nWith a nice and detailed paragraph.']);
-    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, equals(1.0));
   });
 
@@ -114,7 +114,7 @@ void main() {
     Map<String,dynamic> cls = newClassWithComments(
         'A comment\n\nwith a nice and detailed paragraph.',
         ['Another comment.\n\nWith a nice and detailed paragraph.', '', '']);
-    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, closeTo(0.66666, 0.00001));
   });
 
@@ -124,7 +124,7 @@ void main() {
         ['Another comment.\n\nWith a nice and detailed paragraph.',
          'Another another comment.\n\nWith a nice and detailed paragraph.',
          '']);
-    double score = new DocCoverage().calculateScore(jsonFrom(cls));
+    double score = new DocCoverage.fromJson(jsonFrom(cls)).score;
     expect(score, closeTo(0.83333, 0.00001));
   });
 }
