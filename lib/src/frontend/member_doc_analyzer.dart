@@ -68,7 +68,7 @@ abstract class MemberDocAnalyzer {
       ..classes.add('hidden')
       ..classes.add('gaps-row');
     TableCellElement classGaps = classGapsRow.addCell()
-      ..append(gapsSection())
+      ..append(gapsSection(detailed: false))
       ..attributes['colspan'] = '4';
   }
 
@@ -89,5 +89,30 @@ abstract class MemberDocAnalyzer {
     }
   }
 
-  Element gapsSection();
+  Element gapsSection({detailed: true}) {
+    Element section = new Element.section();
+    GapsAnalysis analysis = new GapsAnalysis(
+        member['name'],
+        member['qualifiedName'],
+        member['comment'])
+      ..analyzeGaps(member);
+    int gapCount = analysis['gapCount'];
+    section.dataset['count'] = '$gapCount';
+    if (detailed) {
+      section.append(new HeadingElement.h2()
+        ..text = decoratedName);
+    }
+
+    if (analysis['gapCount'] == 0) {
+      section.appendHtml('<em>No gaps</em>');
+      return section;
+    }
+
+    section
+      ..append(new SpanElement()..text = '($gapCount points of coverage gaps)');
+
+    reportOnTopLevelComment(analysis.gaps, section);
+
+    return section;
+  }
 }

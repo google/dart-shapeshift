@@ -54,12 +54,6 @@ class DocCoverage {
     return score;
   }
 
-  static String resolveCommentText(String rawComment) =>
-    rawComment.replaceAllMapped(
-        new RegExp(r'<a>([^<]+)</a>'),
-        (Match match) => '<a>${new DocsLocation(match[1]).lastName}</a>'
-    );
-
   /// members is a List of Maps with keys 'size' and 'score' with numeric values.
   static double weightedScore(List<Map> members) {
     int weight = members.fold(0, (memo, Map member) => memo + member['size']);
@@ -67,6 +61,23 @@ class DocCoverage {
     // If no members, then we say 100%.
     if (weight == 0) return 1.00;
     return mass / weight;
+  }
+
+  static void annotateGaps(Map thing, Map g) {
+    if (!thing.containsKey('comment')) {
+      print('ACK!');
+      return;
+    }
+
+    String commentUnparsed = resolveCommentText(thing['comment']);
+    CommentAnalyses analyses = new CommentAnalyses(commentUnparsed);
+    thing['comment'] = commentUnparsed;
+
+    if (analyses.commentIsEmpty)
+      g['missing'].add(thing);
+
+    if (analyses.summaryTooLong)
+      g['no-one-liner'].add(thing);
   }
 
   DocCoverage(this.api);
@@ -88,7 +99,7 @@ class DocCoverage {
 
     if (api['packageName'] != null) {
       // This is a package.
-      if (!api.containsKey('comment') || (api['comment'] as String).isEmpty ) {
+      if (!api.containsKey('comment') || (api['comment'] as String).isEmpty) {
         gaps['gapCount'] = (gaps['gapCount'] as int) + libraryCommentGap;
       }
       else if ((api['comment'] as String).split('\n').length < 2 ) {
@@ -99,7 +110,7 @@ class DocCoverage {
     }
     else {
       // This is a class.
-      if (!api.containsKey('comment') || (api['comment'] as String).isEmpty ) {
+      if (!api.containsKey('comment') || (api['comment'] as String).isEmpty) {
         gaps['gapCount'] = (gaps['gapCount'] as int) + classCommentGap;
       }
       else if ((api['comment'] as String).split('\n').length < 2 ) {
@@ -131,23 +142,6 @@ class DocCoverage {
     Map methods = (api['methods'] as Map)[category];
     methods.forEach((String name, Map thing) => annotateGaps(thing, g));
     return g;
-  }
-
-  void annotateGaps(Map thing, Map g) {
-    if (!thing.containsKey('comment')) {
-      print('ACK!');
-      return;
-    }
-
-    String commentUnparsed = resolveCommentText(thing['comment']);
-    CommentAnalyses analyses = new CommentAnalyses(commentUnparsed);
-    thing['comment'] = commentUnparsed;
-
-    if (analyses.commentIsEmpty)
-      g['missing'].add(thing);
-
-    if (analyses.summaryTooLong)
-      g['no-one-liner'].add(thing);
   }
 
   double get score {
@@ -220,3 +214,9 @@ class DocCoverage {
     return shieldUrlForScore((100*score).toInt());
   }
 }
+
+String resolveCommentText(String rawComment) =>
+  rawComment.replaceAllMapped(
+      new RegExp(r'<a>([^<]+)</a>'),
+      (Match match) => '<a>${new DocsLocation(match[1]).lastName}</a>'
+  );

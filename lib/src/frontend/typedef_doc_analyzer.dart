@@ -12,10 +12,4 @@ class TypedefDocAnalyzer extends MemberDocAnalyzer {
   void reportGaps() {
     // TODO;
   }
-
-  Element gapsSection() {
-    Element section = new Element.section();
-    section.appendHtml('<em>Typedef gap analysis is unimplemented.</em>');
-    return section;
-  }
 }

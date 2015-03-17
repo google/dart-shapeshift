@@ -31,7 +31,7 @@ class DocCoverageReporter {
         print('$i: inspecting $file');
         File f = new File('$path/$file');
         String apiString = f.readAsStringSync();
-        Map y = new DocCoverage().calculateCoverage(apiString);
+        Map y = new DocCoverage.fromJson(apiString).calculateCoverage();
         if (y.isNotEmpty) { gaps[file] = y; }
       }
     });

@@ -12,3 +12,4 @@ import 'package:shapeshift/shapeshift_common.dart';
 
 part 'src/common/comment_analyses.dart';
 part 'src/common/doc_coverage.dart';
+part 'src/common/gaps_analysis.dart';

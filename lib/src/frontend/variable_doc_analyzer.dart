@@ -12,10 +12,4 @@ class VariableDocAnalyzer extends MemberDocAnalyzer {
   void reportGaps() {
     // TODO;
   }
-
-  Element gapsSection() {
-    Element section = new Element.section();
-    section.appendHtml('<em>Library variable gap analysis is unimplemented.</em>');
-    return section;
-  }
 }

@@ -12,10 +12,4 @@ class LibraryCommentDocAnalyzer extends MemberDocAnalyzer {
   void reportGaps() {
     // TODO;
   }
-
-  Element gapsSection() {
-    Element section = new Element.section();
-    section.appendHtml('<em>Library comment gap analysis is unimplemented.</em>');
-    return section;
-  }
 }

@@ -105,8 +105,14 @@ class LibraryDocAnalyzer {
       .catchError(_handleError);
   }
 
-  void _handleError(ProgressEvent error) =>
-      handleError(error, section, name: 'Dart library "${name.replaceFirst('dart-', '')}"');
+  void _handleError(Error error) {
+    if (error is! ProgressEvent)
+      throw error;
+
+    ProgressEvent err = error as ProgressEvent;
+    HttpRequest target = err.target;
+    handleError(err, section, name: 'Dart library "${name.replaceFirst('dart-', '')}"');
+  }
 
   void addToSortedRows(Element classRow, int gapCount, {bool reverse: false}) {
     addToSortedList(classRow, scoresTable, sortedSections, gapCount, reverse: reverse);

@@ -16,10 +16,4 @@ class FunctionDocAnalyzer extends MemberDocAnalyzer {
   void reportGaps() {
     // TODO;
   }
-
-  Element gapsSection() {
-    Element section = new Element.section();
-    section.appendHtml('<em>Library function gap analysis is unimplemented.</em>');
-    return section;
-  }
 }
