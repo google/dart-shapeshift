@@ -4,8 +4,8 @@
 part of doc_coverage_frontend;
 
 class VariableDocAnalyzer extends MemberDocAnalyzer {
-  VariableDocAnalyzer(LibraryDocAnalyzer libraryDocAnalyzer, Map member) :
-    super(libraryDocAnalyzer, member);
+  VariableDocAnalyzer(LibraryDocAnalyzer libraryDocAnalyzer, Map member)
+      : super(libraryDocAnalyzer, member);
 
   String get decoratedName => 'property $name';
 

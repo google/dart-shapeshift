@@ -5,6 +5,6 @@ part of shapeshift_frontend;
 
 AnchorElement dartlangAnchor(String qualifiedName, [String text]) {
   return new AnchorElement()
-    ..text = text !=null ? text : decoratedName(qualifiedName)
+    ..text = text != null ? text : decoratedName(qualifiedName)
     ..attributes['href'] = fullDartlangLocation(qualifiedName);
 }

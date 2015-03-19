@@ -4,9 +4,13 @@
 part of shapeshift_common;
 
 String pluralize(String s) {
-  if (s=='annotations') { return s; }
-  if (s.endsWith('s')) { return s+'es'; }
-  return s+'s';
+  if (s == 'annotations') {
+    return s;
+  }
+  if (s.endsWith('s')) {
+    return s + 'es';
+  }
+  return s + 's';
 }
 
 String pretty(Object json) {
@@ -14,7 +18,9 @@ String pretty(Object json) {
 }
 
 String singularize(String s) {
-  if (s=='return') { return s; }
+  if (s == 'return') {
+    return s;
+  }
   // Remove trailing character. Presumably an 's'.
-  return s.substring(0, s.length-1);
+  return s.substring(0, s.length - 1);
 }

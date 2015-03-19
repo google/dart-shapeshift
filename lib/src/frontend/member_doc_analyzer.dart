@@ -15,22 +15,22 @@ abstract class MemberDocAnalyzer {
   void go(String screen) {
     name = member['name'];
     // name, qualifiedName (path/path.method), comment
-    docUrl = libraryDocAnalyzer.htmlUrl != null ?
-        '${libraryDocAnalyzer.htmlUrl}.$name' : null;
-    if (screen == 'score')
-      reportScore();
-    else
-      reportGaps();
+    docUrl = libraryDocAnalyzer.htmlUrl != null
+        ? '${libraryDocAnalyzer.htmlUrl}.$name'
+        : null;
+    if (screen == 'score') reportScore();
+    else reportGaps();
   }
 
   String get decoratedName;
 
   void reportScore() {
-    int score = (100*DocCoverage.scoreThing(member)).toInt();
+    int score = (100 * DocCoverage.scoreThing(member)).toInt();
     scoreSection = libraryDocAnalyzer.scoresTable.createTBody();
     TableRowElement classRow = scoreSection.addRow();
 
-    libraryDocAnalyzer.addToSortedRows(scoreSection, score.toInt(), reverse: true);
+    libraryDocAnalyzer.addToSortedRows(scoreSection, score.toInt(),
+        reverse: true);
     ImageElement shieldImg = new ImageElement()
       ..attributes['src'] = DocCoverage.shieldUrlForScore(score)
       ..classes.add('shield');
@@ -38,16 +38,19 @@ abstract class MemberDocAnalyzer {
     Element text;
     if (docUrl == null) {
       text = new SpanElement()..innerHtml = '$decoratedName';
-    }
-    else {
+    } else {
       text = new AnchorElement()
         ..attributes['href'] = docUrl
         ..text = '$decoratedName '
-        ..append(new SpanElement()..innerHtml = '&#x2197;'..classes.add('sup'));
+        ..append(new SpanElement()
+          ..innerHtml = '&#x2197;'
+          ..classes.add('sup'));
     }
 
     SpanElement gapsToggle = new SpanElement()
-      ..append(new SpanElement()..innerHtml = '&#x25ba;'..classes.add('arrow'))
+      ..append(new SpanElement()
+        ..innerHtml = '&#x25ba;'
+        ..classes.add('arrow'))
       ..appendText(' gaps')
       ..classes.add('button')
       ..onClick.listen(toggleGaps);
@@ -82,8 +85,7 @@ abstract class MemberDocAnalyzer {
     if (gapsRow.classes.contains('hidden')) {
       gapsRow.classes.remove('hidden');
       e.querySelector('.arrow').innerHtml = '&#x25bc;';
-    }
-    else {
+    } else {
       gapsRow.classes.add('hidden');
       e.querySelector('.arrow').innerHtml = '&#x25b6;';
     }
@@ -92,15 +94,12 @@ abstract class MemberDocAnalyzer {
   Element gapsSection({detailed: true}) {
     Element section = new Element.section();
     GapsAnalysis analysis = new GapsAnalysis(
-        member['name'],
-        member['qualifiedName'],
-        member['comment'])
+        member['name'], member['qualifiedName'], member['comment'])
       ..analyzeGaps(member);
     int gapCount = analysis['gapCount'];
     section.dataset['count'] = '$gapCount';
     if (detailed) {
-      section.append(new HeadingElement.h2()
-        ..text = decoratedName);
+      section.append(new HeadingElement.h2()..text = decoratedName);
     }
 
     if (analysis['gapCount'] == 0) {

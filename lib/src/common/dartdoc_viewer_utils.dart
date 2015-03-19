@@ -12,7 +12,7 @@ String decoratedName(String qualifiedName) => qualifiedName
 /// Return the full URL for dart core APIs.
 String fullDartlangLocation(String qualifiedName) =>
     'https://api.dartlang.org/apidocs/channels/dev'
-    '/dartdoc-viewer/' + Uri.encodeFull(qualifiedName);
+        '/dartdoc-viewer/' + Uri.encodeFull(qualifiedName);
 
 String linkToDartlang(String qualifiedName, [String text]) {
   String x = fullDartlangLocation(qualifiedName);

@@ -8,7 +8,7 @@ class ClassDocAnalyzer {
   final String classType;
   final Map klassBrief;
 
-  Map<String,dynamic> klass;
+  Map<String, dynamic> klass;
   DocCoverage dc;
   String name, docUrl;
   TableSectionElement scoreSection;
@@ -18,38 +18,37 @@ class ClassDocAnalyzer {
   void go(String screen) {
     name = klassBrief['name'];
     String qualifiedName = klassBrief['qualifiedName'].replaceFirst(':', '-');
-    docUrl = libraryDocAnalyzer.htmlUrl != null ?
-        '${libraryDocAnalyzer.htmlUrl}.$name' : null;
-    HttpRequest.getString('${libraryDocAnalyzer.base}/$qualifiedName.json')
-      .then((String json) {
-        klass = new JsonDecoder().convert(json);
-        dc = new DocCoverage(klass);
-        if (screen == 'score')
-          _reportClassScore();
-        else
-          reportClassGaps();
-      })
-      .catchError(_reportError);
+    docUrl = libraryDocAnalyzer.htmlUrl != null
+        ? '${libraryDocAnalyzer.htmlUrl}.$name'
+        : null;
+    HttpRequest
+        .getString('${libraryDocAnalyzer.base}/$qualifiedName.json')
+        .then((String json) {
+      klass = new JsonDecoder().convert(json);
+      dc = new DocCoverage(klass);
+      if (screen == 'score') _reportClassScore();
+      else reportClassGaps();
+    }).catchError(_reportError);
   }
 
   void _reportError(Error err) {
-    if (err is! ProgressEvent)
-      throw err;
+    if (err is! ProgressEvent) throw err;
 
     HttpRequest target = (err as ProgressEvent).target;
     scoreSection = libraryDocAnalyzer.scoresTable.createTBody();
-    TableRowElement classRow = scoreSection.addRow()
-      ..classes.add('error');
+    TableRowElement classRow = scoreSection.addRow()..classes.add('error');
 
     libraryDocAnalyzer.addToSortedRows(scoreSection, 0, reverse: true);
 
     String nameHtml = '$classType $name';
-    if (classType == 'class')
-        nameHtml = '<strong>$nameHtml</strong>';
+    if (classType == 'class') nameHtml = '<strong>$nameHtml</strong>';
     Element errorText = new AnchorElement()
       ..attributes['href'] = target.responseUrl
-      ..innerHtml = 'Error fetching docs: Error ${target.status}: ${target.statusText}'
-      ..append(new SpanElement()..innerHtml = '&#x2197;'..classes.add('sup'));
+      ..innerHtml =
+      'Error fetching docs: Error ${target.status}: ${target.statusText}'
+      ..append(new SpanElement()
+        ..innerHtml = '&#x2197;'
+        ..classes.add('sup'));
 
     scoreSection.dataset['count'] = '0';
     scoreSection.dataset['size'] = '1';
@@ -72,31 +71,34 @@ class ClassDocAnalyzer {
 
   void _reportClassScore() {
     String className = klass['name'];
-    int score = (100*dc.score).toInt();
+    int score = (100 * dc.score).toInt();
     scoreSection = libraryDocAnalyzer.scoresTable.createTBody();
     TableRowElement classRow = scoreSection.addRow();
 
-    libraryDocAnalyzer.addToSortedRows(scoreSection, score.toInt(), reverse: true);
+    libraryDocAnalyzer.addToSortedRows(scoreSection, score.toInt(),
+        reverse: true);
     ImageElement shieldImg = new ImageElement()
       ..attributes['src'] = dc.shieldUrl()
       ..classes.add('shield');
 
     String nameHtml = '$classType $className';
-    if (classType == 'class')
-        nameHtml = '<strong>$nameHtml</strong>';
+    if (classType == 'class') nameHtml = '<strong>$nameHtml</strong>';
     Element text;
     if (docUrl == null) {
       text = new SpanElement()..innerHtml = nameHtml;
-    }
-    else {
+    } else {
       text = new AnchorElement()
         ..attributes['href'] = docUrl
         ..innerHtml = '$nameHtml '
-        ..append(new SpanElement()..innerHtml = '&#x2197;'..classes.add('sup'));
+        ..append(new SpanElement()
+          ..innerHtml = '&#x2197;'
+          ..classes.add('sup'));
     }
 
     SpanElement gapsToggle = new SpanElement()
-      ..append(new SpanElement()..innerHtml = '&#x25ba;'..classes.add('arrow'))
+      ..append(new SpanElement()
+        ..innerHtml = '&#x25ba;'
+        ..classes.add('arrow'))
       ..appendText(' gaps')
       ..classes.add('button')
       ..onClick.listen(toggleClassGaps);
@@ -136,21 +138,20 @@ class ClassDocAnalyzer {
     if (gapsRow.classes.contains('hidden')) {
       gapsRow.classes.remove('hidden');
       e.querySelector('.arrow').innerHtml = '&#x25bc;';
-    }
-    else {
+    } else {
       gapsRow.classes.add('hidden');
       e.querySelector('.arrow').innerHtml = '&#x25b6;';
     }
   }
 
   Element classGapsSection({detailed: true}) {
-    Map<String,dynamic> gaps = dc.calculateCoverage();
+    Map<String, dynamic> gaps = dc.calculateCoverage();
     Element classSection = new Element.section();
     int gapCount = gaps['gapCount'];
     classSection.dataset['count'] = '$gapCount';
     if (detailed) {
-      classSection.append(new HeadingElement.h2()
-        ..text = '$classType ${gaps['name']}');
+      classSection
+          .append(new HeadingElement.h2()..text = '$classType ${gaps['name']}');
     }
 
     if (gaps['gapCount'] == 0) {

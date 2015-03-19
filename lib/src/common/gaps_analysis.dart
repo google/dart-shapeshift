@@ -38,11 +38,9 @@ class GapsAnalysis {
     CommentAnalyses analyses = new CommentAnalyses(commentUnparsed);
     thing['comment'] = commentUnparsed;
 
-    if (analyses.commentIsEmpty)
-      gaps['missing'].add(thing);
+    if (analyses.commentIsEmpty) gaps['missing'].add(thing);
 
-    if (analyses.summaryTooLong)
-      gaps['no-one-liner'].add(thing);
+    if (analyses.summaryTooLong) gaps['no-one-liner'].add(thing);
 
     gaps['gapCount'] = gapCount;
   }

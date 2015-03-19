@@ -15,10 +15,9 @@ class CommentAnalyses {
 
   bool get commentMissingPeriod {
     Element lastPara = comment.querySelector('body >p');
-    String endingText = (lastPara == null)
-      ? comment.querySelector('body').text
-      : lastPara.text;
-    return endingText[endingText.length-1] != '.';
+    String endingText =
+        (lastPara == null) ? comment.querySelector('body').text : lastPara.text;
+    return endingText[endingText.length - 1] != '.';
   }
 
   bool get commentIsEmpty {

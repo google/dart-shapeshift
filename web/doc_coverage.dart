@@ -13,8 +13,8 @@ import 'package:shapeshift/doc_coverage_frontend.dart';
 UrlPattern baseUrl = new UrlPattern(r'(.*).html');
 UrlPattern libraryScoreUrl = new UrlPattern(r'(.*)#/library/([^/]*)/');
 UrlPattern packageScoreUrl = new UrlPattern(r'(.*)#/package/([^/]*)/');
-UrlPattern libraryGapsUrl  = new UrlPattern(r'(.*)#/library/([^/]*)/gaps');
-UrlPattern packageGapsUrl  = new UrlPattern(r'(.*)#/package/([^/]*)/gaps');
+UrlPattern libraryGapsUrl = new UrlPattern(r'(.*)#/library/([^/]*)/gaps');
+UrlPattern packageGapsUrl = new UrlPattern(r'(.*)#/package/([^/]*)/gaps');
 Router router = new Router();
 
 String dartdocs = 'http://www.dartdocs.org/documentation';
@@ -22,14 +22,13 @@ String version;
 String base;
 String versionUrl;
 
-
 void main() {
   gapsDiv = querySelector('#gaps');
   getPackageButton = querySelector('#getPackage');
   getPackageButton.onClick.listen((_) {
     String name = packageInput.value;
-    window.location.hash = name.startsWith('dart:') ?
-        '/library/$name/' : '/package/$name/';
+    window.location.hash =
+        name.startsWith('dart:') ? '/library/$name/' : '/package/$name/';
   });
 
   packageInput = querySelector('#package');
@@ -41,13 +40,13 @@ void main() {
   });
 
   router = new Router()
-        ..addHandler(baseUrl, (_) => null)
-        ..addHandler(libraryScoreUrl, showLibraryScore)
-        ..addHandler(packageScoreUrl, showPackageScore)
-        ..addHandler(libraryGapsUrl, showLibraryGaps)
-        ..addHandler(packageGapsUrl, showPackageGaps)
-        ..listen()
-        ..handle(window.location.toString());
+    ..addHandler(baseUrl, (_) => null)
+    ..addHandler(libraryScoreUrl, showLibraryScore)
+    ..addHandler(packageScoreUrl, showPackageScore)
+    ..addHandler(libraryGapsUrl, showLibraryGaps)
+    ..addHandler(packageGapsUrl, showPackageGaps)
+    ..listen()
+    ..handle(window.location.toString());
 }
 
 void sendGaPageview(String path) {
@@ -101,7 +100,8 @@ class PackageDiscovery {
     // http://www.dartdocs.org/documentation/args/0.12.1/docs/args/args.json
     // http://www.dartdocs.org/documentation/args/0.12.1/docs/args/args.ArgParser.json
     String url = '$dartdocs/$name/latest/';
-    HttpRequest.getString(url)
+    HttpRequest
+        .getString(url)
         .then(redirectToPackageVersion)
         .catchError(_handleError);
   }
@@ -115,7 +115,8 @@ class PackageDiscovery {
     // gives me back an HTML file which includes some JavaScript that redirects
     // to the latest package version. Wah-wah. So we parse that HTML (really the
     // JavaScript inside), for said version:
-    RegExp pattern = new RegExp("latestUrl='$dartdocs/$name/([^/]+)/index.html'");
+    RegExp pattern =
+        new RegExp("latestUrl='$dartdocs/$name/([^/]+)/index.html'");
     if (pattern.hasMatch(html)) {
       version = pattern.firstMatch(html)[1];
       versionUrl = '$dartdocs/$name/$version/index.html';
@@ -128,7 +129,7 @@ class PackageDiscovery {
   }
 
   void reportPackage(String json) {
-    Map<String,dynamic> package;
+    Map<String, dynamic> package;
     dynamic _package = new JsonDecoder().convert(json);
     if (_package is Map) {
       package = _package;
@@ -140,24 +141,24 @@ class PackageDiscovery {
     // A hack to get past the dart: libraries up front.
     Map lastLib = package['libraries'][package['libraries'].length - 1];
     AnchorElement versionAnchor = new AnchorElement()
-        ..text = 'Using version $version docs from dartdocs.org'
-        ..classes.add('version')
-        ..attributes['href'] = '$versionUrl#${lastLib['qualifiedName']}';
+      ..text = 'Using version $version docs from dartdocs.org'
+      ..classes.add('version')
+      ..attributes['href'] = '$versionUrl#${lastLib['qualifiedName']}';
 
     gapsDiv
-        ..append(new HeadingElement.h1()..text = 'package ${lastLib['packageName']}')
-        ..append(versionAnchor);
+      ..append(
+          new HeadingElement.h1()..text = 'package ${lastLib['packageName']}')
+      ..append(versionAnchor);
 
     (package['libraries'] as List).forEach((Map lib) {
       if (!(lib['name'] as String).startsWith('dart-pkg') &&
           ((lib['name'] as String).startsWith('dart-') ||
-           (lib['name'] as String).startsWith('dart:'))) return;
+              (lib['name'] as String).startsWith('dart:'))) return;
 
-      LibraryDocAnalyzer lda = new LibraryDocAnalyzer(lib['qualifiedName'], base, package: name);
-      if (screen == 'score')
-        lda.analyzeScore();
-      else
-        lda.analyzeGaps();
+      LibraryDocAnalyzer lda =
+          new LibraryDocAnalyzer(lib['qualifiedName'], base, package: name);
+      if (screen == 'score') lda.analyzeScore();
+      else lda.analyzeGaps();
     });
   }
 }

@@ -32,8 +32,8 @@ final subMemberMatch = new RegExp(r'\.([\w\<\+\|\[\]\>\/\^\=\&\*\-\%]+)');
 RegExp get anchorMatch {
   var anchorPrefix = ANCHOR_STRING;
   //if (useHistory) anchorPrefix = ANCHOR_PLUS_PREFIX;
-  return new RegExp(r'\' + anchorPrefix +
-      r'([\w\<\+\|\[\]\>\/\^\=\&\*\-\%\.\,]+)');
+  return new RegExp(
+      r'\' + anchorPrefix + r'([\w\<\+\|\[\]\>\/\^\=\&\*\-\%\.\,]+)');
 }
 
 /// The separator to use between the "anchor" portion of the location, which

@@ -6,7 +6,7 @@ import 'package:args/args.dart';
 
 class Shapeshift {
   ArgResults args;
-  
+
   void go(List<String> arguments) {
     parseArgs(arguments);
     String left = args.rest[0];
@@ -18,12 +18,14 @@ class Shapeshift {
       rightPath += "/${args['subset']}";
     }
     new PackageReporter(leftPath, rightPath, out: args['out'])
-        ..calculateAllDiffs()..report();
+      ..calculateAllDiffs()
+      ..report();
   }
-  
+
   void parseArgs(List<String> arguments) {
     var parser = new ArgParser();
-    parser.addOption('base', defaultsTo: '/Users/srawlins/code/dartlang.org/api-docs');
+    parser.addOption('base',
+        defaultsTo: '/Users/srawlins/code/dartlang.org/api-docs');
     parser.addOption('subset', defaultsTo: '');
     parser.addOption('out');
     args = parser.parse(arguments);
