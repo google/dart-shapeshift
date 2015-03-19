@@ -13,12 +13,12 @@ class SdkLibraryDocAnalyzer extends LibraryDocAnalyzer {
     super.analyzeScore();
 
     AnchorElement linkToDocs = new AnchorElement()
-        ..attributes['href'] = htmlUrl
-        ..text = 'api.dartlang.org';
+      ..attributes['href'] = htmlUrl
+      ..text = 'api.dartlang.org';
     ParagraphElement p = new ParagraphElement()
-        ..appendText('View $name docs at ')
-        ..append(linkToDocs)
-        ..appendText('.');
+      ..appendText('View $name docs at ')
+      ..append(linkToDocs)
+      ..appendText('.');
     section.insertBefore(p, section.lastChild);
   }
 }

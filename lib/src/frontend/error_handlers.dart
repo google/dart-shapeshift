@@ -13,10 +13,10 @@ handleError(ProgressEvent error, HtmlElement el, { String name: 'That library' }
   }
 
   DivElement errorDiv = new DivElement()
-      ..classes.add('error');
+    ..classes.add('error');
   errorDiv.append(new HeadingElement.h1()..text = 'Error details');
   errorDiv.append(new ParagraphElement()
-      ..text = 'Error from ${target.responseUrl}: ${target.status} ${target.statusText}'
+    ..text = 'Error from ${target.responseUrl}: ${target.status} ${target.statusText}'
   );
 
   el.append(errorDiv);

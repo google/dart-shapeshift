@@ -20,15 +20,16 @@ class ClassDocAnalyzer {
     String qualifiedName = klassBrief['qualifiedName'].replaceFirst(':', '-');
     docUrl = libraryDocAnalyzer.htmlUrl != null ?
         '${libraryDocAnalyzer.htmlUrl}.$name' : null;
-    HttpRequest.getString('${libraryDocAnalyzer.base}/$qualifiedName.json').then((String json) {
-      klass = new JsonDecoder().convert(json);
-      dc = new DocCoverage(klass);
-      if (screen == 'score')
-        _reportClassScore();
-      else
-        reportClassGaps();
-    })
-    .catchError(_reportError);
+    HttpRequest.getString('${libraryDocAnalyzer.base}/$qualifiedName.json')
+      .then((String json) {
+        klass = new JsonDecoder().convert(json);
+        dc = new DocCoverage(klass);
+        if (screen == 'score')
+          _reportClassScore();
+        else
+          reportClassGaps();
+      })
+      .catchError(_reportError);
   }
 
   void _reportError(Error err) {
@@ -36,7 +37,6 @@ class ClassDocAnalyzer {
       throw err;
 
     HttpRequest target = (err as ProgressEvent).target;
-
     scoreSection = libraryDocAnalyzer.scoresTable.createTBody();
     TableRowElement classRow = scoreSection.addRow()
       ..classes.add('error');
