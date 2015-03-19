@@ -16,13 +16,18 @@ class DocCoverage {
   static const int methodWeight = 2;
   static const int variableWeight = 1;
 
-  static const List<String> methodCategories =
-      const ['getters', 'setters', 'constructors', 'methods', 'operators'];
+  static const List<String> methodCategories = const [
+    'getters',
+    'setters',
+    'constructors',
+    'methods',
+    'operators'
+  ];
 
   // Poor man's class for now.
-  final Map<String,Object> gaps = new Map();
+  final Map<String, Object> gaps = new Map();
 
-  Map<String,Object> api;
+  Map<String, Object> api;
   double _score;
 
   static String shieldUrlForScore(int score) {
@@ -41,15 +46,13 @@ class DocCoverage {
     }
 
     double score = 1.0;
-    CommentAnalyses analyses = new CommentAnalyses(resolveCommentText(thing['comment']));
-    if (analyses.commentIsEmpty)
-      return 0.0;
+    CommentAnalyses analyses =
+        new CommentAnalyses(resolveCommentText(thing['comment']));
+    if (analyses.commentIsEmpty) return 0.0;
 
-    if (analyses.summaryTooLong)
-      score -= 0.2;
+    if (analyses.summaryTooLong) score -= 0.2;
 
-    if (analyses.commentMissingPeriod)
-      score -= 0.1;
+    if (analyses.commentMissingPeriod) score -= 0.1;
 
     return score;
   }
@@ -57,7 +60,8 @@ class DocCoverage {
   /// members is a List of Maps with keys 'size' and 'score' with numeric values.
   static double weightedScore(List<Map> members) {
     int weight = members.fold(0, (memo, Map member) => memo + member['size']);
-    double mass = members.fold(0.0, (memo, Map member) => memo + member['size'] * member['score']);
+    double mass = members.fold(
+        0.0, (memo, Map member) => memo + member['size'] * member['score']);
     // If no members, then we say 100%.
     if (weight == 0) return 1.00;
     return mass / weight;
@@ -73,11 +77,9 @@ class DocCoverage {
     CommentAnalyses analyses = new CommentAnalyses(commentUnparsed);
     thing['comment'] = commentUnparsed;
 
-    if (analyses.commentIsEmpty)
-      g['missing'].add(thing);
+    if (analyses.commentIsEmpty) g['missing'].add(thing);
 
-    if (analyses.summaryTooLong)
-      g['no-one-liner'].add(thing);
+    if (analyses.summaryTooLong) g['no-one-liner'].add(thing);
   }
 
   DocCoverage(this.api);
@@ -91,7 +93,7 @@ class DocCoverage {
     }
   }
 
-  Map<String,dynamic> calculateCoverage() {
+  Map<String, dynamic> calculateCoverage() {
     gaps['gapCount'] = 0;
     gaps['qualifiedName'] = api['qualifiedName'];
     gaps['name'] = api['name'];
@@ -101,31 +103,28 @@ class DocCoverage {
       // This is a package.
       if (!api.containsKey('comment') || (api['comment'] as String).isEmpty) {
         gaps['gapCount'] = (gaps['gapCount'] as int) + libraryCommentGap;
-      }
-      else if ((api['comment'] as String).split('\n').length < 2 ) {
+      } else if ((api['comment'] as String).split('\n').length < 2) {
         gaps['gapCount'] = (gaps['gapCount'] as int) + libraryCommentBrief;
       }
 
       gaps['packageName'] = api['qualifiedName'];
-    }
-    else {
+    } else {
       // This is a class.
       if (!api.containsKey('comment') || (api['comment'] as String).isEmpty) {
         gaps['gapCount'] = (gaps['gapCount'] as int) + classCommentGap;
-      }
-      else if ((api['comment'] as String).split('\n').length < 2 ) {
+      } else if ((api['comment'] as String).split('\n').length < 2) {
         gaps['gapCount'] = (gaps['gapCount'] as int) + classCommentBrief;
       }
 
       methodCategories.forEach((String c) {
-        Map<String,List> catGaps = categoryGaps(c);
+        Map<String, List> catGaps = categoryGaps(c);
         gaps[c] = catGaps;
         gaps['gapCount'] = (gaps['gapCount'] as int) +
             catGaps['missing'].length * memberCommentGap +
             catGaps['no-one-liner'].length * memberCommentIssue;
       });
 
-      Map<String,List> g = { 'missing': new List(), 'no-one-liner': new List() };
+      Map<String, List> g = {'missing': new List(), 'no-one-liner': new List()};
       Map variables = api['variables'];
       variables.forEach((String name, Map thing) => annotateGaps(thing, g));
       gaps['variables'] = g;
@@ -138,7 +137,7 @@ class DocCoverage {
   }
 
   Map categoryGaps(String category) {
-    Map<String,List> g = { 'missing': new List(), 'no-one-liner': new List() };
+    Map<String, List> g = {'missing': new List(), 'no-one-liner': new List()};
     Map methods = (api['methods'] as Map)[category];
     methods.forEach((String name, Map thing) => annotateGaps(thing, g));
     return g;
@@ -152,23 +151,19 @@ class DocCoverage {
 
     if (api['packageName'] != null) {
       // This is a package.
-    }
-    else {
+    } else {
       // This is a class.
-      if (!api.containsKey('comment'))
-        topLevelScore = 0.0;
+      if (!api.containsKey('comment')) topLevelScore = 0.0;
       else {
         CommentAnalyses analyses = new CommentAnalyses(api['comment']);
-        if (analyses.commentIsEmpty)
-          topLevelScore = 0.0;
+        if (analyses.commentIsEmpty) topLevelScore = 0.0;
 
         // This analysis is too strict for now... I should re-add when I can make
         // the analysis configurable.
         /*if (analyses.commentIsOneLine)
           topLevelScore = 0.5;*/
 
-        if (analyses.summaryTooLong)
-          topLevelScore -= 0.2;
+        if (analyses.summaryTooLong) topLevelScore -= 0.2;
       }
 
       double methodScoreSum = 0.0;
@@ -178,16 +173,16 @@ class DocCoverage {
         if (methods == null) return;
         Iterable<double> scores = methods.values.map(scoreThing);
 
-        if (scores.isNotEmpty)
-          methodScoreSum += scores.reduce((value, el) => value + el);
+        if (scores.isNotEmpty) methodScoreSum +=
+            scores.reduce((value, el) => value + el);
         methodCount += methods.length;
       });
 
       Map variables = api['variables'] as Map;
       double variableScoreSum = 0.0;
       Iterable<double> scores = variables.values.map(scoreThing);
-      if (scores.isNotEmpty)
-        variableScoreSum = scores.reduce((value, el) => value + el);
+      if (scores.isNotEmpty) variableScoreSum =
+          scores.reduce((value, el) => value + el);
       int variableCount = variables.length;
 
       methodScoreSum *= methodWeight;
@@ -195,28 +190,29 @@ class DocCoverage {
       variableScoreSum *= variableWeight;
       variableCount *= variableWeight;
 
-      if (methodCount + variableCount > 0)
-        memberLevelScore = (methodScoreSum + variableScoreSum) / (methodCount + variableCount);
+      if (methodCount + variableCount > 0) memberLevelScore =
+          (methodScoreSum + variableScoreSum) / (methodCount + variableCount);
     }
-    _score = topLevelScore*topLevelWeight + memberLevelScore*memberLevelWeight;
+    _score =
+        topLevelScore * topLevelWeight + memberLevelScore * memberLevelWeight;
     return _score;
   }
 
   int calculateSize() {
-    Function numMethodThings = (memo, el) =>
-        memo + ((api['methods'] as Map)[el] == null ? 0 : (api['methods'] as Map)[el].length);
+    Function numMethodThings = (memo, el) => memo +
+        ((api['methods'] as Map)[el] == null
+            ? 0
+            : (api['methods'] as Map)[el].length);
 
     return (api['variables'] as Map).length +
         methodCategories.fold(0, numMethodThings);
   }
 
   String shieldUrl() {
-    return shieldUrlForScore((100*score).toInt());
+    return shieldUrlForScore((100 * score).toInt());
   }
 }
 
-String resolveCommentText(String rawComment) =>
-  rawComment.replaceAllMapped(
-      new RegExp(r'<a>([^<]+)</a>'),
-      (Match match) => '<a>${new DocsLocation(match[1]).lastName}</a>'
-  );
+String resolveCommentText(String rawComment) => rawComment.replaceAllMapped(
+    new RegExp(r'<a>([^<]+)</a>'),
+    (Match match) => '<a>${new DocsLocation(match[1]).lastName}</a>');

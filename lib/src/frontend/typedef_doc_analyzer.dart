@@ -4,8 +4,8 @@
 part of doc_coverage_frontend;
 
 class TypedefDocAnalyzer extends MemberDocAnalyzer {
-  TypedefDocAnalyzer(LibraryDocAnalyzer libraryDocAnalyzer, Map member) :
-    super(libraryDocAnalyzer, member);
+  TypedefDocAnalyzer(LibraryDocAnalyzer libraryDocAnalyzer, Map member)
+      : super(libraryDocAnalyzer, member);
 
   String get decoratedName => 'typedef $name';
 

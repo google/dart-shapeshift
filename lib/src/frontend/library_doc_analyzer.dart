@@ -3,10 +3,15 @@
 
 part of doc_coverage_frontend;
 
-const methodTypes = const ['getters', 'setters', 'constructors', 'methods', 'operators'];
+const methodTypes = const [
+  'getters',
+  'setters',
+  'constructors',
+  'methods',
+  'operators'
+];
 
 class LibraryDocAnalyzer {
-
   final String name, nameWithColon, base, package;
   final Element section = new Element.section();
   final Element sectionHeading = new HeadingElement.h1();
@@ -40,30 +45,32 @@ class LibraryDocAnalyzer {
 
   void analyzeScore() {
     prepareElements();
-    String gapsUrl = (package == null) ?
-        '#/library/${name.replaceFirst('-', ':')}/gaps' :
-        '#/package/${package}/gaps';
+    String gapsUrl = (package == null)
+        ? '#/library/${name.replaceFirst('-', ':')}/gaps'
+        : '#/package/${package}/gaps';
 
     AnchorElement linkToGaps = new AnchorElement()
-        ..attributes['href'] = gapsUrl
-        ..text = 'See';
+      ..attributes['href'] = gapsUrl
+      ..text = 'See';
     ParagraphElement p = new ParagraphElement()
-        ..append(linkToGaps)
-        ..appendText(' the gaps in doc coverage.');
+      ..append(linkToGaps)
+      ..appendText(' the gaps in doc coverage.');
     section.append(p);
     section.append(scoresTable);
-    scoresTable.classes..add('hidden')..add('scores-table');
+    scoresTable.classes
+      ..add('hidden')
+      ..add('scores-table');
     getJsonAndReport('score');
   }
-  
+
   void updateLibraryBadge() {
-    List<Map> memberData = sortedSections.map((Element el) =>
-        {
-          'size': int.parse(el.dataset['size']),
-          'score': int.parse(el.dataset['count']) / 100
-        }
-    ).toList();
-    int score = (100*DocCoverage.weightedScore(memberData)).toInt();
+    List<Map> memberData = sortedSections
+        .map((Element el) => {
+      'size': int.parse(el.dataset['size']),
+      'score': int.parse(el.dataset['count']) / 100
+    })
+        .toList();
+    int score = (100 * DocCoverage.weightedScore(memberData)).toInt();
     sectionShield.attributes['src'] = DocCoverage.shieldUrlForScore(score);
   }
 
@@ -80,53 +87,52 @@ class LibraryDocAnalyzer {
   /// * the library's top-level functions
   /// * the library's top-level properties
   void getJsonAndReport(String screen) {
-    HttpRequest.getString('$base/${name}.json')
-      .then((String json) {
-        Map<String,dynamic> library = new JsonDecoder().convert(json);
-        new LibraryCommentDocAnalyzer(this, library).go(screen);
-        (library['classes']['class'] as List).forEach((klass) =>
-          new ClassDocAnalyzer(this, 'class', klass).go(screen));
-        (library['classes']['error'] as List).forEach((klass) =>
-          new ClassDocAnalyzer(this, 'error', klass).go(screen));
-        // Typedefs don't have their own files; it's all inline.
-        (library['classes']['typedef'] as Map).values.forEach((klass) =>
-          new TypedefDocAnalyzer(this, klass).go(screen));
+    HttpRequest.getString('$base/${name}.json').then((String json) {
+      Map<String, dynamic> library = new JsonDecoder().convert(json);
+      new LibraryCommentDocAnalyzer(this, library).go(screen);
+      (library['classes']['class'] as List).forEach(
+          (klass) => new ClassDocAnalyzer(this, 'class', klass).go(screen));
+      (library['classes']['error'] as List).forEach(
+          (klass) => new ClassDocAnalyzer(this, 'error', klass).go(screen));
+      // Typedefs don't have their own files; it's all inline.
+      (library['classes']['typedef'] as Map).values
+          .forEach((klass) => new TypedefDocAnalyzer(this, klass).go(screen));
 
-        methodTypes.forEach((methodType) =>
-            (library['functions'][methodType] as Map).forEach((String name, Map method) {
-              new FunctionDocAnalyzer(this, methodType, method).go(screen);
-            })
-        );
+      methodTypes.forEach(
+          (methodType) => (library['functions'][methodType] as Map)
+              .forEach((String name, Map method) {
+        new FunctionDocAnalyzer(this, methodType, method).go(screen);
+      }));
 
-        (library['variables'] as Map).forEach((String name, Map variable) {
-          new VariableDocAnalyzer(this, variable).go(screen);
-        });
-      })
-      .catchError(_handleError);
+      (library['variables'] as Map).forEach((String name, Map variable) {
+        new VariableDocAnalyzer(this, variable).go(screen);
+      });
+    }).catchError(_handleError);
   }
 
   void _handleError(Error error) {
-    if (error is! ProgressEvent)
-      throw error;
+    if (error is! ProgressEvent) throw error;
 
     ProgressEvent err = error as ProgressEvent;
     HttpRequest target = err.target;
-    handleError(err, section, name: 'Dart library "${name.replaceFirst('dart-', '')}"');
+    handleError(err, section,
+        name: 'Dart library "${name.replaceFirst('dart-', '')}"');
   }
 
   void addToSortedRows(Element classRow, int gapCount, {bool reverse: false}) {
-    addToSortedList(classRow, scoresTable, sortedSections, gapCount, reverse: reverse);
+    addToSortedList(classRow, scoresTable, sortedSections, gapCount,
+        reverse: reverse);
   }
 
-  void addToSortedSections(Element classSection, int gapCount, {bool reverse: false}) {
-    addToSortedList(classSection, section, sortedSections, gapCount, reverse: reverse);
+  void addToSortedSections(Element classSection, int gapCount,
+      {bool reverse: false}) {
+    addToSortedList(classSection, section, sortedSections, gapCount,
+        reverse: reverse);
   }
 
-  void addToSortedList(Element element,
-                       Element listElement,
-                       List<Element> list,
-                       int value,
-                       {bool reverse: false}) {
+  void addToSortedList(
+      Element element, Element listElement, List<Element> list, int value,
+      {bool reverse: false}) {
     // This is craziness. There has to be a better way.
     listElement.classes.remove('hidden');
     if (list.isEmpty) {
@@ -142,12 +148,13 @@ class LibraryDocAnalyzer {
       return reverse ? value > count : value < count;
     }
 
-    while (i < list.length && keepGoing()) { i++; }
+    while (i < list.length && keepGoing()) {
+      i++;
+    }
 
     if (i == list.length) {
       listElement.append(element);
-    }
-    else {
+    } else {
       listElement.insertBefore(element, list[i]);
     }
     list.insert(i, element);
@@ -158,95 +165,100 @@ class LibraryDocAnalyzer {
     gapSummary.dataset['value'] = sum.toString();
     gapSummary.innerHtml = '<em>Coverage gap total: $sum points</em>';
   }
-
 }
 
-void reportOnTopLevelComment(Map<String,dynamic> gaps, [Element section]) {
-  if (section == null) { section = gapsDiv; }
+void reportOnTopLevelComment(Map<String, dynamic> gaps, [Element section]) {
+  if (section == null) {
+    section = gapsDiv;
+  }
   if (!gaps.containsKey('comment') || (gaps['comment'] as String).isEmpty) {
     section.append(new ParagraphElement()
-        ..append(dartlangAnchor(gaps['qualifiedName']))
-        ..appendText(' has no comment!')
-    );
-  }
-  else if ((gaps['comment'] as String).split('\n').length < 2 ) {
+      ..append(dartlangAnchor(gaps['qualifiedName']))
+      ..appendText(' has no comment!'));
+  } else if ((gaps['comment'] as String).split('\n').length < 2) {
     String x = linkToDartlang(gaps['qualifiedName']);
     section.append(new ParagraphElement()
-        ..append(dartlangAnchor(gaps['qualifiedName']))
-        ..appendText('''\'s comment is too short (under 2 paragraphs)
-                        (${DocCoverage.classCommentBrief} points each):''')
-    );
+      ..append(dartlangAnchor(gaps['qualifiedName']))
+      ..appendText('''\'s comment is too short (under 2 paragraphs)
+                        (${DocCoverage.classCommentBrief} points each):'''));
     section.append(new ParagraphElement()
-        ..innerHtml = gaps['comment']
-        ..className = 'quote'
-    );
+      ..innerHtml = gaps['comment']
+      ..className = 'quote');
   }
 }
 
-void reportOnMethods(Map<String,dynamic> gaps, [Element section]) {
+void reportOnMethods(Map<String, dynamic> gaps, [Element section]) {
   bool any = false;
   methodTypes.forEach((cat) {
     if (gaps[cat].length > 0) {
       any = true;
     }
   });
-  if (!any) { return; }
+  if (!any) {
+    return;
+  }
 
   methodTypes.forEach((cat) => reportOnCategory(cat, gaps, section));
 }
 
-void reportOnVariables(Map<String,dynamic> gaps, [Element section]) {
+void reportOnVariables(Map<String, dynamic> gaps, [Element section]) {
   if (!gaps.containsKey('variables')) return;
   bool any = false;
   if (gaps['variables'].length > 0) {
     any = true;
   }
-  if (!any) { return; }
+  if (!any) {
+    return;
+  }
 
   reportOnCategory('variables', gaps, section);
 }
 
-void reportOnCategory(String cat, Map<String,dynamic> gaps, [Element section]) {
-  if (section == null) { section = gapsDiv; }
+void reportOnCategory(String cat, Map<String, dynamic> gaps,
+    [Element section]) {
+  if (section == null) {
+    section = gapsDiv;
+  }
   List missing = gaps[cat]['missing'];
   List noOneLiner = gaps[cat]['no-one-liner'];
 
   if (missing.length > 0) {
     String catMsg = missing.length == 1 ? '${singularize(cat)} is' : '$cat are';
     section.append(new ParagraphElement()
-        ..text = '''${missing.length} $catMsg missing comments
-                    (${DocCoverage.memberCommentGap} points each):'''
-    );
+      ..text = '''${missing.length} $catMsg missing comments
+                    (${DocCoverage.memberCommentGap} points each):''');
     UListElement l = new UListElement();
     section.append(l);
-    missing.forEach((Map<String,Object> meth) {
+    missing.forEach((Map<String, Object> meth) {
       String name = meth['name'] as String;
-      if (name.isEmpty) { name = "(default constructor)"; }
+      if (name.isEmpty) {
+        name = "(default constructor)";
+      }
       l.append(new LIElement()
-          ..append(dartlangAnchor(meth['qualifiedName'] as String, name))
-      );
+        ..append(dartlangAnchor(meth['qualifiedName'] as String, name)));
     });
   }
 
   if (noOneLiner.length > 0) {
-    String catMsg = noOneLiner.length == 1 ? '${singularize(cat)} has' : '$cat have';
+    String catMsg =
+        noOneLiner.length == 1 ? '${singularize(cat)} has' : '$cat have';
     section.append(new ParagraphElement()
-        ..text = '''${noOneLiner.length} $catMsg no one-liner (the first line is too
-                    long) (${DocCoverage.memberCommentIssue} point each):'''
-    );
+      ..text =
+      '''${noOneLiner.length} $catMsg no one-liner (the first line is too
+                    long) (${DocCoverage.memberCommentIssue} point each):''');
     UListElement l = new UListElement();
     section.append(l);
-    noOneLiner.forEach((Map<String,Object> meth) {
+    noOneLiner.forEach((Map<String, Object> meth) {
       String name = meth['name'] as String;
-      if (name.isEmpty) { name = "(default constructor)"; }
+      if (name.isEmpty) {
+        name = "(default constructor)";
+      }
       String link = linkToDartlang(meth['qualifiedName'] as String, name);
       l.append(new LIElement()
-          ..append(dartlangAnchor(meth['qualifiedName'] as String, name))
-          ..append(new ParagraphElement()
-              ..innerHtml = meth['comment']
-              ..className = 'quote'
-          )
-      );
+        ..append(dartlangAnchor(meth['qualifiedName'] as String, name))
+        ..append(new ParagraphElement()
+          ..innerHtml = meth['comment']
+          ..className = 'quote'));
     });
   }
 }

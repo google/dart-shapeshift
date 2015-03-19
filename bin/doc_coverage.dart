@@ -8,7 +8,7 @@ import 'package:args/args.dart';
 
 class DocCoverage {
   ArgResults args;
-  
+
   void go(List<String> arguments) {
     parseArgs(arguments);
     if (args.rest.length == 0) {
@@ -21,12 +21,14 @@ class DocCoverage {
       path += "/${args['subset']}";
     }
     new DocCoverageReporter(path, out: args['out'])
-        ..calculateAllCoverage()..report();
+      ..calculateAllCoverage()
+      ..report();
   }
-  
+
   void parseArgs(List<String> arguments) {
     var parser = new ArgParser();
-    parser.addOption('base', defaultsTo: '/Users/srawlins/code/dartlang.org/api-docs');
+    parser.addOption('base',
+        defaultsTo: '/Users/srawlins/code/dartlang.org/api-docs');
     parser.addOption('subset', defaultsTo: '');
     parser.addOption('out');
     args = parser.parse(arguments);

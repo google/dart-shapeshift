@@ -6,10 +6,11 @@ part of doc_coverage_frontend;
 class FunctionDocAnalyzer extends MemberDocAnalyzer {
   final String methodType;
 
-  FunctionDocAnalyzer(LibraryDocAnalyzer libraryDocAnalyzer, _methodType, Map member) :
-    super(libraryDocAnalyzer, member),
-    // For some reason, the method types are delivered plural.
-    methodType = _methodType.replaceFirst(new RegExp('s\$'), '');
+  FunctionDocAnalyzer(
+      LibraryDocAnalyzer libraryDocAnalyzer, _methodType, Map member)
+      : super(libraryDocAnalyzer, member),
+        // For some reason, the method types are delivered plural.
+        methodType = _methodType.replaceFirst(new RegExp('s\$'), '');
 
   String get decoratedName => '$methodType $name';
 

@@ -4,8 +4,8 @@
 part of doc_coverage_frontend;
 
 class LibraryCommentDocAnalyzer extends MemberDocAnalyzer {
-  LibraryCommentDocAnalyzer(LibraryDocAnalyzer libraryDocAnalyzer, Map member) :
-    super(libraryDocAnalyzer, member);
+  LibraryCommentDocAnalyzer(LibraryDocAnalyzer libraryDocAnalyzer, Map member)
+      : super(libraryDocAnalyzer, member);
 
   String get decoratedName => 'library $name';
 

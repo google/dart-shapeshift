@@ -4,35 +4,37 @@
 part of shapeshift_cli;
 
 class PackageReporter {
-  final Map<String,DiffNode> diff = new Map<String,DiffNode>();
+  final Map<String, DiffNode> diff = new Map<String, DiffNode>();
   final String leftPath, rightPath, out;
   MarkdownWriter io;
 
-  PackageReporter(this.leftPath, this.rightPath, { this.out });
+  PackageReporter(this.leftPath, this.rightPath, {this.out});
 
   void calculateDiff(String fileName) {
     File leftFile = new File('$leftPath/$fileName');
     File rightFile = new File('$rightPath/$fileName');
     if (!leftFile.existsSync()) {
-      print('$leftFile doesn\'t exist, which should be caught in the package json.');
+      print(
+          '$leftFile doesn\'t exist, which should be caught in the package json.');
       return;
     }
-    JsonDiffer differ = new JsonDiffer(leftFile.readAsStringSync(), rightFile.readAsStringSync());
+    JsonDiffer differ = new JsonDiffer(
+        leftFile.readAsStringSync(), rightFile.readAsStringSync());
     differ.atomics
-        ..add('type')
-        ..add('return')
-        ..add('annotations[]');
-    differ.metadataToKeep
-        ..add('qualifiedName');
+      ..add('type')
+      ..add('return')
+      ..add('annotations[]');
+    differ.metadataToKeep..add('qualifiedName');
     differ.ensureIdentical(['name', 'qualifiedName']);
     diff[fileName] = differ.diff()
-        ..metadata['qualifiedName'] = differ.leftJson['qualifiedName']
-        ..metadata['name'] = differ.leftJson['name']
-        ..metadata['packageName'] = differ.leftJson['packageName'];
+      ..metadata['qualifiedName'] = differ.leftJson['qualifiedName']
+      ..metadata['name'] = differ.leftJson['name']
+      ..metadata['packageName'] = differ.leftJson['packageName'];
   }
 
   void calculateAllDiffs() {
-    List<FileSystemEntity> rightRawLs = new Directory(rightPath).listSync(recursive: true);
+    List<FileSystemEntity> rightRawLs =
+        new Directory(rightPath).listSync(recursive: true);
     List<String> rightLs = rightRawLs
         .where((FileSystemEntity f) => f is File)
         .map((File f) => f.path)
@@ -40,7 +42,9 @@ class PackageReporter {
 
     rightLs.forEach((String file) {
       file = file.replaceFirst(rightPath, '');
-      if (file.endsWith('/index.json') || file.endsWith('/library_list.json') || !file.endsWith('.json')) {
+      if (file.endsWith('/index.json') ||
+          file.endsWith('/library_list.json') ||
+          !file.endsWith('.json')) {
         print('Skipping $file');
         return;
       }
@@ -49,7 +53,7 @@ class PackageReporter {
   }
 
   void report() {
-    Map<String,PackageSdk> diffsBySubpackage = new Map();
+    Map<String, PackageSdk> diffsBySubpackage = new Map();
     diff.forEach((String file, DiffNode node) {
       if (node.metadata['packageName'] != null) {
         String subpackage = node.metadata['qualifiedName'];
@@ -81,7 +85,8 @@ class PackageReporter {
     }
 
     Directory dir = new Directory(out)..createSync(recursive: true);
-    io = new MarkdownWriter(() => (new File('$out/$packageName.markdown')..createSync(recursive: true)).openWrite());
+    io = new MarkdownWriter(() => (new File('$out/$packageName.markdown')
+      ..createSync(recursive: true)).openWrite());
     io.writeMetadata(packageName);
   }
 
@@ -101,7 +106,7 @@ class FileReporter {
   final bool shouldErase = true;
   bool hideInherited = true;
 
-  FileReporter(this.fileName, this.diff, { this.io });
+  FileReporter(this.fileName, this.diff, {this.io});
 
   void report() {
     if (diff == null) {
@@ -112,7 +117,8 @@ class FileReporter {
       io.bufferH1(diff.metadata['qualifiedName']);
       reportPackage();
     } else {
-      io.bufferH2('class ${mdLinkToDartlang(diff.metadata['qualifiedName'], diff.metadata['name'])}');
+      io.bufferH2(
+          'class ${mdLinkToDartlang(diff.metadata['qualifiedName'], diff.metadata['name'])}');
       reportClass();
     }
 
@@ -129,8 +135,12 @@ class FileReporter {
 
   void reportPackage() {
     if (diff.changed.containsKey('packageIntro')) {
-      io.writeBad('TODO: The <strong>packageIntro</strong> changed, which is probably huge. Not including here yet.', '');
-      if (shouldErase) { diff.changed.remove('packageIntro'); }
+      io.writeBad(
+          'TODO: The <strong>packageIntro</strong> changed, which is probably huge. Not including here yet.',
+          '');
+      if (shouldErase) {
+        diff.changed.remove('packageIntro');
+      }
     }
 
     // iterate over the class categories
@@ -140,10 +150,8 @@ class FileReporter {
 
     diff.changed.forEach((String key, List oldNew) {
       io.writeln("${diff.metadata['name']}'s `${key}` changed:\n");
-      io.writeWasNow(
-          (oldNew as List<String>)[0],
-          (oldNew as List<String>)[1],
-          blockquote: key=='comment');
+      io.writeWasNow((oldNew as List<String>)[0], (oldNew as List<String>)[1],
+          blockquote: key == 'comment');
       io.writeln('\n---\n');
     });
     diff.changed.clear();
@@ -156,8 +164,11 @@ class FileReporter {
     if (a.containsKey('parameters')) {
       result += '(${a['parameters'].join(', ')})';
     }
-    if (backticks) { return '`$result`'; }
-    else { return result; }
+    if (backticks) {
+      return '`$result`';
+    } else {
+      return result;
+    }
   }
 
   String classFormatter(String c, {bool link: true}) {
@@ -166,26 +177,25 @@ class FileReporter {
 
   void reportClass() {
     if (diff.containsKey('annotations')) {
-      reportList(diff.metadata['name'], 'annotations', diff, formatter: annotationFormatter);
+      reportList(diff.metadata['name'], 'annotations', diff,
+          formatter: annotationFormatter);
     }
 
     if (diff.hasChanged) {
       diff.forEachChanged((String key, List oldNew) {
         io.writeln("${diff.metadata['name']}'s `${key}` changed:\n");
-        io.writeWasNow(
-            (oldNew as List<String>)[0],
-            (oldNew as List<String>)[1],
-            blockquote: key=='comment',
-            link: ['superclass'].contains(key));
+        io.writeWasNow((oldNew as List<String>)[0], (oldNew as List<String>)[1],
+            blockquote: key == 'comment', link: ['superclass'].contains(key));
         io.writeln('\n---\n');
       });
       diff.changed.clear();
     }
 
     if (diff.containsKey('subclass')) {
-      reportList(diff.metadata['name'], 'subclass', diff, formatter: classFormatter);
+      reportList(diff.metadata['name'], 'subclass', diff,
+          formatter: classFormatter);
     }
-    
+
     if (diff.containsKey('implements')) {
       DiffNode implements = diff['implements'];
       if (implements.hasAdded) {
@@ -194,7 +204,8 @@ class FileReporter {
         erase(implements.added);
       }
       if (implements.hasRemoved) {
-        String removed = implements.removed.values.map(mdLinkToDartlang).join(', ');
+        String removed =
+            implements.removed.values.map(mdLinkToDartlang).join(', ');
         io.writeln("${diff.metadata['name']} no longer implements ${removed}.");
         erase(implements.removed);
       }
@@ -211,7 +222,9 @@ class FileReporter {
         // TODO: hmm... io.writeln("_Hiding inherited $methodCategory changes._\n\n---\n");
       });
       if (diff.containsKey('inheritedMethods')) {
-        if (shouldErase) { diff.node.remove('inheritedMethods'); }
+        if (shouldErase) {
+          diff.node.remove('inheritedMethods');
+        }
       }
     } else {
       diff.forEachOf('inheritedMethods', (String methodCategory, DiffNode d) {
@@ -222,31 +235,37 @@ class FileReporter {
     reportVariables('variables');
     if (hideInherited) {
       if (diff.containsKey('inheritedVariables')) {
-        if (shouldErase) { diff.node.remove('inheritedVariables'); }
+        if (shouldErase) {
+          diff.node.remove('inheritedVariables');
+        }
       }
     } else {
       reportVariables('inheritedVariables');
     }
   }
-  
+
   void reportVariables(String variableList) {
-    if (!diff.containsKey(variableList)) { return; }
+    if (!diff.containsKey(variableList)) {
+      return;
+    }
     DiffNode variables = diff[variableList];
 
     if (variables.hasAdded) {
       io.writeln('New $variableList:\n');
-      io.writeCodeblockHr(variables.added.values.map(variableSignature).join('\n\n'));
+      io.writeCodeblockHr(
+          variables.added.values.map(variableSignature).join('\n\n'));
     }
     erase(variables.added);
 
     if (variables.hasRemoved) {
       io.writeln('Removed $variableList:\n');
-      io.writeCodeblockHr(variables.removed.values.map(variableSignature).join('\n\n'));
+      io.writeCodeblockHr(
+          variables.removed.values.map(variableSignature).join('\n\n'));
     }
     erase(variables.removed);
 
     if (variables.hasChanged) {
-      variables.forEachChanged((k,v) {
+      variables.forEachChanged((k, v) {
         print('CHANGED: $k, $v');
       });
     }
@@ -256,7 +275,9 @@ class FileReporter {
         // Magically renamed (I suspect docgen).
         if (variable.changed.containsKey('qualifiedName')) {
           var oldNew = variable.changed['qualifiedName'];
-          io.writeBad('The `$key` variable\'s qualifiedName changed from ${oldNew[0]} to ${oldNew[1]}', null);
+          io.writeBad(
+              'The `$key` variable\'s qualifiedName changed from ${oldNew[0]} to ${oldNew[1]}',
+              null);
         } else {
           io.writeBad('TODO: WHAT?', null);
         }
@@ -265,11 +286,14 @@ class FileReporter {
       var link = mdLinkToDartlang(variable.metadata['qualifiedName'], key);
       if (variable.hasChanged) {
         variable.forEachChanged((attribute, value) {
-          io.writeln('The $link ${singularize(variableList)}\'s `$attribute` changed:\n');
+          io.writeln(
+              'The $link ${singularize(variableList)}\'s `$attribute` changed:\n');
           if (attribute == 'type') {
-            io.writeWasNow(simpleType(value[0]), simpleType(value[1]), link: true);
+            io.writeWasNow(simpleType(value[0]), simpleType(value[1]),
+                link: true);
           } else {
-            io.writeWasNow(value[0], value[1], blockquote: attribute=='comment');
+            io.writeWasNow(value[0], value[1],
+                blockquote: attribute == 'comment');
           }
           io.writeln('\n---\n');
         });
@@ -279,13 +303,17 @@ class FileReporter {
       if (variable.node.isNotEmpty) {
         variable.node.forEach((attribute, dn) {
           if (attribute == 'annotations') {
-            io.writeln('The $link ${singularize(variableList)}\'s annotations have changed:\n');
+            io.writeln(
+                'The $link ${singularize(variableList)}\'s annotations have changed:\n');
             dn.forEachChanged((String idx, List<Object> annotation) {
-              io.writeWasNow(annotationFormatter(annotation[0]), annotationFormatter(annotation[1]));
+              io.writeWasNow(annotationFormatter(annotation[0]),
+                  annotationFormatter(annotation[1]));
             });
             io.writeln('\n---\n');
           } else {
-            io.writeBad('TODO: The [$key](#) ${singularize(variableList)}\'s `$attribute` has changed:\n', dn.toString(pretty: false));
+            io.writeBad(
+                'TODO: The [$key](#) ${singularize(variableList)}\'s `$attribute` has changed:\n',
+                dn.toString(pretty: false));
           }
         });
       }
@@ -293,11 +321,13 @@ class FileReporter {
     });
   }
 
-  void reportList(String owner, String key, DiffNode d, { Function formatter }) {
+  void reportList(String owner, String key, DiffNode d, {Function formatter}) {
     if (d[key].hasAdded) {
       io.writeln('$owner has new ${pluralize(key)}:\n');
       d[key].forEachAdded((String idx, Object el) {
-        if (formatter != null) { el = formatter(el, link: true); }
+        if (formatter != null) {
+          el = formatter(el, link: true);
+        }
         io.writeln('* $el');
       });
       io.writeln('\n---\n');
@@ -307,7 +337,9 @@ class FileReporter {
     if (d[key].hasRemoved) {
       io.writeln('$owner no longer has these ${pluralize(key)}:\n');
       d[key].forEachRemoved((String idx, Object el) {
-        if (formatter != null) { el = formatter(el, link: false); }
+        if (formatter != null) {
+          el = formatter(el, link: false);
+        }
         io.writeln('* $el');
       });
       io.writeln('\n---\n');
@@ -331,17 +363,22 @@ class FileReporter {
   }
 
   String comment(String c) {
-    if (c.isEmpty) { return ''; }
+    if (c.isEmpty) {
+      return '';
+    }
     return c.split('\n').map((String x) => '/// $x\n').join('');
   }
 
   void erase(Map m) {
-    if (shouldErase) { m.clear(); }
+    if (shouldErase) {
+      m.clear();
+    }
   }
 
   void reportEachClassThing(String classCategory, DiffNode d) {
     if (d.hasRemoved) {
-      var cat = d.removed.length == 1 ? classCategory : pluralize(classCategory);
+      var cat =
+          d.removed.length == 1 ? classCategory : pluralize(classCategory);
       var names = d.removed.values.map((klass) => klass['name']).join(', ');
       io.writeln('Removed $cat: $names.');
       io.writeln('\n---\n');
@@ -350,7 +387,10 @@ class FileReporter {
 
     if (d.hasAdded) {
       var cat = d.added.length == 1 ? classCategory : pluralize(classCategory);
-      var names = d.added.values.map((klass) => mdLinkToDartlang(klass['qualifiedName'], klass['name'])).join(', ');
+      var names = d.added.values
+          .map((klass) =>
+              mdLinkToDartlang(klass['qualifiedName'], klass['name']))
+          .join(', ');
       io.writeln('New $cat: $names.');
       io.writeln('\n---\n');
       erase(d.added);
@@ -359,9 +399,12 @@ class FileReporter {
     d.forEach((String classThingName, DiffNode classThing) {
       if (classThing.hasAdded) {
         classThing.added.forEach((String key, dynamic thing) {
-          String name = classThing.metadata['qualifiedName'].replaceAll(new RegExp(r'.*\.'), '');
-          String classThingLink = mdLinkToDartlang(classThing.metadata['qualifiedName'], name);
-          io.writeln("${diff.metadata['name']}'s $classThingLink $classCategory has a new `$key`:\n");
+          String name = classThing.metadata['qualifiedName'].replaceAll(
+              new RegExp(r'.*\.'), '');
+          String classThingLink =
+              mdLinkToDartlang(classThing.metadata['qualifiedName'], name);
+          io.writeln(
+              "${diff.metadata['name']}'s $classThingLink $classCategory has a new `$key`:\n");
           if (key == 'preview') {
             io.writeBlockquote(thing);
           } else {
@@ -379,7 +422,8 @@ class FileReporter {
         // another was added, at the same index in the class thing list.
         // Awkward.
         var changed = classThing.changed;
-        String newThingLink = mdLinkToDartlang(changed['qualifiedName'][1], changed['name'][1]);
+        String newThingLink =
+            mdLinkToDartlang(changed['qualifiedName'][1], changed['name'][1]);
         io.writeln('Removed $classCategory: ${changed['name'][0]}.');
         io.writeln('\n---\n');
         io.writeln('New $classCategory: $newThingLink.');
@@ -388,12 +432,14 @@ class FileReporter {
 
       if (classThing.hasChanged) {
         classThing.changed.forEach((String key, List oldNew) {
-          String name = classThing.metadata['qualifiedName'].replaceAll(new RegExp(r'.*\.'), '');
-          String classThingLink = mdLinkToDartlang(classThing.metadata['qualifiedName'], name);
-          io.writeln("${diff.metadata['name']}'s $classThingLink $classCategory `$key` changed:\n");
+          String name = classThing.metadata['qualifiedName'].replaceAll(
+              new RegExp(r'.*\.'), '');
+          String classThingLink =
+              mdLinkToDartlang(classThing.metadata['qualifiedName'], name);
+          io.writeln(
+              "${diff.metadata['name']}'s $classThingLink $classCategory `$key` changed:\n");
           io.writeWasNow(
-              (oldNew as List<String>)[0],
-              (oldNew as List<String>)[1],
+              (oldNew as List<String>)[0], (oldNew as List<String>)[1],
               blockquote: ['comment', 'preview'].contains(key));
           io.writeln('\n---\n');
         });
@@ -402,20 +448,27 @@ class FileReporter {
       erase(classThing.changed);
     });
   }
-  
-  void reportEachMethodThing(String methodCategory, DiffNode d, { String parenthetical:""}) {
+
+  void reportEachMethodThing(String methodCategory, DiffNode d,
+      {String parenthetical: ""}) {
     String category = singularize(methodCategory);
-    if (parenthetical.isNotEmpty) { parenthetical = ' _($parenthetical)_'; }
+    if (parenthetical.isNotEmpty) {
+      parenthetical = ' _($parenthetical)_';
+    }
     d.forEachAdded((methodName, method) {
-      io.writeln('New $category$parenthetical ${mdLinkToDartlang(method['qualifiedName'], methodName)}:\n');
+      io.writeln(
+          'New $category$parenthetical ${mdLinkToDartlang(method['qualifiedName'], methodName)}:\n');
       io.writeCodeblockHr(methodSignature(method as Map));
     });
     erase(d.added);
-    
+
     d.forEachRemoved((methodName, method) {
-      if (methodName == '') { methodName = diff.metadata['name']; }
+      if (methodName == '') {
+        methodName = diff.metadata['name'];
+      }
       io.writeln('Removed $category$parenthetical $methodName:\n');
-      io.writeCodeblockHr(methodSignature(method as Map, includeComment: false, includeAnnotations: false));
+      io.writeCodeblockHr(methodSignature(method as Map,
+          includeComment: false, includeAnnotations: false));
     });
     erase(d.removed);
 
@@ -424,7 +477,8 @@ class FileReporter {
     });
   }
 
-  void reportEachMethodAttribute(String category, String method, DiffNode attributes) {
+  void reportEachMethodAttribute(
+      String category, String method, DiffNode attributes) {
     var link = mdLinkToDartlang(attributes.metadata['qualifiedName'], method);
     bool shouldHr = false;
     attributes.forEach((attributeName, attribute) {
@@ -463,7 +517,7 @@ class FileReporter {
         });
         erase(attribute.added);
       }
-      
+
       if (attribute.hasChanged) {
         if (shouldHr) {
           // TODO: get this font weight up.
@@ -474,15 +528,18 @@ class FileReporter {
         shouldHr = true;
         attribute.forEachChanged((k, v) {
           if (attributeName == 'annotations') {
-            io.writeln('* ${annotationFormatter(v[0])} is now ${annotationFormatter(v[1])}.');
+            io.writeln(
+                '* ${annotationFormatter(v[0])} is now ${annotationFormatter(v[1])}.');
           } else {
             io.writeln('* `${v[0]}` is now `${v[1]}`.');
           }
         });
         erase(attribute.changed);
       }
-      if (shouldHr) { io.writeln('\n---\n'); }
-      
+      if (shouldHr) {
+        io.writeln('\n---\n');
+      }
+
       attribute.node.forEach((attributeAttributeName, attributeAttribute) {
         reportEachMethodAttributeAttribute(category, method,
             attributes.metadata['qualifiedName'], attributeName,
@@ -491,32 +548,36 @@ class FileReporter {
     });
 
     attributes.forEachChanged((String key, List oldNew) {
-      if (key == 'commentFrom') { return; } // We don't care about commentFrom.
+      if (key == 'commentFrom') {
+        return;
+      } // We don't care about commentFrom.
       io.writeln('The $link $category\'s `${key}` changed:\n');
       if (key == 'return') {
         io.writeWasNow(simpleType(oldNew[0]), simpleType(oldNew[1]));
       } else {
-        io.writeWasNow((oldNew as List<String>)[0], (oldNew as List<String>)[1], blockquote: key=='comment');
+        io.writeWasNow((oldNew as List<String>)[0], (oldNew as List<String>)[1],
+            blockquote: key == 'comment');
       }
       io.writeln('\n---\n');
     });
     erase(attributes.changed);
   }
-  
-  void reportEachMethodAttributeAttribute(String category,
-                                          String method,
-                                          String methodQname,
-                                          String attributeName,
-                                          String attributeAttributeName,
-                                          DiffNode attributeAttribute) {
+
+  void reportEachMethodAttributeAttribute(String category, String method,
+      String methodQname, String attributeName, String attributeAttributeName,
+      DiffNode attributeAttribute) {
     attributeAttribute.forEachChanged((key, oldNew) {
       var methodLink = mdLinkToDartlang(methodQname, method);
-      var attrLink = mdLinkToDartlang('$methodQname,$attributeAttributeName', attributeAttributeName);
-      var firstPart = 'The $methodLink ${category}\'s $attrLink ${singularize(attributeName)}\'s';
+      var attrLink = mdLinkToDartlang(
+          '$methodQname,$attributeAttributeName', attributeAttributeName);
+      var firstPart =
+          'The $methodLink ${category}\'s $attrLink ${singularize(attributeName)}\'s';
       if (key == 'type') {
-        io.writeln('$firstPart $key changed from `${simpleType(oldNew[0])}` to `${simpleType(oldNew[1])}`');
+        io.writeln(
+            '$firstPart $key changed from `${simpleType(oldNew[0])}` to `${simpleType(oldNew[1])}`');
       } else {
-        io.writeln('$firstPart changed from `$key: ${oldNew[0]}` to `$key: ${oldNew[1]}`');
+        io.writeln(
+            '$firstPart changed from `$key: ${oldNew[0]}` to `$key: ${oldNew[1]}`');
       }
       io.writeln('\n---\n');
     });
@@ -525,18 +586,23 @@ class FileReporter {
     if (attributeAttribute.containsKey('type')) {
       String key = 'type';
       List<String> oldNew = attributeAttribute[key]['0'].changed['outer'];
-      io.writeln('The [$method](#) ${category}\'s [${attributeAttributeName}](#) ${singularize(attributeName)}\'s $key has changed from `${oldNew[0]}` to `${oldNew[1]}`');
+      io.writeln(
+          'The [$method](#) ${category}\'s [${attributeAttributeName}](#) ${singularize(attributeName)}\'s $key has changed from `${oldNew[0]}` to `${oldNew[1]}`');
       io.writeln('\n---\n');
-      if (shouldErase) { attributeAttribute.node.remove('type'); }
+      if (shouldErase) {
+        attributeAttribute.node.remove('type');
+      }
     }
   }
 
   // TODO: just steal this from dartdoc-viewer
-  String methodSignature(Map<String,Object> method,
-                         { bool includeComment: true, bool includeAnnotations: true }) {
+  String methodSignature(Map<String, Object> method,
+      {bool includeComment: true, bool includeAnnotations: true}) {
     String name = method['name'];
     String type = simpleType(method['return']);
-    if (name == '') { name = diff.metadata['name']; }
+    if (name == '') {
+      name = diff.metadata['name'];
+    }
     String s = '$type $name';
     if (includeComment) {
       s = comment(method['comment']) + s;
@@ -555,14 +621,19 @@ class FileReporter {
   }
 
   String simpleType(List<Map> t) {
-    if (t == null) { return null; }
-    return t.map((Map<String,Object> ty) =>
-        decoratedName(ty['outer'] as String) + ((ty['inner'] as List).isEmpty ? '' : '<${simpleType(ty['inner'])}>')
-    ).join(',');
+    if (t == null) {
+      return null;
+    }
+    return t
+        .map((Map<String, Object> ty) => decoratedName(ty['outer'] as String) +
+            ((ty['inner'] as List).isEmpty
+                ? ''
+                : '<${simpleType(ty['inner'])}>'))
+        .join(',');
   }
 
   // TODO: just steal this from dartdoc-viewer
-  String parameterSignature(Map<String,Object> parameter) {
+  String parameterSignature(Map<String, Object> parameter) {
     String type = simpleType(parameter['type']);
     String s = "$type ${parameter['name']}";
     bool optional = parameter.containsKey('optional') && parameter['optional'];
@@ -571,22 +642,32 @@ class FileReporter {
     if (optional) {
       String def = '';
       if (named) {
-        if (defaultt) { def = ': ${parameter['value']}'; }
+        if (defaultt) {
+          def = ': ${parameter['value']}';
+        }
         s = '{$s$def}';
       } else {
-        if (defaultt) { def = ' = ${parameter['value']}'; }
+        if (defaultt) {
+          def = ' = ${parameter['value']}';
+        }
         s = '[$s$def]';
       }
     }
     return s;
   }
 
-  String variableSignature(Map<String,Object> variable) {
+  String variableSignature(Map<String, Object> variable) {
     String type = simpleType(variable['type']);
     String s = '$type ${variable['name']};';
-    if (variable['constant'])  { s = 'const $s'; }
-    if (variable['final'])  { s = 'final $s'; }
-    if (variable['static']) { s = 'static $s'; }
+    if (variable['constant']) {
+      s = 'const $s';
+    }
+    if (variable['final']) {
+      s = 'final $s';
+    }
+    if (variable['static']) {
+      s = 'static $s';
+    }
     (variable['annotations'] as List).forEach((Map annotation) {
       s = annotationFormatter(annotation, backticks: false) + '\n' + s;
     });

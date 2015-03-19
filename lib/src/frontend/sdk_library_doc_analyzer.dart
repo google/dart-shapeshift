@@ -4,7 +4,8 @@
 part of doc_coverage_frontend;
 
 class SdkLibraryDocAnalyzer extends LibraryDocAnalyzer {
-  static final String apiDartlang = 'https://api.dartlang.org/apidocs/channels/stable';
+  static final String apiDartlang =
+      'https://api.dartlang.org/apidocs/channels/stable';
   SdkLibraryDocAnalyzer(String name) : super(name, '$apiDartlang/docs');
 
   void analyzeScore() {
