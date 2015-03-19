@@ -5,8 +5,8 @@ library doc_coverage_common;
 
 import 'dart:convert';
 
-import 'package:html5lib/dom.dart' show Document, Element;
-import 'package:html5lib/parser.dart' show parse;
+import 'package:html/dom.dart' show Document, Element;
+import 'package:html/parser.dart' show parse;
 
 import 'package:shapeshift/shapeshift_common.dart';
 

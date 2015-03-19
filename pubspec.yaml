@@ -1,10 +1,10 @@
 name: shapeshift
 description: A sample command-line application
 dependencies:
-  args: '>=0.12.0'
+  args: any
   browser: any
   diff_match_patch: '>=0.2.1'
-  html5lib: any
+  html: '>=0.12.0 <0.13.0'
   json_diff: '>=0.1.0 <1.0.0'
   route: any
 dev_dependencies:
