@@ -11,8 +11,8 @@ class PackageReporter {
   PackageReporter(this.leftPath, this.rightPath, {this.out});
 
   void calculateDiff(String fileName) {
-    File leftFile = new File('$leftPath/$fileName');
-    File rightFile = new File('$rightPath/$fileName');
+    File leftFile = new File(p.join(leftPath, fileName));
+    File rightFile = new File(p.join(rightPath, fileName));
     if (!leftFile.existsSync()) {
       print(
           '$leftFile doesn\'t exist, which should be caught in the package json.');
@@ -41,10 +41,10 @@ class PackageReporter {
         .toList();
 
     rightLs.forEach((String file) {
-      file = file.replaceFirst(rightPath, '');
-      if (file.endsWith('/index.json') ||
-          file.endsWith('/library_list.json') ||
-          !file.endsWith('.json')) {
+      file = p.relative(file, from: rightPath);
+      if (p.basename(file) == 'index.json' ||
+          p.basename(file) == 'library_list.json' ||
+          p.extension(file) != '.json') {
         print('Skipping $file');
         return;
       }
