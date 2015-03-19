@@ -458,8 +458,28 @@ class FileReporter {
           io.writeln('\n---\n');
         });
       }
-
       erase(classThing.changed);
+
+      if (classThing.containsKey('parameters')) {
+        classThing.forEachOf('parameters', (String name, DiffNode parameter) {
+          if (!parameter.changed.containsKey('type'))
+            return;
+
+          String key = 'type';
+          String oldType = simpleType(parameter.changed[key][0]);
+          String newType = simpleType(parameter.changed[key][1]);
+          // This is so ugly because we are so deep, but an example would be:
+          // The foo typedef's value parameter's type has changed from int to bool.
+          io.writeln(
+              'The [${classThing.metadata['qualifiedName']}](#) $classCategory\'s [$name](#) '
+              'parameter\'s $key has changed from '
+              '`$oldType` to `$newType`');
+          io.writeln('\n---\n');
+          if (shouldErase) {
+            parameter.changed.remove('type');
+          }
+        });
+      }
     });
   }
 
@@ -600,11 +620,38 @@ class FileReporter {
     if (attributeAttribute.containsKey('type')) {
       String key = 'type';
       List<String> oldNew = attributeAttribute[key]['0'].changed['outer'];
+      // This is so ugly because we are so deep, but an example would be:
+      // The foo method's value parameter's type has changed from int to bool.
       io.writeln(
-          'The [$method](#) ${category}\'s [${attributeAttributeName}](#) ${singularize(attributeName)}\'s $key has changed from `${oldNew[0]}` to `${oldNew[1]}`');
+          'The [$method](#) ${category}\'s [${attributeAttributeName}](#) '
+          '${singularize(attributeName)}\'s $key has changed from '
+          '`${oldNew[0]}` to `${oldNew[1]}`');
       io.writeln('\n---\n');
       if (shouldErase) {
         attributeAttribute.node.remove('type');
+      }
+    }
+
+    // TODO: Clean up? But really I need to start OOing more of this from
+    // above. reportEachMethodAttributeAttribute takes 6 args. :/
+    if (attributeAttribute.containsKey('functionDeclaration')) {
+      DiffNode declaration = attributeAttribute.node['functionDeclaration'];
+      if (declaration.changed.containsKey('return')) {
+        String key = 'return type';
+        List<List<Map>> oldNew = declaration.changed['return'];
+        String oldType = simpleType(oldNew[0]);
+        String newType = simpleType(oldNew[1]);
+        // This is so ugly because we are so deep, but an example would be:
+        // The foo method's callback parameter's return type has changed from
+        // Object to String.
+        io.writeln(
+            'The [$method](#) ${category}\'s [${attributeAttributeName}](#) '
+            '${singularize(attributeName)}\'s $key has changed from '
+            '`$oldType` to `$newType`');
+        io.writeln('\n---\n');
+        if (shouldErase) {
+          declaration.changed.remove('return');
+        }
       }
     }
   }
