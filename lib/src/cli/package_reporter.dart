@@ -432,12 +432,26 @@ class FileReporter {
 
       if (classThing.hasChanged) {
         classThing.changed.forEach((String key, List oldNew) {
-          String name = classThing.metadata['qualifiedName'].replaceAll(
-              new RegExp(r'.*\.'), '');
+          String name = classThing.metadata['name'];
+          String qualifiedName = classThing.metadata['qualifiedName'];
+          // If a class's name changed, then "name" won't be in the metadata,
+          // so we'll grab it from the changed map.
+          // TODO: make this better...
+          if (name == null) {
+            if (classThing.changed.containsKey('name')) {
+              name = classThing.changed['name'][0];
+            }
+          }
+          if (qualifiedName == null) {
+            if (classThing.changed.containsKey('qualifiedName')) {
+              qualifiedName = classThing.changed['qualifiedName'][0];
+            }
+          }
+          qualifiedName = qualifiedName.replaceAll(new RegExp(r'.*\.'), '');
           String classThingLink =
-              mdLinkToDartlang(classThing.metadata['qualifiedName'], name);
+              mdLinkToDartlang(qualifiedName, qualifiedName);
           io.writeln(
-              "${diff.metadata['name']}'s $classThingLink $classCategory `$key` changed:\n");
+              "${name}'s $classThingLink $classCategory `$key` changed:\n");
           io.writeWasNow(
               (oldNew as List<String>)[0], (oldNew as List<String>)[1],
               blockquote: ['comment', 'preview'].contains(key));
