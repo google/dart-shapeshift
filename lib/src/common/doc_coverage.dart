@@ -24,9 +24,7 @@ class DocCoverage {
     'operators'
   ];
 
-  // Poor man's class for now.
-  final Map<String, Object> gaps = new Map();
-
+  GapsAnalysis gaps;
   Map<String, Object> api;
   double _score;
 
@@ -94,10 +92,7 @@ class DocCoverage {
   }
 
   Map<String, dynamic> calculateCoverage() {
-    gaps['gapCount'] = 0;
-    gaps['qualifiedName'] = api['qualifiedName'];
-    gaps['name'] = api['name'];
-    gaps['comment'] = api['comment'];
+    gaps = new GapsAnalysis(api['name'], api['qualifiedName'], api['comment']);
 
     if (api['packageName'] != null) {
       // This is a package.
@@ -133,7 +128,7 @@ class DocCoverage {
           g['no-one-liner'].length * memberCommentIssue;
     }
 
-    return gaps;
+    return gaps.gaps;
   }
 
   Map categoryGaps(String category) {

@@ -26,7 +26,7 @@ class GapsAnalysis {
 
   operator [](key) => gaps[key];
 
-  //operator []=(key, value) => gaps[key] = value;
+  operator []=(key, value) => gaps[key] = value;
 
   void analyzeGaps(Map thing) {
     if (!thing.containsKey('comment')) {
