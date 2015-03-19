@@ -16,7 +16,7 @@ String fullDartlangLocation(String qualifiedName) =>
 
 String linkToDartlang(String qualifiedName, [String text]) {
   String x = fullDartlangLocation(qualifiedName);
-  return '<a href="${fullDartlangLocation(qualifiedName)}">${text !=null ? text : decoratedName(qualifiedName)}</a>';
+  return '<a href="${x}">${text !=null ? text : decoratedName(qualifiedName)}</a>';
 }
 
 /// Return a Markdown link to the Dart id specified by [qualifiedName]. If the

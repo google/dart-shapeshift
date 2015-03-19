@@ -64,7 +64,7 @@ class ClassDocAnalyzer {
     TableRowElement classGapsRow = scoreSection.addRow()
       ..classes.add('hidden')
       ..classes.add('gaps-row');
-    TableCellElement classGaps = classGapsRow.addCell()
+    classGapsRow.addCell()
       ..append(classGapsSection())
       ..attributes['colspan'] = '4';
   }
@@ -118,7 +118,7 @@ class ClassDocAnalyzer {
     TableRowElement classGapsRow = scoreSection.addRow()
       ..classes.add('hidden')
       ..classes.add('gaps-row');
-    TableCellElement classGaps = classGapsRow.addCell()
+    classGapsRow.addCell()
       ..append(classGapsSection(detailed: false))
       ..attributes['colspan'] = '4';
   }
