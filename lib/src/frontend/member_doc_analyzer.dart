@@ -70,7 +70,7 @@ abstract class MemberDocAnalyzer {
     TableRowElement classGapsRow = scoreSection.addRow()
       ..classes.add('hidden')
       ..classes.add('gaps-row');
-    TableCellElement classGaps = classGapsRow.addCell()
+    classGapsRow.addCell()
       ..append(gapsSection(detailed: false))
       ..attributes['colspan'] = '4';
   }

@@ -84,7 +84,7 @@ class PackageReporter {
       return;
     }
 
-    Directory dir = new Directory(out)..createSync(recursive: true);
+    new Directory(out).createSync(recursive: true);
     io = new MarkdownWriter(() => (new File('$out/$packageName.markdown')
       ..createSync(recursive: true)).openWrite());
     io.writeMetadata(packageName);

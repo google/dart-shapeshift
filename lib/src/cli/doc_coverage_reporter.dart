@@ -96,7 +96,7 @@ class DocCoverageReporter {
       return;
     }
 
-    Directory dir = new Directory(out)..createSync(recursive: true);
+    new Directory(out).createSync(recursive: true);
     io = new MarkdownWriter(() => (new File('$out/$packageName.markdown')
       ..createSync(recursive: true)).openWrite());
     io.writeMetadata(packageName);
@@ -116,10 +116,8 @@ class DocCoverageReporter {
       }
     } else {
       bool any = false;
-      String msg = '${cov['qualifiedName']} (${cov['gapCount']}): ';
       ['getters', 'setters', 'constructors', 'methods'].forEach((cat) {
         if (cov[cat].length > 0) {
-          msg += '$cat: ${cov[cat].length}, ';
           any = true;
         }
       });

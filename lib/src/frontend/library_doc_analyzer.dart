@@ -114,7 +114,6 @@ class LibraryDocAnalyzer {
     if (error is! ProgressEvent) throw error;
 
     ProgressEvent err = error as ProgressEvent;
-    HttpRequest target = err.target;
     handleError(err, section,
         name: 'Dart library "${name.replaceFirst('dart-', '')}"');
   }
@@ -176,7 +175,6 @@ void reportOnTopLevelComment(Map<String, dynamic> gaps, [Element section]) {
       ..append(dartlangAnchor(gaps['qualifiedName']))
       ..appendText(' has no comment!'));
   } else if ((gaps['comment'] as String).split('\n').length < 2) {
-    String x = linkToDartlang(gaps['qualifiedName']);
     section.append(new ParagraphElement()
       ..append(dartlangAnchor(gaps['qualifiedName']))
       ..appendText('''\'s comment is too short (under 2 paragraphs)
@@ -253,7 +251,6 @@ void reportOnCategory(String cat, Map<String, dynamic> gaps,
       if (name.isEmpty) {
         name = "(default constructor)";
       }
-      String link = linkToDartlang(meth['qualifiedName'] as String, name);
       l.append(new LIElement()
         ..append(dartlangAnchor(meth['qualifiedName'] as String, name))
         ..append(new ParagraphElement()
