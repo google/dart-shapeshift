@@ -17,7 +17,7 @@ class Shapeshift {
       leftPath += "/${args['subset']}";
       rightPath += "/${args['subset']}";
     }
-    new PackageReporter(leftPath, rightPath, out: args['out'])
+    new LibraryReporter(leftPath, rightPath, out: args['out'])
       ..calculateAllDiffs()
       ..report();
   }
