@@ -346,13 +346,6 @@ class FileReporter {
     }
   }
 
-  String comment(String c) {
-    if (c.isEmpty) {
-      return '';
-    }
-    return c.split('\n').map((String x) => '/// $x\n').join('');
-  }
-
   void erase(Map m) {
     if (shouldErase) {
       m.clear();
@@ -638,31 +631,6 @@ class FileReporter {
         }
       }
     }
-  }
-
-  // TODO: just steal this from dartdoc-viewer
-  String methodSignature(Map<String, Object> method,
-      {bool includeComment: true, bool includeAnnotations: true}) {
-    String name = method['name'];
-    String type = simpleType(method['return']);
-    if (name == '') {
-      name = diff.metadata['name'];
-    }
-    String s = '$type $name';
-    if (includeComment) {
-      s = comment(method['comment']) + s;
-    }
-    if (includeAnnotations) {
-      (method['annotations'] as List).forEach((Map annotation) {
-        s = annotationFormatter(annotation, backticks: false) + '\n' + s;
-      });
-    }
-    List<String> p = new List<String>();
-    (method['parameters'] as Map).forEach((k, v) {
-      p.add(parameterSignature(v));
-    });
-    s = '$s(${p.join(', ')})';
-    return s;
   }
 }
 
