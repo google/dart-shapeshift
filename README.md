@@ -24,16 +24,29 @@ Then you can run the following command to generate reports of the API
 differences.
 
 ```bash
-shapeshift \
+dart bin/shapeshift.dart \
     --base=/Code/my_package/docs \
     --out=./diff-1.6.0_1.7.0 \
-    docs-v1.6.0 docs-v1.7.0
+    docs-v1.6.0 \
+    docs-v1.7.0
 ```
 
 In this command, `--base` specifies the directory where your two documentation
 directories live. `--out` specifies a new or existing directory where you want
 the output markdown files to be written. The final two arguments are the
 directory with the _old_ and the directory with the _new_ documentation.
+
+This command will create the output directory, if it wasn't there, and write a
+markdown file for each library that was examined. For example, if a
+`dart-async.json` file was found, documenting the `dart:async` library, then
+the output will include a `dart:async.markdown` file.
+
+Each library's markdown file will then include all of the changes found for the
+library itself, and for every class within the library.
+
+The directory of markdown files works surprisingly well with
+[Jekyll](http://jekyllrb.com/) and Jekyll's basic template, but we're working
+on more streamlined output options.
 
 Options
 -------

@@ -129,7 +129,10 @@ String highlightInserted(String theOld, String theNew) {
           d.text.contains('<p>') ||
           d.text.contains('<pre>')) {
         result +=
-            '<div style="background-color: #9F9; display: inline-block; padding: 2px; margin: 0 1px;">${d.text}</div>';
+            '<div '
+            'style="background-color: #9F9; display: inline-block; padding: 2px; margin: 0 1px; width: 100%;">'
+            '${d.text}'
+            '</div>';
       } else {
         result +=
             '<span style="background-color: #9F9; padding: 1px;">${d.text}</span>';
