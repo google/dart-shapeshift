@@ -159,22 +159,6 @@ class FileReporter {
     diff.forEachOf('functions', reportEachMethodThing);
   }
 
-  String annotationFormatter(Map a, {bool backticks: true, bool link: false}) {
-    String result = '@' + (a['name'] as String).split('.').last;
-    if (a.containsKey('parameters')) {
-      result += '(${a['parameters'].join(', ')})';
-    }
-    if (backticks) {
-      return '`$result`';
-    } else {
-      return result;
-    }
-  }
-
-  String classFormatter(String c, {bool link: true}) {
-    return link ? mdLinkToDartlang(c) : decoratedName(c);
-  }
-
   void reportClass() {
     if (diff.containsKey('annotations')) {
       reportList(diff.metadata['name'], 'annotations', diff,
@@ -678,60 +662,6 @@ class FileReporter {
       p.add(parameterSignature(v));
     });
     s = '$s(${p.join(', ')})';
-    return s;
-  }
-
-  String simpleType(List<Map> t) {
-    if (t == null) {
-      return null;
-    }
-    return t
-        .map((Map<String, Object> ty) => decoratedName(ty['outer'] as String) +
-            ((ty['inner'] as List).isEmpty
-                ? ''
-                : '<${simpleType(ty['inner'])}>'))
-        .join(',');
-  }
-
-  // TODO: just steal this from dartdoc-viewer
-  String parameterSignature(Map<String, Object> parameter) {
-    String type = simpleType(parameter['type']);
-    String s = "$type ${parameter['name']}";
-    bool optional = parameter.containsKey('optional') && parameter['optional'];
-    bool named = parameter.containsKey('named') && parameter['named'];
-    bool defaultt = parameter.containsKey('default') && parameter['default'];
-    if (optional) {
-      String def = '';
-      if (named) {
-        if (defaultt) {
-          def = ': ${parameter['value']}';
-        }
-        s = '{$s$def}';
-      } else {
-        if (defaultt) {
-          def = ' = ${parameter['value']}';
-        }
-        s = '[$s$def]';
-      }
-    }
-    return s;
-  }
-
-  String variableSignature(Map<String, Object> variable) {
-    String type = simpleType(variable['type']);
-    String s = '$type ${variable['name']};';
-    if (variable['constant']) {
-      s = 'const $s';
-    }
-    if (variable['final']) {
-      s = 'final $s';
-    }
-    if (variable['static']) {
-      s = 'static $s';
-    }
-    (variable['annotations'] as List).forEach((Map annotation) {
-      s = annotationFormatter(annotation, backticks: false) + '\n' + s;
-    });
     return s;
   }
 }

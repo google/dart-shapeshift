@@ -3,6 +3,7 @@ packages/
 bin/packages
 test/packages
 test/doc_coverage/packages
+test/shapeshift/packages
 web/packages
 pubspec.lock
 .buildlog
