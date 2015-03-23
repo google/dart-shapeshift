@@ -3,6 +3,15 @@
 
 part of shapeshift_cli;
 
+/// Reporter for changes in a method's attributes.
+///
+/// This reporter can iterate over attributes with their own added, deleted, or
+/// changed attributes, and iterate over shallow attributes (such as `return`)
+/// to list changes.
+///
+/// It is unexpected to find any new or removed attributes themselves (a method
+/// should never be missing the "parameters" attribute, or suddenly gain the
+/// "annotations" attribute).
 class MethodAttributesReporter {
   final String category;
   final String method;
@@ -25,63 +34,12 @@ class MethodAttributesReporter {
   }
 
   void reportEach(String attributeName, DiffNode attribute) {
-    if (attribute.hasRemoved) {
-      reporter.io.writeln('The $link $category has removed $attributeName:\n');
-      shouldHr = true;
-      attribute.forEachRemoved((k, v) {
-        if (attributeName == 'annotations') {
-          reporter.io.writeln('* ${annotationFormatter(v)}');
-        } else if (attributeName == 'parameters') {
-          reporter.io.writeln('* `${parameterSignature(v as Map)}`');
-        } else {
-          reporter.io.writeln('* `$v`');
-        }
-      });
-      reporter.io.writeln('');
-      reporter.erase(attribute.removed);
-    }
+    reportEachWithRemoved(attributeName, attribute);
+    reportEachWithAdded(attributeName, attribute);
+    reportEachWithChanged(attributeName, attribute);
 
-    if (attribute.hasAdded) {
-      if (shouldHr) {
-        // TODO: get this font-weight up.
-        reporter.io.writeln('and new $attributeName:\n');
-      } else {
-        reporter.io.writeln('The $link $category has new $attributeName:\n');
-      }
-      shouldHr = true;
-      attribute.forEachAdded((k, v) {
-        if (attributeName == 'annotations') {
-          reporter.io.writeln('* ${annotationFormatter(v)}');
-        } else if (attributeName == 'parameters') {
-          reporter.io.writeln('* `${parameterSignature(v as Map)}`');
-        } else {
-          reporter.io.writeln('* `$v`');
-        }
-      });
-      reporter.erase(attribute.added);
-    }
-
-    if (attribute.hasChanged) {
-      if (shouldHr) {
-        // TODO: get this font weight up.
-        reporter.io.writeln('and changed $attributeName:\n');
-      } else {
-        reporter.io.writeln('The $link $category has changed $attributeName:\n');
-      }
-      shouldHr = true;
-      attribute.forEachChanged((k, v) {
-        if (attributeName == 'annotations') {
-          reporter.io.writeln(
-              '* ${annotationFormatter(v[0])} is now ${annotationFormatter(v[1])}.');
-        } else {
-          reporter.io.writeln('* `${v[0]}` is now `${v[1]}`.');
-        }
-      });
-      reporter.erase(attribute.changed);
-    }
-    if (shouldHr) {
+    if (shouldHr)
       reporter.io.writeHr();
-    }
 
     attribute.node.forEach((attributeAttributeName, attributeAttribute) {
       reportEachMethodAttributeAttribute(
@@ -102,6 +60,74 @@ class MethodAttributesReporter {
           blockquote: key == 'comment');
     }
     reporter.io.writeHr();
+  }
+
+  void reportEachWithRemoved(String attributeName, DiffNode attribute) {
+    if (!attribute.hasRemoved)
+      return;
+
+    reporter.io.writeln('The $link $category has removed $attributeName:\n');
+    shouldHr = true;
+
+    attribute.forEachRemoved((_, v) =>
+        reporter.io.writeln(attributeAttributeListItem(attributeName, v)));
+
+    reporter.io.writeln('');
+    reporter.erase(attribute.removed);
+  }
+
+  void reportEachWithAdded(String attributeName, DiffNode attribute) {
+    if (!attribute.hasAdded)
+      return;
+
+    if (shouldHr) {
+      // TODO: get this font-weight up.
+      reporter.io.writeln('and new $attributeName:\n');
+    } else {
+      reporter.io.writeln('The $link $category has new $attributeName:\n');
+    }
+
+    shouldHr = true;
+
+    attribute.forEachAdded((_, v) =>
+      reporter.io.writeln(attributeAttributeListItem(attributeName, v)));
+
+    reporter.erase(attribute.added);
+  }
+
+  void reportEachWithChanged(String attributeName, DiffNode attribute) {
+    if (!attribute.hasChanged)
+      return;
+
+    if (shouldHr) {
+      // TODO: get this font weight up.
+      reporter.io.writeln('and changed $attributeName:\n');
+    } else {
+      reporter.io.writeln('The $link $category has changed $attributeName:\n');
+    }
+
+    shouldHr = true;
+
+    attribute.forEachChanged((k, v) {
+      if (attributeName == 'annotations') {
+        reporter.io.writeln(
+            '* ${annotationFormatter(v[0])} is now ${annotationFormatter(v[1])}.');
+      } else {
+        reporter.io.writeln('* `${v[0]}` is now `${v[1]}`.');
+      }
+    });
+
+    reporter.erase(attribute.changed);
+  }
+
+  String attributeAttributeListItem(String attributeName, Map attributeAttribute) {
+    if (attributeName == 'annotations')
+      return '* ${annotationFormatter(attributeAttribute)}';
+
+    if (attributeName == 'parameters')
+      return '* `${parameterSignature(attributeAttribute)}`';
+
+    return '* `$attributeAttribute`';
   }
 
   void reportEachMethodAttributeAttribute(
