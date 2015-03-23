@@ -6,8 +6,17 @@ part of shapeshift_cli;
 /// Reporter for changes in a method's attributes.
 ///
 /// This reporter can iterate over attributes with their own added, deleted, or
-/// changed attributes, and iterate over shallow attributes (such as `return`)
+/// changed properties, and iterate over shallow attributes (such as `return`)
 /// to list changes.
+///
+/// Definitions that might help:
+///
+/// * There are 5 method categories: constructor, method, getter, setter, and
+///   operator.
+/// * Each method has attributes, such as "parameters" and "annotations"
+/// * Each method attribute, or member thereof, might have properties.
+///   E.g. Each member of the "parameters" attribute (each parameter) has
+///   properties such as "name", and "type".
 ///
 /// It is unexpected to find any new or removed attributes themselves (a method
 /// should never be missing the "parameters" attribute, or suddenly gain the
@@ -34,16 +43,16 @@ class MethodAttributesReporter {
   }
 
   void reportEach(String attributeName, DiffNode attribute) {
-    reportEachWithRemoved(attributeName, attribute);
-    reportEachWithAdded(attributeName, attribute);
-    reportEachWithChanged(attributeName, attribute);
+    reportRemovedProperties(attributeName, attribute);
+    reportAddedProperties(attributeName, attribute);
+    reportChangedProperties(attributeName, attribute);
 
     if (shouldHr)
       reporter.io.writeHr();
 
-    attribute.node.forEach((attributeAttributeName, attributeAttribute) {
-      reportEachMethodAttributeAttribute(
-          attributeName, attributeAttributeName, attributeAttribute);
+    attribute.node.forEach((propertyName, property) {
+      reportEachProperty(
+          attributeName, propertyName, property);
     });
   }
 
@@ -62,21 +71,21 @@ class MethodAttributesReporter {
     reporter.io.writeHr();
   }
 
-  void reportEachWithRemoved(String attributeName, DiffNode attribute) {
+  void reportRemovedProperties(String attributeName, DiffNode attribute) {
     if (!attribute.hasRemoved)
       return;
 
     reporter.io.writeln('The $link $category has removed $attributeName:\n');
     shouldHr = true;
 
-    attribute.forEachRemoved((_, v) =>
-        reporter.io.writeln(attributeAttributeListItem(attributeName, v)));
+    attribute.forEachRemoved((_, property) =>
+        reporter.io.writeln(propertyListItem(attributeName, property)));
 
     reporter.io.writeln('');
     reporter.erase(attribute.removed);
   }
 
-  void reportEachWithAdded(String attributeName, DiffNode attribute) {
+  void reportAddedProperties(String attributeName, DiffNode attribute) {
     if (!attribute.hasAdded)
       return;
 
@@ -89,13 +98,13 @@ class MethodAttributesReporter {
 
     shouldHr = true;
 
-    attribute.forEachAdded((_, v) =>
-      reporter.io.writeln(attributeAttributeListItem(attributeName, v)));
+    attribute.forEachAdded((_, property) =>
+      reporter.io.writeln(propertyListItem(attributeName, property)));
 
     reporter.erase(attribute.added);
   }
 
-  void reportEachWithChanged(String attributeName, DiffNode attribute) {
+  void reportChangedProperties(String attributeName, DiffNode attribute) {
     if (!attribute.hasChanged)
       return;
 
@@ -108,39 +117,38 @@ class MethodAttributesReporter {
 
     shouldHr = true;
 
-    attribute.forEachChanged((k, v) {
+    attribute.forEachChanged((_, property) {
       if (attributeName == 'annotations') {
         reporter.io.writeln(
-            '* ${annotationFormatter(v[0])} is now ${annotationFormatter(v[1])}.');
+            '* ${annotationFormatter(property[0])} is now ${annotationFormatter(property[1])}.');
       } else {
-        reporter.io.writeln('* `${v[0]}` is now `${v[1]}`.');
+        reporter.io.writeln('* `${property[0]}` is now `${property[1]}`.');
       }
     });
 
     reporter.erase(attribute.changed);
   }
 
-  String attributeAttributeListItem(String attributeName, Map attributeAttribute) {
+  String propertyListItem(String attributeName, Map property) {
     if (attributeName == 'annotations')
-      return '* ${annotationFormatter(attributeAttribute)}';
+      return '* ${annotationFormatter(property)}';
 
     if (attributeName == 'parameters')
-      return '* `${parameterSignature(attributeAttribute)}`';
+      return '* `${parameterSignature(property)}`';
 
-    return '* `$attributeAttribute`';
+    return '* `$property`';
   }
 
-  void reportEachMethodAttributeAttribute(
-      String attributeName,
-      String attributeAttributeName,
-      DiffNode attributeAttribute) {
+  void reportEachProperty(String attributeName,
+                          String propertyName,
+                          DiffNode property) {
     String methodQualifiedName = attributes.metadata['qualifiedName'];
     String methodLink = mdLinkToDartlang(methodQualifiedName, method);
-    String attrLink = mdLinkToDartlang(
-        '$methodQualifiedName,$attributeAttributeName', attributeAttributeName);
+    String propertyLink = mdLinkToDartlang(
+        '$methodQualifiedName,$propertyName', propertyName);
     String firstPart =
-        'The $methodLink ${category}\'s $attrLink ${singularize(attributeName)}\'s';
-    attributeAttribute.forEachChanged((key, oldNew) {
+        'The $methodLink ${category}\'s $propertyLink ${singularize(attributeName)}\'s';
+    property.forEachChanged((key, oldNew) {
       if (key == 'type') {
         reporter.io.writeln(
             '$firstPart $key changed from `${changedType(oldNew)}`');
@@ -150,32 +158,32 @@ class MethodAttributesReporter {
       }
       reporter.io.writeHr();
     });
-    reporter.erase(attributeAttribute.changed);
+    reporter.erase(property.changed);
 
-    if (attributeAttribute.containsKey('type')) {
+    if (property.containsKey('type')) {
       String key = 'type';
-      List<String> oldNew = attributeAttribute[key]['0'].changed['outer'];
+      List<String> oldNew = property[key]['0'].changed['outer'];
       // This is so ugly because we are so deep, but an example would be:
       // The foo method's value parameter's type has changed from int to bool.
       reporter.io.writeln(
-          'The [$method](#) ${category}\'s [${attributeAttributeName}](#) '
+          'The [$method](#) ${category}\'s [${propertyName}](#) '
           '${singularize(attributeName)}\'s $key has changed from '
           '`${oldNew[0]}` to `${oldNew[1]}`');
       reporter.io.writeHr();
-      if (reporter.shouldErase) {
-        attributeAttribute.node.remove('type');
-      }
+
+      if (reporter.shouldErase)
+        property.node.remove('type');
     }
 
-    if (attributeAttribute.containsKey('functionDeclaration')) {
-      DiffNode declaration = attributeAttribute.node['functionDeclaration'];
+    if (property.containsKey('functionDeclaration')) {
+      DiffNode declaration = property.node['functionDeclaration'];
       if (declaration.changed.containsKey('return')) {
         List<List<Map>> oldNew = declaration.changed['return'];
         // This is so ugly because we are so deep, but an example would be:
         // The foo method's callback parameter's return type has changed from
         // Object to String.
         reporter.io.writeln(
-            'The [$method](#) ${category}\'s [${attributeAttributeName}](#) '
+            'The [$method](#) ${category}\'s [${propertyName}](#) '
             '${singularize(attributeName)}\'s return type has ${changedType(oldNew)}');
         reporter.io.writeHr();
         if (reporter.shouldErase) {
