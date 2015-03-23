@@ -58,7 +58,7 @@ class FileReporter {
       io.writeln("${diff.metadata['name']}'s `${key}` changed:\n");
       io.writeWasNow((oldNew as List<String>)[0], (oldNew as List<String>)[1],
           blockquote: key == 'comment');
-      io.writeln('\n---\n');
+      io.writeHr();
     });
     diff.changed.clear();
 
@@ -76,7 +76,7 @@ class FileReporter {
         io.writeln("${diff.metadata['name']}'s `${key}` changed:\n");
         io.writeWasNow((oldNew as List<String>)[0], (oldNew as List<String>)[1],
             blockquote: key == 'comment', link: ['superclass'].contains(key));
-        io.writeln('\n---\n');
+        io.writeHr();
       });
       diff.changed.clear();
     }
@@ -99,7 +99,7 @@ class FileReporter {
         io.writeln("${diff.metadata['name']} no longer implements ${removed}.");
         erase(implements.removed);
       }
-      io.writeln('\n---\n');
+      io.writeHr();
     }
 
     // Iterate over the method categories.
@@ -185,7 +185,7 @@ class FileReporter {
             io.writeWasNow(value[0], value[1],
                 blockquote: attribute == 'comment');
           }
-          io.writeln('\n---\n');
+          io.writeHr();
         });
       }
       erase(variable.changed);
@@ -199,7 +199,7 @@ class FileReporter {
               io.writeWasNow(annotationFormatter(annotation[0]),
                   annotationFormatter(annotation[1]));
             });
-            io.writeln('\n---\n');
+            io.writeHr();
           } else {
             io.writeBad(
                 'TODO: The [$key](#) ${singularize(variableList)}\'s `$attribute` has changed:\n',
@@ -220,7 +220,7 @@ class FileReporter {
         }
         io.writeln('* $el');
       });
-      io.writeln('\n---\n');
+      io.writeHr();
       erase(d[key].added);
     }
 
@@ -232,7 +232,7 @@ class FileReporter {
         }
         io.writeln('* $el');
       });
-      io.writeln('\n---\n');
+      io.writeHr();
       erase(d[key].removed);
     }
 
@@ -247,7 +247,7 @@ class FileReporter {
         }
         io.writeln('* $theOld is now $theNew.');
       });
-      io.writeln('\n---\n');
+      io.writeHr();
       erase(d[key].changed);
     }
   }
@@ -258,7 +258,7 @@ class FileReporter {
           d.removed.length == 1 ? classCategory : pluralize(classCategory);
       var names = d.removed.values.map((klass) => klass['name']).join(', ');
       io.writeln('Removed $cat: $names.');
-      io.writeln('\n---\n');
+      io.writeHr();
       erase(d.removed);
     }
 
@@ -269,7 +269,7 @@ class FileReporter {
               mdLinkToDartlang(klass['qualifiedName'], klass['name']))
           .join(', ');
       io.writeln('New $cat: $names.');
-      io.writeln('\n---\n');
+      io.writeHr();
       erase(d.added);
     }
 
@@ -287,7 +287,7 @@ class FileReporter {
           } else {
             io.writeCodeblockHr(thing);
           }
-          io.writeln('\n---\n');
+          io.writeHr();
         });
       }
       erase(classThing.added);
@@ -302,9 +302,9 @@ class FileReporter {
         String newThingLink =
             mdLinkToDartlang(changed['qualifiedName'][1], changed['name'][1]);
         io.writeln('Removed $classCategory: ${changed['name'][0]}.');
-        io.writeln('\n---\n');
+        io.writeHr();
         io.writeln('New $classCategory: $newThingLink.');
-        io.writeln('\n---\n');
+        io.writeHr();
       }
 
       if (classThing.hasChanged) {
@@ -332,7 +332,7 @@ class FileReporter {
           io.writeWasNow(
               (oldNew as List<String>)[0], (oldNew as List<String>)[1],
               blockquote: ['comment', 'preview'].contains(key));
-          io.writeln('\n---\n');
+          io.writeHr();
         });
       }
       erase(classThing.changed);
@@ -351,7 +351,7 @@ class FileReporter {
               'The [${classThing.metadata['qualifiedName']}](#) $classCategory\'s [$name](#) '
               'parameter\'s $key has changed from '
               '`$oldType` to `$newType`');
-          io.writeln('\n---\n');
+          io.writeHr();
           if (shouldErase) {
             parameter.changed.remove('type');
           }

@@ -134,12 +134,12 @@ class DocCoverageReporter {
       if (!cov.containsKey('comment') || (cov['comment'] as String).isEmpty) {
         io.writeln(
             '**${mdLinkToDartlang(cov['qualifiedName'])} has no comment!**\n');
-        io.writeln('---\n');
+        io.writeHr();
       } else if ((cov['comment'] as String).split('\n').length < 2) {
         io.writeln(
             '**${mdLinkToDartlang(cov['qualifiedName'])}\'s comment is too short:**\n');
         io.writeBlockquote(cov['comment']);
-        io.writeln('---\n');
+        io.writeHr();
       }
 
       ['getters', 'setters', 'constructors', 'methods'].forEach((cat) {
@@ -159,7 +159,7 @@ class DocCoverageReporter {
                 mdLinkToDartlang(meth['qualifiedName'] as String, name);
             io.writeln('* $link\n');
           });
-          io.writeln('---\n');
+          io.writeHr();
         }
 
         if (noOneLiner.length > 0) {
@@ -177,7 +177,7 @@ class DocCoverageReporter {
             io.writeln('$link:\n');
             io.writeBlockquote(meth['comment']);
           });
-          io.writeln('---\n');
+          io.writeHr();
         }
       });
     }

@@ -61,6 +61,8 @@ class MarkdownWriter {
     io.writeln('```dart\n${s}\n```\n---');
   }
 
+  void writeHr() => io.writeln('\n---\n');
+
   void bufferH1(String s) {
     h1Buffer = '$s\n${'=' * s.length}\n';
   }

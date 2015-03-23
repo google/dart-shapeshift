@@ -80,7 +80,7 @@ class MethodAttributesReporter {
       reporter.erase(attribute.changed);
     }
     if (shouldHr) {
-      reporter.io.writeln('\n---\n');
+      reporter.io.writeHr();
     }
 
     attribute.node.forEach((attributeAttributeName, attributeAttribute) {
@@ -101,7 +101,7 @@ class MethodAttributesReporter {
       reporter.io.writeWasNow(oldNew[0], oldNew[1],
           blockquote: key == 'comment');
     }
-    reporter.io.writeln('\n---\n');
+    reporter.io.writeHr();
   }
 
   void reportEachMethodAttributeAttribute(
@@ -122,7 +122,7 @@ class MethodAttributesReporter {
         reporter.io.writeln(
             '$firstPart changed from `$key: ${oldNew[0]}` to `$key: ${oldNew[1]}`');
       }
-      reporter.io.writeln('\n---\n');
+      reporter.io.writeHr();
     });
     reporter.erase(attributeAttribute.changed);
 
@@ -135,7 +135,7 @@ class MethodAttributesReporter {
           'The [$method](#) ${category}\'s [${attributeAttributeName}](#) '
           '${singularize(attributeName)}\'s $key has changed from '
           '`${oldNew[0]}` to `${oldNew[1]}`');
-      reporter.io.writeln('\n---\n');
+      reporter.io.writeHr();
       if (reporter.shouldErase) {
         attributeAttribute.node.remove('type');
       }
@@ -151,7 +151,7 @@ class MethodAttributesReporter {
         reporter.io.writeln(
             'The [$method](#) ${category}\'s [${attributeAttributeName}](#) '
             '${singularize(attributeName)}\'s return type has ${changedType(oldNew)}');
-        reporter.io.writeln('\n---\n');
+        reporter.io.writeHr();
         if (reporter.shouldErase) {
           declaration.changed.remove('return');
         }
