@@ -1,103 +1,7 @@
-// Copyright 2014 Google Inc. All Rights Reserved.
+// Copyright 2015 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
 part of shapeshift_cli;
-
-class PackageReporter {
-  final Map<String, DiffNode> diff = new Map<String, DiffNode>();
-  final String leftPath, rightPath, out;
-  MarkdownWriter io;
-
-  PackageReporter(this.leftPath, this.rightPath, {this.out});
-
-  void calculateDiff(String fileName) {
-    File leftFile = new File(p.join(leftPath, fileName));
-    File rightFile = new File(p.join(rightPath, fileName));
-    if (!leftFile.existsSync()) {
-      print(
-          '$leftFile doesn\'t exist, which should be caught in the package json.');
-      return;
-    }
-    JsonDiffer differ = new JsonDiffer(
-        leftFile.readAsStringSync(), rightFile.readAsStringSync());
-    differ.atomics
-      ..add('type')
-      ..add('return')
-      ..add('annotations[]');
-    differ.metadataToKeep..add('qualifiedName');
-    differ.ensureIdentical(['name', 'qualifiedName']);
-    diff[fileName] = differ.diff()
-      ..metadata['qualifiedName'] = differ.leftJson['qualifiedName']
-      ..metadata['name'] = differ.leftJson['name']
-      ..metadata['packageName'] = differ.leftJson['packageName'];
-  }
-
-  void calculateAllDiffs() {
-    List<FileSystemEntity> rightRawLs =
-        new Directory(rightPath).listSync(recursive: true);
-    List<String> rightLs = rightRawLs
-        .where((FileSystemEntity f) => f is File)
-        .map((File f) => f.path)
-        .toList();
-
-    rightLs.forEach((String file) {
-      file = p.relative(file, from: rightPath);
-      if (p.basename(file) == 'index.json' ||
-          p.basename(file) == 'library_list.json' ||
-          p.extension(file) != '.json') {
-        print('Skipping $file');
-        return;
-      }
-      calculateDiff(file);
-    });
-  }
-
-  void report() {
-    Map<String, PackageSdk> diffsBySubpackage = new Map();
-    diff.forEach((String file, DiffNode node) {
-      if (node.metadata['packageName'] != null) {
-        String subpackage = node.metadata['qualifiedName'];
-        if (!diffsBySubpackage.containsKey(subpackage)) {
-          diffsBySubpackage[subpackage] = new PackageSdk();
-        }
-        diffsBySubpackage[subpackage].package = node;
-      } else {
-        String subpackage = getSubpackage(node);
-        if (!diffsBySubpackage.containsKey(subpackage)) {
-          diffsBySubpackage[subpackage] = new PackageSdk();
-        }
-        diffsBySubpackage[subpackage].classes.add(node);
-      }
-    });
-
-    diffsBySubpackage.forEach((String name, PackageSdk p) {
-      setIo(name);
-      reportFile(name, p.package);
-      p.classes.forEach((k) => reportFile(name, k));
-      io.close();
-    });
-  }
-
-  void setIo(String packageName) {
-    if (out == null) {
-      io = new MarkdownWriter(() => stdout);
-      return;
-    }
-
-    new Directory(out).createSync(recursive: true);
-    io = new MarkdownWriter(() => (new File('$out/$packageName.markdown')
-      ..createSync(recursive: true)).openWrite());
-    io.writeMetadata(packageName);
-  }
-
-  void reportFile(String name, DiffNode d) {
-    new FileReporter(name, d, io: io).report();
-  }
-
-  String getSubpackage(DiffNode node) {
-    return (node.metadata['qualifiedName']).split('.')[0];
-  }
-}
 
 class FileReporter {
   final String fileName;
@@ -109,14 +13,16 @@ class FileReporter {
   FileReporter(this.fileName, this.diff, {this.io});
 
   void report() {
-    if (diff == null) {
+    if (diff == null)
       return;
-    }
 
     if (diff.metadata['packageName'] != null) {
+      // The file I'm reporting on represents a library.
       io.bufferH1(diff.metadata['qualifiedName']);
-      reportPackage();
+      reportLibrary();
     } else {
+      // The file I'm reporting on represents a "class".
+      // TODO: also Errors and Typedefs?
       io.bufferH2(
           'class ${mdLinkToDartlang(diff.metadata['qualifiedName'], diff.metadata['name'])}');
       reportClass();
@@ -133,7 +39,7 @@ class FileReporter {
     }
   }
 
-  void reportPackage() {
+  void reportLibrary() {
     if (diff.changed.containsKey('packageIntro')) {
       io.writeBad(
           'TODO: The <strong>packageIntro</strong> changed, which is probably huge. Not including here yet.',
@@ -229,9 +135,9 @@ class FileReporter {
   }
 
   void reportVariables(String variableList) {
-    if (!diff.containsKey(variableList)) {
+    if (!diff.containsKey(variableList))
       return;
-    }
+
     DiffNode variables = diff[variableList];
 
     if (variables.hasAdded) {
@@ -346,17 +252,9 @@ class FileReporter {
     }
   }
 
-  String comment(String c) {
-    if (c.isEmpty) {
-      return '';
-    }
-    return c.split('\n').map((String x) => '/// $x\n').join('');
-  }
-
   void erase(Map m) {
-    if (shouldErase) {
+    if (shouldErase)
       m.clear();
-    }
   }
 
   void reportEachClassThing(String classCategory, DiffNode d) {
@@ -639,34 +537,4 @@ class FileReporter {
       }
     }
   }
-
-  // TODO: just steal this from dartdoc-viewer
-  String methodSignature(Map<String, Object> method,
-      {bool includeComment: true, bool includeAnnotations: true}) {
-    String name = method['name'];
-    String type = simpleType(method['return']);
-    if (name == '') {
-      name = diff.metadata['name'];
-    }
-    String s = '$type $name';
-    if (includeComment) {
-      s = comment(method['comment']) + s;
-    }
-    if (includeAnnotations) {
-      (method['annotations'] as List).forEach((Map annotation) {
-        s = annotationFormatter(annotation, backticks: false) + '\n' + s;
-      });
-    }
-    List<String> p = new List<String>();
-    (method['parameters'] as Map).forEach((k, v) {
-      p.add(parameterSignature(v));
-    });
-    s = '$s(${p.join(', ')})';
-    return s;
-  }
-}
-
-class PackageSdk {
-  final List<DiffNode> classes = new List();
-  DiffNode package;
 }

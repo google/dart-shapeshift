@@ -38,6 +38,13 @@ String classFormatter(String c, {bool link: true}) {
   return link ? mdLinkToDartlang(c) : decoratedName(c);
 }
 
+String formattedComment(String c) {
+  if (c.isEmpty) {
+    return '';
+  }
+  return c.split('\n').map((String x) => '/// $x\n').join('');
+}
+
 String annotationFormatter(Map ann, {bool backticks: true, bool link: false}) {
   String result = '@' + (ann['name'] as String).split('.').last;
   if (ann.containsKey('parameters')) {
@@ -91,6 +98,32 @@ String variableSignature(Map<String, Object> variable) {
     s = annotationFormatter(annotation, backticks: false) + '\n' + s;
   });
 
+  return s;
+}
+
+// TODO: just steal this from dartdoc-viewer
+String methodSignature(Map<String, Object> method,
+    {bool includeComment: true, bool includeAnnotations: true}) {
+  String name = method['name'];
+  String type = simpleType(method['return']);
+  if (name == '') {
+    // Apparently this used to be an issue... I can't recreate it.
+    throw new Exception();
+  }
+  String s = '$type $name';
+  if (includeComment) {
+    s = formattedComment(method['comment']) + s;
+  }
+  if (includeAnnotations) {
+    (method['annotations'] as List).forEach((Map annotation) {
+      s = annotationFormatter(annotation, backticks: false) + '\n' + s;
+    });
+  }
+  List<String> p = new List<String>();
+  (method['parameters'] as Map).forEach((k, v) {
+    p.add(parameterSignature(v));
+  });
+  s = '$s(${p.join(', ')})';
   return s;
 }
 

@@ -12,5 +12,6 @@ import 'package:path/path.dart' as p;
 
 import 'shapeshift_common.dart';
 
-part 'src/cli/package_reporter.dart';
+part 'src/cli/file_reporter.dart';
+part 'src/cli/library_reporter.dart';
 part 'src/cli/markdown_writer.dart';
