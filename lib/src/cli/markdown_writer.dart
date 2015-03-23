@@ -120,6 +120,7 @@ permalink: /$packageName/
 String highlightInserted(String theOld, String theNew) {
   List<Diff> diffResult = diffAndCleanup(theOld, theNew);
   String result = '';
+  String greenBg = 'background-color: rgba(153, 255, 153, 0.7)';
   diffResult.forEach((Diff d) {
     if (d.operation == DIFF_EQUAL) {
       result += d.text;
@@ -130,12 +131,12 @@ String highlightInserted(String theOld, String theNew) {
           d.text.contains('<pre>')) {
         result +=
             '<div '
-            'style="background-color: #9F9; display: inline-block; padding: 2px; margin: 0 1px; width: 100%;">'
+            'style="$greenBg; display: inline-block; padding: 2px; margin: 0 1px; width: 100%;">'
             '${d.text}'
             '</div>';
       } else {
         result +=
-            '<span style="background-color: #9F9; padding: 1px;">${d.text}</span>';
+            '<span style="$greenBg; padding: 1px;">${d.text}</span>';
       }
     }
   });
@@ -144,7 +145,8 @@ String highlightInserted(String theOld, String theNew) {
 
 String highlightDeleted(String theOld, String theNew) {
   List<Diff> diffResult = diffAndCleanup(theOld, theNew);
-  String result = "";
+  String result = '';
+  String redBg = 'background-color: rgba(255, 153, 153, 0.7)';
   diffResult.forEach((Diff d) {
     if (d.operation == DIFF_EQUAL) {
       result += d.text;
@@ -154,10 +156,10 @@ String highlightDeleted(String theOld, String theNew) {
           d.text.contains('<p>') ||
           d.text.contains('<pre>')) {
         result +=
-            '<div style="background-color: #F99; display: inline-block; padding: 1px; margin: 0 1px;">${d.text}</div>';
+            '<div style="$redBg; display: inline-block; padding: 1px; margin: 0 1px;">${d.text}</div>';
       } else {
         result +=
-            '<span style="background-color: #F99; padding: 1px; margin: 0 1px;">${d.text}</span>';
+            '<span style="$redBg; padding: 1px; margin: 0 1px;">${d.text}</span>';
       }
     }
   });
