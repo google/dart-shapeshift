@@ -15,3 +15,4 @@ import 'shapeshift_common.dart';
 part 'src/cli/file_reporter.dart';
 part 'src/cli/library_reporter.dart';
 part 'src/cli/markdown_writer.dart';
+part 'src/cli/method_attributes_reporter.dart';

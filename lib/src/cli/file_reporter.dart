@@ -252,11 +252,6 @@ class FileReporter {
     }
   }
 
-  void erase(Map m) {
-    if (shouldErase)
-      m.clear();
-  }
-
   void reportEachClassThing(String classCategory, DiffNode d) {
     if (d.hasRemoved) {
       var cat =
@@ -389,152 +384,14 @@ class FileReporter {
     erase(d.removed);
 
     d.forEach((method, attributes) {
-      reportEachMethodAttribute(category, method, attributes);
+      new MethodAttributesReporter(category, method, attributes, this).report();
     });
   }
 
-  void reportEachMethodAttribute(
-      String category, String method, DiffNode attributes) {
-    var link = mdLinkToDartlang(attributes.metadata['qualifiedName'], method);
-    bool shouldHr = false;
-    attributes.forEach((attributeName, attribute) {
-      if (attribute.hasRemoved) {
-        io.writeln('The $link $category has removed $attributeName:\n');
-        shouldHr = true;
-        attribute.forEachRemoved((k, v) {
-          if (attributeName == 'annotations') {
-            io.writeln('* ${annotationFormatter(v)}');
-          } else if (attributeName == 'parameters') {
-            io.writeln('* `${parameterSignature(v as Map)}`');
-          } else {
-            io.writeln('* `$v`');
-          }
-        });
-        io.writeln('');
-        erase(attribute.removed);
-      }
 
-      if (attribute.hasAdded) {
-        if (shouldHr) {
-          // TODO: get this font-weight up.
-          io.writeln('and new $attributeName:\n');
-        } else {
-          io.writeln('The $link $category has new $attributeName:\n');
-        }
-        shouldHr = true;
-        attribute.forEachAdded((k, v) {
-          if (attributeName == 'annotations') {
-            io.writeln('* ${annotationFormatter(v)}');
-          } else if (attributeName == 'parameters') {
-            io.writeln('* `${parameterSignature(v as Map)}`');
-          } else {
-            io.writeln('* `$v`');
-          }
-        });
-        erase(attribute.added);
-      }
 
-      if (attribute.hasChanged) {
-        if (shouldHr) {
-          // TODO: get this font weight up.
-          io.writeln('and changed $attributeName:\n');
-        } else {
-          io.writeln('The $link $category has changed $attributeName:\n');
-        }
-        shouldHr = true;
-        attribute.forEachChanged((k, v) {
-          if (attributeName == 'annotations') {
-            io.writeln(
-                '* ${annotationFormatter(v[0])} is now ${annotationFormatter(v[1])}.');
-          } else {
-            io.writeln('* `${v[0]}` is now `${v[1]}`.');
-          }
-        });
-        erase(attribute.changed);
-      }
-      if (shouldHr) {
-        io.writeln('\n---\n');
-      }
-
-      attribute.node.forEach((attributeAttributeName, attributeAttribute) {
-        reportEachMethodAttributeAttribute(category, method,
-            attributes.metadata['qualifiedName'], attributeName,
-            attributeAttributeName, attributeAttribute);
-      });
-    });
-
-    attributes.forEachChanged((String key, List oldNew) {
-      if (key == 'commentFrom') {
-        return;
-      } // We don't care about commentFrom.
-      io.writeln('The $link $category\'s `${key}` changed:\n');
-      if (key == 'return') {
-        io.writeWasNow(simpleType(oldNew[0]), simpleType(oldNew[1]));
-      } else {
-        io.writeWasNow((oldNew as List<String>)[0], (oldNew as List<String>)[1],
-            blockquote: key == 'comment');
-      }
-      io.writeln('\n---\n');
-    });
-    erase(attributes.changed);
-  }
-
-  void reportEachMethodAttributeAttribute(String category, String method,
-      String methodQname, String attributeName, String attributeAttributeName,
-      DiffNode attributeAttribute) {
-    attributeAttribute.forEachChanged((key, oldNew) {
-      var methodLink = mdLinkToDartlang(methodQname, method);
-      var attrLink = mdLinkToDartlang(
-          '$methodQname,$attributeAttributeName', attributeAttributeName);
-      var firstPart =
-          'The $methodLink ${category}\'s $attrLink ${singularize(attributeName)}\'s';
-      if (key == 'type') {
-        io.writeln(
-            '$firstPart $key changed from `${simpleType(oldNew[0])}` to `${simpleType(oldNew[1])}`');
-      } else {
-        io.writeln(
-            '$firstPart changed from `$key: ${oldNew[0]}` to `$key: ${oldNew[1]}`');
-      }
-      io.writeln('\n---\n');
-    });
-    erase(attributeAttribute.changed);
-
-    if (attributeAttribute.containsKey('type')) {
-      String key = 'type';
-      List<String> oldNew = attributeAttribute[key]['0'].changed['outer'];
-      // This is so ugly because we are so deep, but an example would be:
-      // The foo method's value parameter's type has changed from int to bool.
-      io.writeln(
-          'The [$method](#) ${category}\'s [${attributeAttributeName}](#) '
-          '${singularize(attributeName)}\'s $key has changed from '
-          '`${oldNew[0]}` to `${oldNew[1]}`');
-      io.writeln('\n---\n');
-      if (shouldErase) {
-        attributeAttribute.node.remove('type');
-      }
-    }
-
-    // TODO: Clean up? But really I need to start OOing more of this from
-    // above. reportEachMethodAttributeAttribute takes 6 args. :/
-    if (attributeAttribute.containsKey('functionDeclaration')) {
-      DiffNode declaration = attributeAttribute.node['functionDeclaration'];
-      if (declaration.changed.containsKey('return')) {
-        String key = 'return type';
-        List<List<Map>> oldNew = declaration.changed['return'];
-        String oldType = simpleType(oldNew[0]);
-        String newType = simpleType(oldNew[1]);
-        // This is so ugly because we are so deep, but an example would be:
-        // The foo method's callback parameter's return type has changed from
-        // Object to String.
-        io.writeln(
-            'The [$method](#) ${category}\'s [${attributeAttributeName}](#) '
-            '${singularize(attributeName)}\'s $key has changed from '
-            '`$oldType` to `$newType`');
-        io.writeln('\n---\n');
-        if (shouldErase) {
-          declaration.changed.remove('return');
-        }
-      }
-    }
+  void erase(Map m) {
+    if (shouldErase)
+      m.clear();
   }
 }
