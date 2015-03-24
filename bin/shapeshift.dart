@@ -1,6 +1,8 @@
 // Copyright 2014 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
+import 'dart:io';
+
 import 'package:args/args.dart';
 import 'package:path/path.dart' as path;
 
@@ -19,7 +21,12 @@ class Shapeshift {
       leftPath = path.join(leftPath, args['subset']);
       rightPath = path.join(rightPath, args['subset']);
     }
-    new LibraryReporter(leftPath, rightPath, out: args['out'])
+
+    Writer w = (args['out'] == null)
+        ? new SingleSinkWriter(stdout)
+        : new DirectoryWriter(args['out']);
+
+    new LibraryReporter(leftPath, rightPath, writer: w)
       ..calculateAllDiffs()
       ..report();
   }

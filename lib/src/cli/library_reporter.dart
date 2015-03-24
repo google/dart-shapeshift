@@ -5,10 +5,11 @@ part of shapeshift_cli;
 
 class LibraryReporter {
   final Map<String, DiffNode> diff = new Map<String, DiffNode>();
-  final String leftPath, rightPath, out;
+  final String leftPath, rightPath;
+  final Writer writer;
   MarkdownWriter io;
 
-  LibraryReporter(this.leftPath, this.rightPath, {this.out});
+  LibraryReporter(this.leftPath, this.rightPath, {this.writer});
 
   void calculateDiff(String fileName) {
     File leftFile = new File(p.join(leftPath, fileName));
@@ -71,26 +72,12 @@ class LibraryReporter {
     });
 
     diffsBySubpackage.forEach((String name, PackageSdk p) {
-      setIo(name);
+      io = writer.writerFor(name);
+      io.writeMetadata(name);
       reportFile(name, p.package);
       p.classes.forEach((k) => reportFile(name, k));
       io.close();
     });
-  }
-
-  void setIo(String packageName) {
-    if (out == null) {
-      io = new MarkdownWriter(() => stdout);
-      return;
-    }
-
-    new Directory(out).createSync(recursive: true);
-    io = new MarkdownWriter(() {
-      File f = new File('$out/$packageName.markdown')
-        ..createSync(recursive: true);
-      return f.openWrite();
-    });
-    io.writeMetadata(packageName);
   }
 
   void reportFile(String name, DiffNode d) {
