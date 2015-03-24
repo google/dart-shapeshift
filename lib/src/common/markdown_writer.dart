@@ -1,14 +1,16 @@
 // Copyright 2014 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-part of shapeshift_cli;
+part of shapeshift_common;
 
 class MarkdownWriter {
-  IOSink _io;
-  Function openIo;
+  final Function openIo;
+  final bool shouldClose;
+
+  StreamSink _io;
   String buffer, h1Buffer, h2Buffer;
 
-  MarkdownWriter(this.openIo);
+  MarkdownWriter(this.openIo, this.shouldClose);
 
   get io {
     if (_io == null) {
@@ -24,7 +26,7 @@ class MarkdownWriter {
       //io.writeln('_No changes in this package._');
       return;
     }
-    if (io != stdout) {
+    if (shouldClose) {
       Future.wait([io.close()]);
     }
   }
@@ -34,10 +36,12 @@ class MarkdownWriter {
       io.writeln(buffer);
       buffer = null;
     }
+
     if (h1Buffer != null) {
       io.writeln(h1Buffer);
       h1Buffer = null;
     }
+
     if (h2Buffer != null) {
       io.writeln(h2Buffer);
       h2Buffer = null;

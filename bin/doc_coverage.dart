@@ -6,6 +6,9 @@ import 'dart:io';
 import 'package:shapeshift/doc_coverage_cli.dart';
 import 'package:args/args.dart';
 
+import 'package:shapeshift/shapeshift_cli.dart';
+import 'package:shapeshift/shapeshift_common.dart';
+
 class DocCoverage {
   ArgResults args;
 
@@ -20,7 +23,12 @@ class DocCoverage {
     if (args['subset'].isNotEmpty) {
       path += "/${args['subset']}";
     }
-    new DocCoverageReporter(path, out: args['out'])
+
+    Writer w = (args['out'] == null)
+        ? new SingleSinkWriter(stdout)
+        : new DirectoryWriter(args['out']);
+
+    new DocCoverageReporter(path, writer: w)
       ..calculateAllCoverage()
       ..report();
   }

@@ -3,10 +3,8 @@
 
 library shapeshift_cli;
 
-import 'dart:async';
 import 'dart:io';
 
-import 'package:diff_match_patch/diff_match_patch.dart';
 import 'package:json_diff/json_diff.dart';
 import 'package:path/path.dart' as p;
 
@@ -15,7 +13,5 @@ import 'shapeshift_common.dart';
 part 'src/cli/directory_writer.dart';
 part 'src/cli/file_reporter.dart';
 part 'src/cli/library_reporter.dart';
-part 'src/cli/markdown_writer.dart';
 part 'src/cli/method_attributes_reporter.dart';
 part 'src/cli/single_sink_writer.dart';
-part 'src/cli/writer.dart';

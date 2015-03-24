@@ -4,11 +4,12 @@
 part of doc_coverage_cli;
 
 class DocCoverageReporter {
-  final String path, out;
+  final String path;
+  final Writer writer;
   final Map<String, Map> gaps = new Map();
   MarkdownWriter io;
 
-  DocCoverageReporter(this.path, {this.out});
+  DocCoverageReporter(this.path, {this.writer});
 
   void calculateAllCoverage() {
     //gaps['docgen/dart-async.Stream.json'] = new FileDocCoverage().calculateCoverage(path, 'docgen/dart-async.Stream.json');
@@ -78,7 +79,8 @@ class DocCoverageReporter {
     });
 
     coverageBySubpackage.forEach((String name, PackageDocSdk p) {
-      setIo(name);
+      io = writer.writerFor(name);
+      io.writeMetadata(name);
       if (p.package == null) {
         print('No package for $name???');
       } else {
@@ -88,18 +90,6 @@ class DocCoverageReporter {
       p.classes.forEach((k) => reportFile(name, k));
       io.close();
     });
-  }
-
-  void setIo(String packageName) {
-    if (out == null) {
-      io = new MarkdownWriter(() => stdout);
-      return;
-    }
-
-    new Directory(out).createSync(recursive: true);
-    io = new MarkdownWriter(() => (new File('$out/$packageName.markdown')
-      ..createSync(recursive: true)).openWrite());
-    io.writeMetadata(packageName);
   }
 
   void reportFile(String name, Map cov) {

@@ -8,5 +8,5 @@ class SingleSinkWriter extends Writer {
   SingleSinkWriter(this.sink);
 
   /// In the SingleSinkWriter, the writer is simple the original sink.
-  MarkdownWriter writerFor(String _) => new MarkdownWriter(() => sink);
+  MarkdownWriter writerFor(String _) => new MarkdownWriter(() => sink, false);
 }

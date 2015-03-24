@@ -7,6 +7,7 @@ import 'package:args/args.dart';
 import 'package:path/path.dart' as path;
 
 import 'package:shapeshift/shapeshift_cli.dart';
+import 'package:shapeshift/shapeshift_common.dart';
 
 class Shapeshift {
   ArgResults args;

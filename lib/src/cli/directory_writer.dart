@@ -13,10 +13,12 @@ class DirectoryWriter extends Writer {
   }
 
   MarkdownWriter writerFor(String libraryName) {
-    return new MarkdownWriter(() {
-      File f = new File('$path/$libraryName.markdown')
-        ..createSync(recursive: true);
-      return f.openWrite();
-    });
+    return new MarkdownWriter(
+        () {
+          File f = new File('$path/$libraryName.markdown')
+            ..createSync(recursive: true);
+          return f.openWrite();
+        },
+        true);
   }
 }
