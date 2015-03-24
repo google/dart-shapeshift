@@ -85,8 +85,11 @@ class LibraryReporter {
     }
 
     new Directory(out).createSync(recursive: true);
-    io = new MarkdownWriter(() => (new File('$out/$packageName.markdown')
-      ..createSync(recursive: true)).openWrite());
+    io = new MarkdownWriter(() {
+      File f = new File('$out/$packageName.markdown')
+        ..createSync(recursive: true);
+      return f.openWrite();
+    });
     io.writeMetadata(packageName);
   }
 

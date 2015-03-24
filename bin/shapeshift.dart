@@ -1,8 +1,10 @@
 // Copyright 2014 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-import 'package:shapeshift/shapeshift_cli.dart';
 import 'package:args/args.dart';
+import 'package:path/path.dart' as path;
+
+import 'package:shapeshift/shapeshift_cli.dart';
 
 class Shapeshift {
   ArgResults args;
@@ -11,11 +13,11 @@ class Shapeshift {
     parseArgs(arguments);
     String left = args.rest[0];
     String right = args.rest[1];
-    String leftPath = "${args['base']}/$left";
-    String rightPath = "${args['base']}/$right";
+    String leftPath = path.join(args['base'], left);
+    String rightPath = path.join(args['base'], right);
     if (args['subset'].isNotEmpty) {
-      leftPath += "/${args['subset']}";
-      rightPath += "/${args['subset']}";
+      leftPath = path.join(leftPath, args['subset']);
+      rightPath = path.join(rightPath, args['subset']);
     }
     new LibraryReporter(leftPath, rightPath, out: args['out'])
       ..calculateAllDiffs()
