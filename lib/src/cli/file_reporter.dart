@@ -44,9 +44,7 @@ class FileReporter {
       io.writeBad(
           'TODO: The <strong>packageIntro</strong> changed, which is probably huge. Not including here yet.',
           '');
-      if (shouldErase) {
-        diff.changed.remove('packageIntro');
-      }
+      erase(diff.changed, 'packageIntro');
     }
 
     // iterate over the class categories
@@ -112,9 +110,7 @@ class FileReporter {
         // TODO: hmm... io.writeln("_Hiding inherited $methodCategory changes._\n\n---\n");
       });
       if (diff.containsKey('inheritedMethods')) {
-        if (shouldErase) {
-          diff.node.remove('inheritedMethods');
-        }
+        erase(diff.node, 'inheritedMethods');
       }
     } else {
       diff.forEachOf('inheritedMethods', (String methodCategory, DiffNode d) {
@@ -125,9 +121,7 @@ class FileReporter {
     reportVariables('variables');
     if (hideInherited) {
       if (diff.containsKey('inheritedVariables')) {
-        if (shouldErase) {
-          diff.node.remove('inheritedVariables');
-        }
+        erase(diff.node, 'inheritedVariables');
       }
     } else {
       reportVariables('inheritedVariables');
@@ -352,9 +346,7 @@ class FileReporter {
               'parameter\'s $key has changed from '
               '`$oldType` to `$newType`');
           io.writeHr();
-          if (shouldErase) {
-            parameter.changed.remove('type');
-          }
+          erase(parameter.changed, 'type');
         });
       }
     });
@@ -384,14 +376,19 @@ class FileReporter {
     erase(d.removed);
 
     d.forEach((method, attributes) {
-      new MethodAttributesReporter(category, method, attributes, this).report();
+      new MethodAttributesReporter(category, method, attributes, io, erase).report();
     });
   }
 
 
 
-  void erase(Map m) {
-    if (shouldErase)
+  void erase(Map m, [String key]) {
+    if (!shouldErase)
+      return;
+
+    if (key == null)
       m.clear();
+    else
+      m.remove(key);
   }
 }

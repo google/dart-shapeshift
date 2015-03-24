@@ -25,13 +25,14 @@ class MethodAttributesReporter {
   final String category;
   final String method;
   final DiffNode attributes;
-  final FileReporter reporter;
+  final MarkdownWriter io;
+  final Function erase;
 
   String link;
   bool shouldHr;
 
   MethodAttributesReporter(this.category, this.method, this.attributes,
-      this.reporter) {
+      this.io, this.erase) {
     link = mdLinkToDartlang(attributes.metadata['qualifiedName'], method);
     shouldHr = false;
   }
@@ -39,7 +40,7 @@ class MethodAttributesReporter {
   void report() {
     attributes.forEach(reportEach);
     attributes.forEachChanged(reportEachChanged);
-    reporter.erase(attributes.changed);
+    erase(attributes.changed);
   }
 
   void reportEach(String attributeName, DiffNode attribute) {
@@ -48,7 +49,7 @@ class MethodAttributesReporter {
     reportChangedProperties(attributeName, attribute);
 
     if (shouldHr)
-      reporter.io.writeHr();
+      io.writeHr();
 
     attribute.node.forEach((propertyName, property) {
       reportEachProperty(
@@ -61,28 +62,28 @@ class MethodAttributesReporter {
     if (key == 'commentFrom')
       return;
 
-    reporter.io.writeln('The $link $category\'s `${key}` changed:\n');
+    io.writeln('The $link $category\'s `${key}` changed:\n');
     if (key == 'return') {
-      reporter.io.writeWasNow(simpleType(oldNew[0]), simpleType(oldNew[1]));
+      io.writeWasNow(simpleType(oldNew[0]), simpleType(oldNew[1]));
     } else {
-      reporter.io.writeWasNow(oldNew[0], oldNew[1],
+      io.writeWasNow(oldNew[0], oldNew[1],
           blockquote: key == 'comment');
     }
-    reporter.io.writeHr();
+    io.writeHr();
   }
 
   void reportRemovedProperties(String attributeName, DiffNode attribute) {
     if (!attribute.hasRemoved)
       return;
 
-    reporter.io.writeln('The $link $category has removed $attributeName:\n');
+    io.writeln('The $link $category has removed $attributeName:\n');
     shouldHr = true;
 
     attribute.forEachRemoved((_, property) =>
-        reporter.io.writeln(propertyListItem(attributeName, property)));
+        io.writeln(propertyListItem(attributeName, property)));
 
-    reporter.io.writeln('');
-    reporter.erase(attribute.removed);
+    io.writeln('');
+    erase(attribute.removed);
   }
 
   void reportAddedProperties(String attributeName, DiffNode attribute) {
@@ -91,17 +92,17 @@ class MethodAttributesReporter {
 
     if (shouldHr) {
       // TODO: get this font-weight up.
-      reporter.io.writeln('and new $attributeName:\n');
+      io.writeln('and new $attributeName:\n');
     } else {
-      reporter.io.writeln('The $link $category has new $attributeName:\n');
+      io.writeln('The $link $category has new $attributeName:\n');
     }
 
     shouldHr = true;
 
     attribute.forEachAdded((_, property) =>
-      reporter.io.writeln(propertyListItem(attributeName, property)));
+      io.writeln(propertyListItem(attributeName, property)));
 
-    reporter.erase(attribute.added);
+    erase(attribute.added);
   }
 
   void reportChangedProperties(String attributeName, DiffNode attribute) {
@@ -110,23 +111,23 @@ class MethodAttributesReporter {
 
     if (shouldHr) {
       // TODO: get this font weight up.
-      reporter.io.writeln('and changed $attributeName:\n');
+      io.writeln('and changed $attributeName:\n');
     } else {
-      reporter.io.writeln('The $link $category has changed $attributeName:\n');
+      io.writeln('The $link $category has changed $attributeName:\n');
     }
 
     shouldHr = true;
 
     attribute.forEachChanged((_, property) {
       if (attributeName == 'annotations') {
-        reporter.io.writeln(
+        io.writeln(
             '* ${annotationFormatter(property[0])} is now ${annotationFormatter(property[1])}.');
       } else {
-        reporter.io.writeln('* `${property[0]}` is now `${property[1]}`.');
+        io.writeln('* `${property[0]}` is now `${property[1]}`.');
       }
     });
 
-    reporter.erase(attribute.changed);
+    erase(attribute.changed);
   }
 
   String propertyListItem(String attributeName, Map property) {
@@ -150,29 +151,27 @@ class MethodAttributesReporter {
         'The $methodLink ${category}\'s $propertyLink ${singularize(attributeName)}\'s';
     property.forEachChanged((key, oldNew) {
       if (key == 'type') {
-        reporter.io.writeln(
+        io.writeln(
             '$firstPart $key changed from `${changedType(oldNew)}`');
       } else {
-        reporter.io.writeln(
+        io.writeln(
             '$firstPart changed from `$key: ${oldNew[0]}` to `$key: ${oldNew[1]}`');
       }
-      reporter.io.writeHr();
+      io.writeHr();
     });
-    reporter.erase(property.changed);
+    erase(property.changed);
 
     if (property.containsKey('type')) {
       String key = 'type';
       List<String> oldNew = property[key]['0'].changed['outer'];
       // This is so ugly because we are so deep, but an example would be:
       // The foo method's value parameter's type has changed from int to bool.
-      reporter.io.writeln(
+      io.writeln(
           'The [$method](#) ${category}\'s [${propertyName}](#) '
           '${singularize(attributeName)}\'s $key has changed from '
           '`${oldNew[0]}` to `${oldNew[1]}`');
-      reporter.io.writeHr();
-
-      if (reporter.shouldErase)
-        property.node.remove('type');
+      io.writeHr();
+      erase(property.node, 'type');
     }
 
     if (property.containsKey('functionDeclaration')) {
@@ -182,13 +181,11 @@ class MethodAttributesReporter {
         // This is so ugly because we are so deep, but an example would be:
         // The foo method's callback parameter's return type has changed from
         // Object to String.
-        reporter.io.writeln(
+        io.writeln(
             'The [$method](#) ${category}\'s [${propertyName}](#) '
             '${singularize(attributeName)}\'s return type has ${changedType(oldNew)}');
-        reporter.io.writeHr();
-        if (reporter.shouldErase) {
-          declaration.changed.remove('return');
-        }
+        io.writeHr();
+        erase(declaration.changed, 'return');
       }
     }
   }

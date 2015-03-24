@@ -11,5 +11,6 @@ import 'package:diff_match_patch/diff_match_patch.dart';
 part 'src/common/dartdoc_viewer_utils.dart';
 part 'src/common/docs_location.dart';
 part 'src/common/markdown_writer.dart';
+part 'src/common/readable_string_sink.dart';
 part 'src/common/utils.dart';
 part 'src/common/writer.dart';
