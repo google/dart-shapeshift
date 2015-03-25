@@ -15,8 +15,13 @@ class LibraryReporter {
     File leftFile = new File(p.join(leftPath, fileName));
     File rightFile = new File(p.join(rightPath, fileName));
     if (!leftFile.existsSync()) {
-      print(
-          '$leftFile doesn\'t exist, which should be caught in the package json.');
+      String associatedLibrary = associatedLibraryJsonPath(leftFile.path);
+      if (associatedLibrary != null)
+        // TODO: I'm thinking of not printing anything here.
+        print('"${leftFile.path}" doesn\'t exist; diffing '
+              '$associatedLibrary should catch this.');
+      else
+        print('Hmm... "${leftFile.path} doesn\'t exist, which is weird.');
       return;
     }
     JsonDiffer differ = new JsonDiffer(

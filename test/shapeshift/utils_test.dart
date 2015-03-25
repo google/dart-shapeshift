@@ -59,4 +59,14 @@ void main() {
       expect(variableSignature(v), equals('static String foo;'));
     });
   });
+
+  test('Shapeshift utils: associatedLibraryJsonPath works on good input', () {
+    String classPath = '/directory/dart-foo.Foo.json';
+    expect(associatedLibraryJsonPath(classPath), equals('dart-foo.json'));
+  });
+
+  test('Shapeshift utils: associatedLibraryJsonPath works on bad input', () {
+    String classPath = '/directory/dart-foo.json';
+    expect(associatedLibraryJsonPath(classPath), isNull);
+  });
 }

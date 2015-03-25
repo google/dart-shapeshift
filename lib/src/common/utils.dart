@@ -139,3 +139,12 @@ String simpleType(List<Map> type) {
           decoratedName(ty['outer']) + innerTypeBrackets(ty['inner']))
       .join(',');
 }
+
+String associatedLibraryJsonPath(String classPath) {
+  RegExp re = new RegExp(r'/([^/]+)\.([^/]+)\.json$');
+  if (classPath.contains(re)) {
+    Match m = re.allMatches(classPath).first;
+    return m[1] + '.json';
+  }
+  return null;
+}
