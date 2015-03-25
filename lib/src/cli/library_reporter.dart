@@ -24,18 +24,8 @@ class LibraryReporter {
         print('Hmm... "${leftFile.path} doesn\'t exist, which is weird.');
       return;
     }
-    JsonDiffer differ = new JsonDiffer(
+    diff[fileName] = diffApis(
         leftFile.readAsStringSync(), rightFile.readAsStringSync());
-    differ.atomics
-      ..add('type')
-      ..add('return')
-      ..add('annotations[]');
-    differ.metadataToKeep..add('qualifiedName');
-    differ.ensureIdentical(['name', 'qualifiedName']);
-    diff[fileName] = differ.diff()
-      ..metadata['qualifiedName'] = differ.leftJson['qualifiedName']
-      ..metadata['name'] = differ.leftJson['name']
-      ..metadata['packageName'] = differ.leftJson['packageName'];
   }
 
   void calculateAllDiffs() {
