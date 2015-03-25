@@ -6,6 +6,7 @@ part of shapeshift_cli;
 class FileReporter {
   static bool hideInherited = true;
   static bool shouldErase = true;
+  static Function identityFormatter = (e, {link: null}) => e;
 
   final String fileName;
   final DiffNode diff;
@@ -121,44 +122,42 @@ class FileReporter {
   void _reportEachMethodCategory(String methodCategory, DiffNode diff) =>
       new MethodsReporter(methodCategory, diff, io, erase).report();
 
-  void _reportList(String owner, String key, DiffNode d, {Function formatter}) {
-    if (d[key].hasAdded) {
+  void _reportList(String owner, String key, DiffNode diff,
+                   {Function formatter: null}) {
+    if (formatter == null)
+      formatter = identityFormatter;
+
+    if (diff[key].hasAdded) {
       io.writeln('$owner has new ${pluralize(key)}:\n');
-      d[key].forEachAdded((String idx, Object el) {
-        if (formatter != null) {
-          el = formatter(el, link: true);
-        }
+      diff[key].forEachAdded((String idx, Object el) {
+        el = formatter(el, link: true);
         io.writeln('* $el');
       });
       io.writeHr();
-      erase(d[key].added);
+      erase(diff[key].added);
     }
 
-    if (d[key].hasRemoved) {
+    if (diff[key].hasRemoved) {
       io.writeln('$owner no longer has these ${pluralize(key)}:\n');
-      d[key].forEachRemoved((String idx, Object el) {
-        if (formatter != null) {
-          el = formatter(el, link: false);
-        }
+      diff[key].forEachRemoved((String idx, Object el) {
+        el = formatter(el, link: false);
         io.writeln('* $el');
       });
       io.writeHr();
-      erase(d[key].removed);
+      erase(diff[key].removed);
     }
 
-    if (d[key].hasChanged) {
+    if (diff[key].hasChanged) {
       io.writeln('$owner has changed ${pluralize(key)}:\n');
-      d[key].forEachChanged((String idx, List oldNew) {
+      diff[key].forEachChanged((String idx, List oldNew) {
         var theOld = oldNew[0];
         var theNew = oldNew[1];
-        if (formatter != null) {
-          theOld = formatter(theOld, link: false);
-          theNew = formatter(theNew, link: false);
-        }
+        theOld = formatter(theOld, link: false);
+        theNew = formatter(theNew, link: false);
         io.writeln('* $theOld is now $theNew.');
       });
       io.writeHr();
-      erase(d[key].changed);
+      erase(diff[key].changed);
     }
   }
 
