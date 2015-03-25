@@ -49,13 +49,33 @@ Now: `true`'''));
 
 \* `@Bar\(\)`'''));
   });
+
+  test('Shapeshift reports on deep method attribute removals', () {
+    v1 = base
+      ..['annotations'].add({'name':'foo.Bar','parameters':[]});
+    v2 = base;
+
+    diffAndReport(jsonFrom(v1), jsonFrom(v2), io);
+    expectIoContains(new RegExp(
+        r'''The \[foo\]\(.*\) method has removed annotations:
+
+\* `@Bar\(\)`'''));
+  });
 }
 
 Map<String, dynamic> get base => {
   'name': 'foo',
   'qualifiedName': 'foo.Foo.foo',
   'comment': '<p>Send a data event to a stream.</p>',
+  'commentFrom': '',
+  'inheritedFrom': '',
+  'static': false,
   'abstract': false,
+  'constant': false,
+  'return': [
+    {'outer': 'dart:core.Foo', 'inner': []},
+  ],
+  'parameters': {},
   'annotations': [],
 };
 
