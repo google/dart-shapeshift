@@ -15,3 +15,4 @@ part 'src/cli/file_reporter.dart';
 part 'src/cli/library_reporter.dart';
 part 'src/cli/method_attributes_reporter.dart';
 part 'src/cli/single_sink_writer.dart';
+part 'src/cli/variables_reporter.dart';

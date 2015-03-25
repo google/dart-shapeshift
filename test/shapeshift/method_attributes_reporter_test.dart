@@ -13,7 +13,6 @@ import 'package:unittest/unittest.dart';
 
 
 void main() {
-  MethodAttributesReporter mar;
   ReadableStringSink io;
   Map<String, dynamic> v1, v2;
 

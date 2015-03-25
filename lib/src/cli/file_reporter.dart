@@ -4,11 +4,12 @@
 part of shapeshift_cli;
 
 class FileReporter {
+  static bool hideInherited = true;
+  static bool shouldErase = true;
+
   final String fileName;
   final DiffNode diff;
   final MarkdownWriter io;
-  final bool shouldErase = true;
-  bool hideInherited = true;
 
   FileReporter(this.fileName, this.diff, {this.io});
 
@@ -47,7 +48,7 @@ class FileReporter {
       erase(diff.changed, 'packageIntro');
     }
 
-    // iterate over the class categories
+    // Iterate over the class categories ('classes', 'typedefs', 'errors').
     diff.forEachOf('classes', (String classCategory, DiffNode d) {
       reportEachClassThing(classCategory, d);
     });
@@ -59,6 +60,8 @@ class FileReporter {
       io.writeHr();
     });
     diff.changed.clear();
+
+    // TODO: report variables.
 
     diff.forEachOf('functions', reportEachMethodThing);
   }
@@ -118,91 +121,14 @@ class FileReporter {
       });
     }
 
-    reportVariables('variables');
+    reportVariables(diff, 'variables', io, erase);
     if (hideInherited) {
       if (diff.containsKey('inheritedVariables')) {
         erase(diff.node, 'inheritedVariables');
       }
     } else {
-      reportVariables('inheritedVariables');
+      reportVariables(diff, 'inheritedVariables', io, erase);
     }
-  }
-
-  void reportVariables(String variableList) {
-    if (!diff.containsKey(variableList))
-      return;
-
-    DiffNode variables = diff[variableList];
-
-    if (variables.hasAdded) {
-      io.writeln('New $variableList:\n');
-      io.writeCodeblockHr(
-          variables.added.values.map(variableSignature).join('\n\n'));
-    }
-    erase(variables.added);
-
-    if (variables.hasRemoved) {
-      io.writeln('Removed $variableList:\n');
-      io.writeCodeblockHr(
-          variables.removed.values.map(variableSignature).join('\n\n'));
-    }
-    erase(variables.removed);
-
-    if (variables.hasChanged) {
-      variables.forEachChanged((k, v) {
-        print('CHANGED: $k, $v');
-      });
-    }
-
-    variables.forEach((key, variable) {
-      if (!variable.metadata.containsKey('qualifiedName')) {
-        // Magically renamed (I suspect docgen).
-        if (variable.changed.containsKey('qualifiedName')) {
-          var oldNew = variable.changed['qualifiedName'];
-          io.writeBad(
-              'The `$key` variable\'s qualifiedName changed from ${oldNew[0]} to ${oldNew[1]}',
-              null);
-        } else {
-          io.writeBad('TODO: WHAT?', null);
-        }
-        return;
-      }
-      var link = mdLinkToDartlang(variable.metadata['qualifiedName'], key);
-      if (variable.hasChanged) {
-        variable.forEachChanged((attribute, value) {
-          io.writeln(
-              'The $link ${singularize(variableList)}\'s `$attribute` changed:\n');
-          if (attribute == 'type') {
-            io.writeWasNow(simpleType(value[0]), simpleType(value[1]),
-                link: true);
-          } else {
-            io.writeWasNow(value[0], value[1],
-                blockquote: attribute == 'comment');
-          }
-          io.writeHr();
-        });
-      }
-      erase(variable.changed);
-
-      if (variable.node.isNotEmpty) {
-        variable.node.forEach((attribute, dn) {
-          if (attribute == 'annotations') {
-            io.writeln(
-                'The $link ${singularize(variableList)}\'s annotations have changed:\n');
-            dn.forEachChanged((String idx, List<Object> annotation) {
-              io.writeWasNow(annotationFormatter(annotation[0]),
-                  annotationFormatter(annotation[1]));
-            });
-            io.writeHr();
-          } else {
-            io.writeBad(
-                'TODO: The [$key](#) ${singularize(variableList)}\'s `$attribute` has changed:\n',
-                dn.toString(pretty: false));
-          }
-        });
-      }
-      erase(variable.node);
-    });
   }
 
   void reportList(String owner, String key, DiffNode d, {Function formatter}) {
@@ -379,8 +305,6 @@ class FileReporter {
       new MethodAttributesReporter(category, method, attributes, io, erase).report();
     });
   }
-
-
 
   void erase(Map m, [String key]) {
     if (!shouldErase)

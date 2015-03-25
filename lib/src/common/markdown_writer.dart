@@ -50,7 +50,7 @@ class MarkdownWriter {
     io.writeln(s);
   }
 
-  void writeBad(String s, String s2) {
+  void writeBad(String s, [String s2 = '']) {
     writeln('<p style="color: red;">$s</p>');
     writeln('<pre><code style="color: red;">$s2</code></pre>');
     writeln('<hr />');
