@@ -63,12 +63,12 @@ class FileReporter {
 
     // TODO: report variables.
 
-    diff.forEachOf('functions', reportEachMethodThing);
+    diff.forEachOf('functions', _reportEachMethodCategory);
   }
 
   void reportClass() {
     if (diff.containsKey('annotations')) {
-      reportList(diff.metadata['name'], 'annotations', diff,
+      _reportList(diff.metadata['name'], 'annotations', diff,
           formatter: annotationFormatter);
     }
 
@@ -83,7 +83,7 @@ class FileReporter {
     }
 
     if (diff.containsKey('subclass')) {
-      reportList(diff.metadata['name'], 'subclass', diff,
+      _reportList(diff.metadata['name'], 'subclass', diff,
           formatter: classFormatter);
     }
 
@@ -104,34 +104,24 @@ class FileReporter {
     }
 
     // Iterate over the method categories.
-    diff.forEachOf('methods', (String methodCategory, DiffNode d) {
-      reportEachMethodThing(methodCategory, d);
-    });
+    diff.forEachOf('methods', _reportEachMethodCategory);
 
-    if (hideInherited) {
-      diff.forEachOf('inheritedMethods', (String methodCategory, DiffNode d) {
-        // TODO: hmm... io.writeln("_Hiding inherited $methodCategory changes._\n\n---\n");
-      });
-      if (diff.containsKey('inheritedMethods')) {
-        erase(diff.node, 'inheritedMethods');
-      }
-    } else {
-      diff.forEachOf('inheritedMethods', (String methodCategory, DiffNode d) {
-        reportEachMethodThing(methodCategory, d, parenthetical: 'inherited');
-      });
-    }
+    if (hideInherited)
+      erase(diff.node, 'inheritedMethods');
+    else
+      diff.forEachOf('inheritedMethods', _reportEachMethodCategory);
 
     reportVariables(diff, 'variables', io, erase);
-    if (hideInherited) {
-      if (diff.containsKey('inheritedVariables')) {
-        erase(diff.node, 'inheritedVariables');
-      }
-    } else {
+    if (hideInherited)
+      erase(diff.node, 'inheritedVariables');
+    else
       reportVariables(diff, 'inheritedVariables', io, erase);
-    }
   }
 
-  void reportList(String owner, String key, DiffNode d, {Function formatter}) {
+  void _reportEachMethodCategory(String methodCategory, DiffNode diff) =>
+      new MethodsReporter(methodCategory, diff, io, erase).report();
+
+  void _reportList(String owner, String key, DiffNode d, {Function formatter}) {
     if (d[key].hasAdded) {
       io.writeln('$owner has new ${pluralize(key)}:\n');
       d[key].forEachAdded((String idx, Object el) {
@@ -275,34 +265,6 @@ class FileReporter {
           erase(parameter.changed, 'type');
         });
       }
-    });
-  }
-
-  void reportEachMethodThing(String methodCategory, DiffNode d,
-      {String parenthetical: ""}) {
-    String category = singularize(methodCategory);
-    if (parenthetical.isNotEmpty) {
-      parenthetical = ' _($parenthetical)_';
-    }
-    d.forEachAdded((methodName, method) {
-      io.writeln(
-          'New $category$parenthetical ${mdLinkToDartlang(method['qualifiedName'], methodName)}:\n');
-      io.writeCodeblockHr(methodSignature(method as Map));
-    });
-    erase(d.added);
-
-    d.forEachRemoved((methodName, method) {
-      if (methodName == '') {
-        methodName = diff.metadata['name'];
-      }
-      io.writeln('Removed $category$parenthetical $methodName:\n');
-      io.writeCodeblockHr(methodSignature(method as Map,
-          includeComment: false, includeAnnotations: false));
-    });
-    erase(d.removed);
-
-    d.forEach((method, attributes) {
-      new MethodAttributesReporter(category, method, attributes, io, erase).report();
     });
   }
 
