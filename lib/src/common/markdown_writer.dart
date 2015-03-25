@@ -7,7 +7,7 @@ class MarkdownWriter {
   final Function openIo;
   final bool shouldClose;
 
-  StreamSink _io;
+  StringSink _io;
   String buffer, h1Buffer, h2Buffer;
 
   MarkdownWriter(this.openIo, this.shouldClose);
