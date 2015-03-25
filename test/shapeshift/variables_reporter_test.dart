@@ -36,6 +36,20 @@ void main() {
 dart:core.String bar;
 ```'''));
   });
+
+  test('Shapeshift reports on removed variables', () {
+    v1 = classWith({'foo': variableNamed('foo'),
+                    'bar': variableNamed('bar')});
+    v2 = classWith({'foo': variableNamed('foo')});
+
+    diffAndReport(jsonFrom(v1), jsonFrom(v2), io);
+    expectIoContains(new RegExp(
+        r'''Removed variables:
+
+```dart
+dart:core.String bar;
+```'''));
+  });
 }
 
 Map<String, dynamic> classWith(Map variables) =>

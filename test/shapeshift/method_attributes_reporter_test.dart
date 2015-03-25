@@ -24,8 +24,8 @@ void main() {
   });
 
   test('Shapeshift reports on changed method attributes', () {
-    v1 = base;
-    v2 = base
+    v1 = baseMethod;
+    v2 = baseMethod
       ..['abstract'] = true;
 
     diffAndReport(jsonFrom(v1), jsonFrom(v2), io);
@@ -37,9 +37,9 @@ Was: `false`
 Now: `true`'''));
   });
 
-  test('Shapeshift reports on deep method attribute additions', () {
-    v1 = base;
-    v2 = base
+  test('Shapeshift reports on new method annotations', () {
+    v1 = baseMethod;
+    v2 = baseMethod
       ..['annotations'].add({'name':'foo.Bar','parameters':[]});
 
     diffAndReport(jsonFrom(v1), jsonFrom(v2), io);
@@ -49,10 +49,10 @@ Now: `true`'''));
 \* `@Bar\(\)`'''));
   });
 
-  test('Shapeshift reports on deep method attribute removals', () {
-    v1 = base
+  test('Shapeshift reports on removed method annotations', () {
+    v1 = baseMethod
       ..['annotations'].add({'name':'foo.Bar','parameters':[]});
-    v2 = base;
+    v2 = baseMethod;
 
     diffAndReport(jsonFrom(v1), jsonFrom(v2), io);
     expectIoContains(new RegExp(
@@ -60,9 +60,33 @@ Now: `true`'''));
 
 \* `@Bar\(\)`'''));
   });
+
+  test('Shapeshift reports on new method parameters', () {
+    v1 = baseMethod;
+    v2 = baseMethod
+      ..['parameters']['p'] = baseParameter;
+
+    diffAndReport(jsonFrom(v1), jsonFrom(v2), io);
+    expectIoContains(new RegExp(
+        r'''The \[foo\]\(.*\) method has new parameters:
+
+\* `dart:core.String p`'''));
+  });
+
+  test('Shapeshift reports on new method parameters', () {
+    v1 = baseMethod
+      ..['parameters']['p'] = baseParameter;
+    v2 = baseMethod;
+
+    diffAndReport(jsonFrom(v1), jsonFrom(v2), io);
+    expectIoContains(new RegExp(
+        r'''The \[foo\]\(.*\) method has removed parameters:
+
+\* `dart:core.String p`'''));
+  });
 }
 
-Map<String, dynamic> get base => {
+Map<String, dynamic> get baseMethod => {
   'name': 'foo',
   'qualifiedName': 'foo.Foo.foo',
   'comment': '<p>Send a data event to a stream.</p>',
@@ -76,6 +100,16 @@ Map<String, dynamic> get base => {
   ],
   'parameters': {},
   'annotations': [],
+};
+
+Map<String, dynamic> get baseParameter => {
+  'name': 'p',
+  'optional': false,
+  'named': false,
+  'default': false,
+  'type': [
+    {'outer': 'dart:core.String', 'inner': []}
+  ],
 };
 
 void diffAndReport(String v1, String v2, ReadableStringSink io) {
