@@ -3,13 +3,13 @@
 
 part of shapeshift_cli;
 
-class LibraryReporter {
+class PackageReporter {
   final Map<String, DiffNode> diff = new Map<String, DiffNode>();
   final String leftPath, rightPath;
   final Writer writer;
   MarkdownWriter io;
 
-  LibraryReporter(this.leftPath, this.rightPath, {this.writer});
+  PackageReporter(this.leftPath, this.rightPath, {this.writer});
 
   void calculateDiff(String fileName) {
     File leftFile = new File(p.join(leftPath, fileName));
@@ -49,42 +49,47 @@ class LibraryReporter {
   }
 
   void report() {
-    Map<String, PackageSdk> diffsBySubpackage = new Map();
+    Map<String, LibraryApiDiff> libraryDiffs = new Map();
     diff.forEach((String file, DiffNode node) {
       if (node.metadata['packageName'] != null) {
-        String subpackage = node.metadata['qualifiedName'];
-        if (!diffsBySubpackage.containsKey(subpackage)) {
-          diffsBySubpackage[subpackage] = new PackageSdk();
-        }
-        diffsBySubpackage[subpackage].package = node;
+        String libraryName = node.metadata['qualifiedName'];
+        if (!libraryDiffs.containsKey(libraryName))
+          libraryDiffs[libraryName] = new LibraryApiDiff();
+        libraryDiffs[libraryName].libraryName = libraryName;
+        libraryDiffs[libraryName].lybrary = node;
       } else {
-        String subpackage = getSubpackage(node);
-        if (!diffsBySubpackage.containsKey(subpackage)) {
-          diffsBySubpackage[subpackage] = new PackageSdk();
-        }
-        diffsBySubpackage[subpackage].classes.add(node);
+        String libraryName = getLibraryName(node);
+        if (!libraryDiffs.containsKey(libraryName))
+          libraryDiffs[libraryName] = new LibraryApiDiff();
+        libraryDiffs[libraryName].classes.add(node);
       }
     });
 
-    diffsBySubpackage.forEach((String name, PackageSdk p) {
+    libraryDiffs.forEach((String name, LibraryApiDiff diff) {
       io = writer.writerFor(name);
-      io.writeMetadata(name);
-      reportFile(name, p.package);
-      p.classes.forEach((k) => reportFile(name, k));
-      io.close();
+      diff.report(io);
     });
   }
 
-  void reportFile(String name, DiffNode d) {
-    new FileReporter(name, d, io: io).report();
-  }
-
-  String getSubpackage(DiffNode node) {
+  String getLibraryName(DiffNode node) {
     return (node.metadata['qualifiedName']).split('.')[0];
   }
 }
 
-class PackageSdk {
+class LibraryApiDiff {
+  String libraryName;
+  DiffNode lybrary;
   final List<DiffNode> classes = new List();
-  DiffNode package;
+  MarkdownWriter io;
+  
+  void report(MarkdownWriter _io) {
+    io = _io;
+    io.writeMetadata(libraryName);
+    reportFile(libraryName, lybrary);
+    classes.forEach((k) => reportFile(libraryName, k));
+    io.close();
+  }
+
+  reportFile(String name, DiffNode d) =>
+    new FileReporter(name, d, io: io).report();
 }

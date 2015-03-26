@@ -27,7 +27,7 @@ class Shapeshift {
         ? new SingleSinkWriter(stdout)
         : new DirectoryWriter(args['out']);
 
-    new LibraryReporter(leftPath, rightPath, writer: w)
+    new PackageReporter(leftPath, rightPath, writer: w)
       ..calculateAllDiffs()
       ..report();
   }
