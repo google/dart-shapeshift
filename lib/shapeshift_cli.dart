@@ -10,11 +10,6 @@ import 'package:path/path.dart' as p;
 
 import 'shapeshift_common.dart';
 
-part 'src/cli/classes_reporter.dart';
 part 'src/cli/directory_writer.dart';
-part 'src/cli/file_reporter.dart';
-part 'src/cli/method_attributes_reporter.dart';
-part 'src/cli/methods_reporter.dart';
 part 'src/cli/package_reporter.dart';
 part 'src/cli/single_sink_writer.dart';
-part 'src/cli/variables_reporter.dart';

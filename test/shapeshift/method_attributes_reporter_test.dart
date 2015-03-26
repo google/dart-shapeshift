@@ -7,7 +7,6 @@ library method_attributes_reporter_tests;
 import 'dart:convert';
 
 import 'package:json_diff/json_diff.dart';
-import 'package:shapeshift/shapeshift_cli.dart';
 import 'package:shapeshift/shapeshift_common.dart';
 import 'package:unittest/unittest.dart';
 
