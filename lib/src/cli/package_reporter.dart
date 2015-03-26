@@ -58,7 +58,7 @@ class PackageReporter {
         libraryDiffs[libraryName].libraryName = libraryName;
         libraryDiffs[libraryName].lybrary = node;
       } else {
-        String libraryName = getLibraryName(node);
+        String libraryName = node.metadata['qualifiedName'].split('.')[0];
         if (!libraryDiffs.containsKey(libraryName))
           libraryDiffs[libraryName] = new LibraryApiDiff();
         libraryDiffs[libraryName].classes.add(node);
@@ -70,26 +70,4 @@ class PackageReporter {
       diff.report(io);
     });
   }
-
-  String getLibraryName(DiffNode node) {
-    return (node.metadata['qualifiedName']).split('.')[0];
-  }
-}
-
-class LibraryApiDiff {
-  String libraryName;
-  DiffNode lybrary;
-  final List<DiffNode> classes = new List();
-  MarkdownWriter io;
-  
-  void report(MarkdownWriter _io) {
-    io = _io;
-    io.writeMetadata(libraryName);
-    reportFile(libraryName, lybrary);
-    classes.forEach((k) => reportFile(libraryName, k));
-    io.close();
-  }
-
-  reportFile(String name, DiffNode d) =>
-    new FileReporter(name, d, io: io).report();
 }
