@@ -50,9 +50,8 @@ class FileReporter {
     }
 
     // Iterate over the class categories ('classes', 'typedefs', 'errors').
-    diff.forEachOf('classes', (String classCategory, DiffNode d) {
-      reportEachClassThing(classCategory, d);
-    });
+    diff.forEachOf('classes', (String classCategory, DiffNode diff) =>
+        new ClassesReporter(classCategory, diff, io, erase).report());
 
     diff.changed.forEach((String key, List oldNew) {
       io.writeln("${diff.metadata['name']}'s `${key}` changed:\n");
@@ -159,112 +158,6 @@ class FileReporter {
       io.writeHr();
       erase(diff[key].changed);
     }
-  }
-
-  void reportEachClassThing(String classCategory, DiffNode d) {
-    if (d.hasRemoved) {
-      var cat =
-          d.removed.length == 1 ? classCategory : pluralize(classCategory);
-      var names = d.removed.values.map((klass) => klass['name']).join(', ');
-      io.writeln('Removed $cat: $names.');
-      io.writeHr();
-      erase(d.removed);
-    }
-
-    if (d.hasAdded) {
-      var cat = d.added.length == 1 ? classCategory : pluralize(classCategory);
-      var names = d.added.values
-          .map((klass) =>
-              mdLinkToDartlang(klass['qualifiedName'], klass['name']))
-          .join(', ');
-      io.writeln('New $cat: $names.');
-      io.writeHr();
-      erase(d.added);
-    }
-
-    d.forEach((String classThingName, DiffNode classThing) {
-      if (classThing.hasAdded) {
-        classThing.added.forEach((String key, dynamic thing) {
-          String name = classThing.metadata['qualifiedName'].replaceAll(
-              new RegExp(r'.*\.'), '');
-          String classThingLink =
-              mdLinkToDartlang(classThing.metadata['qualifiedName'], name);
-          io.writeln(
-              "${diff.metadata['name']}'s $classThingLink $classCategory has a new `$key`:\n");
-          if (key == 'preview') {
-            io.writeBlockquote(thing);
-          } else {
-            io.writeCodeblockHr(thing);
-          }
-          io.writeHr();
-        });
-      }
-      erase(classThing.added);
-
-      if (classThing.hasChanged &&
-          classThing.changed.containsKey('name') &&
-          classThing.changed.containsKey('qualifiedName')) {
-        // A "changed" class thing probably means a class was removed and
-        // another was added, at the same index in the class thing list.
-        // Awkward.
-        var changed = classThing.changed;
-        String newThingLink =
-            mdLinkToDartlang(changed['qualifiedName'][1], changed['name'][1]);
-        io.writeln('Removed $classCategory: ${changed['name'][0]}.');
-        io.writeHr();
-        io.writeln('New $classCategory: $newThingLink.');
-        io.writeHr();
-      }
-
-      if (classThing.hasChanged) {
-        classThing.changed.forEach((String key, List oldNew) {
-          String name = classThing.metadata['name'];
-          String qualifiedName = classThing.metadata['qualifiedName'];
-          // If a class's name changed, then "name" won't be in the metadata,
-          // so we'll grab it from the changed map.
-          // TODO: make this better...
-          if (name == null) {
-            if (classThing.changed.containsKey('name')) {
-              name = classThing.changed['name'][0];
-            }
-          }
-          if (qualifiedName == null) {
-            if (classThing.changed.containsKey('qualifiedName')) {
-              qualifiedName = classThing.changed['qualifiedName'][0];
-            }
-          }
-          qualifiedName = qualifiedName.replaceAll(new RegExp(r'.*\.'), '');
-          String classThingLink =
-              mdLinkToDartlang(qualifiedName, qualifiedName);
-          io.writeln(
-              "${name}'s $classThingLink $classCategory `$key` changed:\n");
-          io.writeWasNow(
-              (oldNew as List<String>)[0], (oldNew as List<String>)[1],
-              blockquote: ['comment', 'preview'].contains(key));
-          io.writeHr();
-        });
-      }
-      erase(classThing.changed);
-
-      if (classThing.containsKey('parameters')) {
-        classThing.forEachOf('parameters', (String name, DiffNode parameter) {
-          if (!parameter.changed.containsKey('type'))
-            return;
-
-          String key = 'type';
-          String oldType = simpleType(parameter.changed[key][0]);
-          String newType = simpleType(parameter.changed[key][1]);
-          // This is so ugly because we are so deep, but an example would be:
-          // The foo typedef's value parameter's type has changed from int to bool.
-          io.writeln(
-              'The [${classThing.metadata['qualifiedName']}](#) $classCategory\'s [$name](#) '
-              'parameter\'s $key has changed from '
-              '`$oldType` to `$newType`');
-          io.writeHr();
-          erase(parameter.changed, 'type');
-        });
-      }
-    });
   }
 
   void erase(Map m, [String key]) {
