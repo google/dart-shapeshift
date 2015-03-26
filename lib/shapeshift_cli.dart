@@ -5,11 +5,10 @@ library shapeshift_cli;
 
 import 'dart:io';
 
-import 'package:json_diff/json_diff.dart';
-import 'package:path/path.dart' as p;
+import 'package:path/path.dart' as path;
 
 import 'shapeshift_common.dart';
 
 part 'src/cli/directory_writer.dart';
-part 'src/cli/package_reporter.dart';
+part 'src/cli/directory_package_reporter.dart';
 part 'src/cli/single_sink_writer.dart';

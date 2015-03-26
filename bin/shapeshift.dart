@@ -23,11 +23,11 @@ class Shapeshift {
       rightPath = path.join(rightPath, args['subset']);
     }
 
-    Writer w = (args['out'] == null)
+    Writer writer = (args['out'] == null)
         ? new SingleSinkWriter(stdout)
         : new DirectoryWriter(args['out']);
 
-    new PackageReporter(leftPath, rightPath, writer: w)
+    new DirectoryPackageReporter(leftPath, rightPath, writer)
       ..calculateAllDiffs()
       ..report();
   }

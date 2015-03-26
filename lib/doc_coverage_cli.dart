@@ -7,7 +7,6 @@ import 'dart:io';
 import 'dart:math';
 
 import './shapeshift_common.dart';
-import './shapeshift_cli.dart';
 import './doc_coverage_common.dart';
 
 part 'src/cli/doc_coverage_reporter.dart';

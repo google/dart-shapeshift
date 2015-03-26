@@ -18,6 +18,7 @@ part 'src/common/library_api_diff.dart';
 part 'src/common/markdown_writer.dart';
 part 'src/common/method_attributes_reporter.dart';
 part 'src/common/methods_reporter.dart';
+part 'src/common/package_reporter.dart';
 part 'src/common/readable_string_sink.dart';
 part 'src/common/utils.dart';
 part 'src/common/variables_reporter.dart';
