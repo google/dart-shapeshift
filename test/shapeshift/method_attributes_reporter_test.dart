@@ -4,18 +4,17 @@
 /// Unit tests for Shapeshift's method attributes reporter.
 library method_attributes_reporter_tests;
 
-import 'dart:convert';
-
 import 'package:json_diff/json_diff.dart';
+
 import 'package:shapeshift/shapeshift_common.dart';
 import 'package:unittest/unittest.dart';
 
+import 'test_helpers.dart';
 
 void main() {
   ReadableStringSink io;
   Map<String, dynamic> v1, v2;
 
-  jsonFrom(Map obj) => new JsonEncoder().convert(obj);
   expectIoContains(RegExp re) => expect(io.read(), matches(re));
 
   setUp(() {
@@ -84,32 +83,6 @@ Now: `true`'''));
 \* `dart:core.String p`'''));
   });
 }
-
-Map<String, dynamic> get baseMethod => {
-  'name': 'foo',
-  'qualifiedName': 'foo.Foo.foo',
-  'comment': '<p>Send a data event to a stream.</p>',
-  'commentFrom': '',
-  'inheritedFrom': '',
-  'static': false,
-  'abstract': false,
-  'constant': false,
-  'return': [
-    {'outer': 'dart:core.Foo', 'inner': []},
-  ],
-  'parameters': {},
-  'annotations': [],
-};
-
-Map<String, dynamic> get baseParameter => {
-  'name': 'p',
-  'optional': false,
-  'named': false,
-  'default': false,
-  'type': [
-    {'outer': 'dart:core.String', 'inner': []}
-  ],
-};
 
 void diffAndReport(String v1, String v2, ReadableStringSink io) {
   DiffNode diff = diffApis(v1, v2);
