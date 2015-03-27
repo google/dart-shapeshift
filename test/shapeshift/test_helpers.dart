@@ -19,6 +19,11 @@ Map<String, dynamic> classWithMethods(Map methods) =>
 Map<String, dynamic> get baseClass => {
   'name': 'Foo',
   'qualifiedName': 'foo.Foo',
+  'comment': '',
+  'isAbstract': false,
+  'superclass': 'dart:core.Object',
+  'implements': [],
+  'subclass': [],
   'variables': {},
   'methods': {
     'setters': {},
@@ -26,7 +31,9 @@ Map<String, dynamic> get baseClass => {
     'constructors': {},
     'operators': {},
     'methods': {},
-  }
+  },
+  'annotations': [
+  ],
 };
 
 Map<String, dynamic> variableNamed(String name) =>

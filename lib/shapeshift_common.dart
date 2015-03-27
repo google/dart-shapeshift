@@ -9,6 +9,8 @@ import 'dart:convert';
 import 'package:diff_match_patch/diff_match_patch.dart';
 import 'package:json_diff/json_diff.dart';
 
+export 'package:json_diff/json_diff.dart' show DiffNode;
+
 part 'src/common/api_differ.dart';
 part 'src/common/dartdoc_viewer_utils.dart';
 part 'src/common/docs_location.dart';

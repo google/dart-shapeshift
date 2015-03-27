@@ -4,8 +4,6 @@
 /// Unit tests for Shapeshift's method attributes reporter.
 library method_attributes_reporter_tests;
 
-import 'package:json_diff/json_diff.dart';
-
 import 'package:shapeshift/shapeshift_common.dart';
 import 'package:unittest/unittest.dart';
 
