@@ -3,32 +3,24 @@
 
 part of shapeshift_common;
 
-class FileReporter {
+class ClassReporter {
   static bool hideInherited = true;
   static bool shouldErase = true;
   static Function identityFormatter = (e, {link: null}) => e;
 
-  final String fileName;
   final DiffNode diff;
   final MarkdownWriter io;
 
-  FileReporter(this.fileName, this.diff, {this.io});
+  ClassReporter(this.diff, this.io);
 
   void report() {
     if (diff == null)
       return;
 
-    if (diff.metadata['packageName'] != null) {
-      // The file I'm reporting on represents a library.
-      io.bufferH1(diff.metadata['qualifiedName']);
-      reportLibrary();
-    } else {
-      // The file I'm reporting on represents a "class".
-      // TODO: also Errors and Typedefs?
-      io.bufferH2(
-          'class ${mdLinkToDartlang(diff.metadata['qualifiedName'], diff.metadata['name'])}');
-      reportClass();
-    }
+    // TODO: also Errors and Typedefs?
+    io.bufferH2(
+        'class ${mdLinkToDartlang(diff.metadata['qualifiedName'], diff.metadata['name'])}');
+    reportClass();
 
     // After reporting, prune and print anything remaining.
     diff.prune();
@@ -39,31 +31,6 @@ class FileReporter {
       print('${qn} HAS UNRESOLVED NODES:');
       print(ds);
     }
-  }
-
-  void reportLibrary() {
-    if (diff.changed.containsKey('packageIntro')) {
-      io.writeBad(
-          'TODO: The <strong>packageIntro</strong> changed, which is probably huge. Not including here yet.',
-          '');
-      erase(diff.changed, 'packageIntro');
-    }
-
-    // Iterate over the class categories ('classes', 'typedefs', 'errors').
-    diff.forEachOf('classes', (String classCategory, DiffNode diff) =>
-        new ClassesReporter(classCategory, diff, io, erase).report());
-
-    diff.changed.forEach((String key, List oldNew) {
-      io.writeln("${diff.metadata['name']}'s `${key}` changed:\n");
-      io.writeWasNow((oldNew as List<String>)[0], (oldNew as List<String>)[1],
-          blockquote: key == 'comment');
-      io.writeHr();
-    });
-    diff.changed.clear();
-
-    // TODO: report variables.
-
-    diff.forEachOf('functions', _reportEachMethodCategory);
   }
 
   void reportClass() {

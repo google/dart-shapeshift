@@ -19,7 +19,8 @@ part 'src/common/utils.dart';
 part 'src/common/writer.dart';
 
 part 'src/common/reporters/classes_reporter.dart';
-part 'src/common/reporters/file_reporter.dart';
+part 'src/common/reporters/class_reporter.dart';
+part 'src/common/reporters/library_reporter.dart';
 part 'src/common/reporters/method_attributes_reporter.dart';
 part 'src/common/reporters/methods_reporter.dart';
 part 'src/common/reporters/package_reporter.dart';
