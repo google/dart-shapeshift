@@ -11,7 +11,12 @@ class ClassReporter {
   final DiffNode diff;
   final MarkdownWriter io;
 
-  ClassReporter(this.diff, this.io);
+  String name, qualifiedName;
+
+  ClassReporter(this.diff, this.io) {
+    name = diff.metadata['name'];
+    qualifiedName = diff.metadata['qualifiedName'];
+  }
 
   void report() {
     if (diff == null)
@@ -19,60 +24,32 @@ class ClassReporter {
 
     // TODO: also Errors and Typedefs?
     io.bufferH2(
-        'class ${mdLinkToDartlang(diff.metadata['qualifiedName'], diff.metadata['name'])}');
+        'class ${mdLinkToDartlang(qualifiedName, name)}');
     reportClass();
 
     // After reporting, prune and print anything remaining.
     diff.prune();
-    String qn = diff.metadata['qualifiedName'];
     diff.metadata.clear();
     String ds = diff.toString();
     if (ds.isNotEmpty) {
-      print('${qn} HAS UNRESOLVED NODES:');
+      print('$qualifiedName HAS UNRESOLVED NODES:');
       print(ds);
     }
   }
 
   void reportClass() {
-    if (diff.containsKey('annotations')) {
-      _reportList(diff.metadata['name'], 'annotations', diff,
-          formatter: annotationFormatter);
-    }
+    if (diff.containsKey('annotations'))
+      _reportList('annotations', formatter: annotationFormatter);
 
-    if (diff.hasChanged) {
-      diff.forEachChanged((String key, List oldNew) {
-        io.writeln("${diff.metadata['name']}'s `${key}` changed:\n");
-        io.writeWasNow((oldNew as List<String>)[0], (oldNew as List<String>)[1],
-            blockquote: key == 'comment', link: ['superclass'].contains(key));
-        io.writeHr();
-      });
-      diff.changed.clear();
-    }
+    _reportImmediateChanges();
 
-    if (diff.containsKey('subclass')) {
-      _reportList(diff.metadata['name'], 'subclass', diff,
-          formatter: classFormatter);
-    }
+    if (diff.containsKey('subclass'))
+      _reportList('subclass', formatter: classFormatter);
 
-    if (diff.containsKey('implements')) {
-      DiffNode implements = diff['implements'];
-      if (implements.hasAdded) {
-        String added = implements.added.values.map(mdLinkToDartlang).join(', ');
-        io.writeln("${diff.metadata['name']} now implements ${added}.");
-        erase(implements.added);
-      }
-      if (implements.hasRemoved) {
-        String removed =
-            implements.removed.values.map(mdLinkToDartlang).join(', ');
-        io.writeln("${diff.metadata['name']} no longer implements ${removed}.");
-        erase(implements.removed);
-      }
-      io.writeHr();
-    }
+    _reportImplements();
 
     // Iterate over the method categories.
     diff.forEachOf('methods', _reportEachMethodCategory);
-
     if (hideInherited)
       erase(diff.node, 'inheritedMethods');
     else
@@ -85,16 +62,47 @@ class ClassReporter {
       reportVariables(diff, 'inheritedVariables', io, erase);
   }
 
+  void _reportImmediateChanges() {
+    if (!diff.hasChanged)
+      return;
+
+    diff.forEachChanged((String key, List oldNew) {
+      io.writeln("$name's `${key}` changed:\n");
+      io.writeWasNow(oldNew[0], oldNew[1],
+          blockquote: key == 'comment', link: ['superclass'].contains(key));
+      io.writeHr();
+    });
+    diff.changed.clear();
+  }
+
+  void _reportImplements() {
+    if (!diff.containsKey('implements'))
+      return;
+
+    DiffNode implements = diff['implements'];
+    if (implements.hasAdded) {
+      String added = implements.added.values.map(mdLinkToDartlang).join(', ');
+      io.writeln("$name now implements ${added}.");
+      erase(implements.added);
+    }
+    if (implements.hasRemoved) {
+      String removed =
+          implements.removed.values.map(mdLinkToDartlang).join(', ');
+      io.writeln("$name no longer implements ${removed}.");
+      erase(implements.removed);
+    }
+    io.writeHr();
+  }
+
   void _reportEachMethodCategory(String methodCategory, DiffNode diff) =>
       new MethodsReporter(methodCategory, diff, io, erase).report();
 
-  void _reportList(String owner, String key, DiffNode diff,
-                   {Function formatter: null}) {
+  void _reportList(String key, {Function formatter: null}) {
     if (formatter == null)
       formatter = identityFormatter;
 
     if (diff[key].hasAdded) {
-      io.writeln('$owner has new ${pluralize(key)}:\n');
+      io.writeln('$name has new ${pluralize(key)}:\n');
       diff[key].forEachAdded((String idx, Object el) {
         el = formatter(el, link: true);
         io.writeln('* $el');
@@ -104,7 +112,7 @@ class ClassReporter {
     }
 
     if (diff[key].hasRemoved) {
-      io.writeln('$owner no longer has these ${pluralize(key)}:\n');
+      io.writeln('$name no longer has these ${pluralize(key)}:\n');
       diff[key].forEachRemoved((String idx, Object el) {
         el = formatter(el, link: false);
         io.writeln('* $el');
@@ -114,7 +122,7 @@ class ClassReporter {
     }
 
     if (diff[key].hasChanged) {
-      io.writeln('$owner has changed ${pluralize(key)}:\n');
+      io.writeln('$name has changed ${pluralize(key)}:\n');
       diff[key].forEachChanged((String idx, List oldNew) {
         var theOld = oldNew[0];
         var theNew = oldNew[1];
