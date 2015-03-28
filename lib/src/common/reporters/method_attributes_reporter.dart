@@ -121,7 +121,7 @@ class MethodAttributesReporter {
     attribute.forEachChanged((_, property) {
       if (attributeName == 'annotations') {
         io.writeln(
-            '* ${annotationFormatter(property[0])} is now ${annotationFormatter(property[1])}.');
+            '* ${formattedAnnotation(property[0])} is now ${formattedAnnotation(property[1])}.');
       } else {
         io.writeln('* `${property[0]}` is now `${property[1]}`.');
       }
@@ -132,7 +132,7 @@ class MethodAttributesReporter {
 
   String propertyListItem(String attributeName, Map property) {
     if (attributeName == 'annotations')
-      return '* ${annotationFormatter(property)}';
+      return '* ${formattedAnnotation(property)}';
 
     if (attributeName == 'parameters')
       return '* `${parameterSignature(property)}`';

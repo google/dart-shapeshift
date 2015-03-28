@@ -57,24 +57,9 @@ class VariablesReporter {
     }
     erase(variable.changed);
 
-    if (variable.node.isNotEmpty) {
-      variable.node.forEach((attribute, dn) {
-        if (attribute == 'annotations') {
-          io.writeln(
-              'The $link $variableList\'s annotations have changed:\n');
-          dn.forEachChanged((String idx, List<Object> annotation) {
-            io.writeWasNow(annotationFormatter(annotation[0]),
-                annotationFormatter(annotation[1]));
-          });
-          io.writeHr();
-        } else {
-          io.writeBad(
-              'TODO: The [$name](#) $variableList\'s `$attribute` has changed:\n',
-              dn.toString(pretty: false));
-        }
-      });
-    }
-    erase(variable.node);
+    if (variable.node.isNotEmpty)
+      variable.node.forEach((String attributeName, DiffNode attribute) =>
+          reportDeepChange(name, variable, link, attributeName, attribute));
   }
 
   void reportChangedAttributes(String attribute, List value, String link) {
@@ -85,6 +70,41 @@ class VariablesReporter {
       io.writeWasNow(value[0], value[1], blockquote: attribute == 'comment');
     }
     io.writeHr();
+  }
+
+  void reportDeepChange(String name, DiffNode variable, String link,
+                        String attributeName, DiffNode attribute) {
+    if (attributeName == 'annotations') {
+      if (attribute.hasAdded) {
+        io.writeln('The $link $variableList has new annotations:\n');
+        attribute.added.forEach((_, property) =>
+          io.writeln(propertyListItem('annotations', property)));
+      }
+      erase(variables.added);
+      if (attribute.hasChanged) {
+        io.writeln('The $link $variableList\'s annotations have changed:\n');
+        attribute.forEachChanged((String idx, List<Object> ann) {
+          io.writeWasNow(formattedAnnotation(ann[0]), formattedAnnotation(ann[1]));
+        });
+      }
+      erase(attribute.changed);
+      io.writeHr();
+    } else {
+      io.writeBad(
+          'TODO: The [$name](#) $variableList\'s `$attributeName` has changed:\n',
+          attribute.toString(pretty: false));
+    }
+  }
+
+  // TODO: yanked from method_attributes_reporter; these need a superclass!
+  String propertyListItem(String attributeName, Map property) {
+    if (attributeName == 'annotations')
+      return '* ${formattedAnnotation(property)}';
+
+    if (attributeName == 'parameters')
+      return '* `${parameterSignature(property)}`';
+
+    return '* `$property`';
   }
 }
 

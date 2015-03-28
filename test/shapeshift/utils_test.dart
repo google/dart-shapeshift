@@ -25,8 +25,8 @@ void main() {
 
   test('Shapeshift utils: annotationFormatter formats annotations', () {
     Map ann = {'name': 'Foo'};
-    expect(annotationFormatter(ann), equals('`@Foo`'));
-    expect(annotationFormatter(ann, backticks: false), equals('@Foo'));
+    expect(formattedAnnotation(ann), equals('`@Foo`'));
+    expect(formattedAnnotation(ann, backticks: false), equals('@Foo'));
   });
 
   group('Shapeshift utils: variableSignature', () {

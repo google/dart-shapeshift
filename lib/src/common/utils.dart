@@ -45,7 +45,7 @@ String formattedComment(String c) {
   return c.split('\n').map((String x) => '/// $x\n').join('');
 }
 
-String annotationFormatter(Map ann, {bool backticks: true, bool link: false}) {
+String formattedAnnotation(Map ann, {bool backticks: true, bool link: false}) {
   String result = '@' + (ann['name'] as String).split('.').last;
   if (ann.containsKey('parameters')) {
     result += '(${ann['parameters'].join(', ')})';
@@ -95,7 +95,7 @@ String variableSignature(Map<String, Object> variable) {
   }
 
   (variable['annotations'] as List).forEach((Map annotation) {
-    s = annotationFormatter(annotation, backticks: false) + '\n' + s;
+    s = formattedAnnotation(annotation, backticks: false) + '\n' + s;
   });
 
   return s;
@@ -116,7 +116,7 @@ String methodSignature(Map<String, Object> method,
   }
   if (includeAnnotations) {
     (method['annotations'] as List).forEach((Map annotation) {
-      s = annotationFormatter(annotation, backticks: false) + '\n' + s;
+      s = formattedAnnotation(annotation, backticks: false) + '\n' + s;
     });
   }
   List<String> p = new List<String>();

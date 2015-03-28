@@ -84,7 +84,7 @@ Now: `true`'''));
 
 void diffAndReport(String v1, String v2, ReadableStringSink io) {
   DiffNode diff = diffApis(v1, v2);
-  MarkdownWriter mw = new MarkdownWriter(() => io, false);
+  MarkdownWriter writer = new MarkdownWriter(() => io, false);
   Function noop = (Map m, [String key]) { };
-  new MethodAttributesReporter('method', 'foo', diff, mw, noop).report();
+  new MethodAttributesReporter('method', 'foo', diff, writer, noop).report();
 }

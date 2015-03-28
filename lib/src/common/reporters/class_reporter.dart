@@ -39,7 +39,7 @@ class ClassReporter {
 
   void reportClass() {
     if (diff.containsKey('annotations'))
-      _reportList('annotations', formatter: annotationFormatter);
+      _reportList('annotations', formatter: formattedAnnotation);
 
     _reportImmediateChanges();
 
