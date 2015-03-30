@@ -1,5 +1,5 @@
 name: shapeshift
-description: A sample command-line application
+description: Understand how the shape of your Dart package is shifting.
 dependencies:
   args: any
   browser: any
