@@ -9,7 +9,7 @@ class ClassReporter {
   static Function identityFormatter = (e, {link: null}) => e;
 
   final DiffNode diff;
-  final MarkdownWriter io;
+  final MarkdownDiffWriter io;
 
   String name, qualifiedName;
 

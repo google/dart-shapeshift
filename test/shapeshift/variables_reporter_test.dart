@@ -64,7 +64,7 @@ void main() {
 
 void diffAndReport(String v1, String v2, ReadableStringSink io) {
   DiffNode diff = diffApis(v1, v2);
-  MarkdownWriter writer = new MarkdownWriter(() => io, false);
+  MarkdownDiffWriter writer = new MarkdownDiffWriter(() => io, false);
   Function noop = (Map m, [String key]) { };
   new VariablesReporter('variables', diff['variables'], writer, noop).report();
 }

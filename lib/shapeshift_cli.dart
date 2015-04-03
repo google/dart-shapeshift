@@ -5,10 +5,12 @@ library shapeshift_cli;
 
 import 'dart:io';
 
+import 'package:doc_coverage/doc_coverage_common.dart';
 import 'package:path/path.dart' as path;
 
 import 'shapeshift_common.dart';
 
-part 'src/cli/directory_writer.dart';
+export 'package:doc_coverage/doc_coverage_cli.dart';
+export 'package:doc_coverage/doc_coverage_common.dart';
+
 part 'src/cli/directory_package_reporter.dart';
-part 'src/cli/single_sink_writer.dart';

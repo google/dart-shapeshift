@@ -70,6 +70,6 @@ Foo has new subclasses:
 
 void diffAndReport(String v1, String v2, ReadableStringSink io) {
   DiffNode diff = diffApis(v1, v2);
-  MarkdownWriter writer = new MarkdownWriter(() => io, false);
+  MarkdownDiffWriter writer = new MarkdownDiffWriter(() => io, false);
   new ClassReporter(diff, writer).report();
 }

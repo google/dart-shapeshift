@@ -6,7 +6,7 @@ part of shapeshift_common;
 class ClassesReporter {
   final String category;
   final DiffNode diff;
-  final MarkdownWriter io;
+  final MarkdownDiffWriter io;
   final Function erase;
 
   ClassesReporter(this.category, this.diff, this.io, this.erase);

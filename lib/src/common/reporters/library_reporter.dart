@@ -7,7 +7,7 @@ class LibraryReporter {
   static bool shouldErase = true;
 
   final DiffNode diff;
-  final MarkdownWriter io;
+  final MarkdownDiffWriter io;
 
   LibraryReporter(this.diff, this.io);
 

@@ -25,7 +25,7 @@ class MethodAttributesReporter {
   final String category;
   final String method;
   final DiffNode attributes;
-  final MarkdownWriter io;
+  final MarkdownDiffWriter io;
   final Function erase;
 
   String link;

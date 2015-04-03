@@ -37,7 +37,7 @@ dart:core.String bar\(\)
 
 void diffAndReport(String v1, String v2, ReadableStringSink io) {
   DiffNode diff = diffApis(v1, v2);
-  MarkdownWriter writer = new MarkdownWriter(() => io, false);
+  MarkdownDiffWriter writer = new MarkdownDiffWriter(() => io, false);
   Function noop = (Map m, [String key]) { };
   new MethodsReporter('methods', diff['methods']['methods'], writer, noop).report();
 }

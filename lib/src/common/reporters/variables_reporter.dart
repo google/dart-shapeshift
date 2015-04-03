@@ -6,7 +6,7 @@ part of shapeshift_common;
 class VariablesReporter {
   final String variableListPlural, variableList;
   final DiffNode variables;
-  final MarkdownWriter io;
+  final MarkdownDiffWriter io;
   final Function erase;
 
   VariablesReporter(_variableListPlural, this.variables, this.io, this.erase)
