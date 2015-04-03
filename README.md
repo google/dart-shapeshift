@@ -7,9 +7,6 @@ Execute shapeshift against two versions of your Dart docgen-generated API to
 expose how your API has changed. Shapeshift generates a set of markdown files
 that list API differences in your Dart package.
 
-(The Shapeshift repository also contains the Dart doc coverage tool, documented
-in [it's own README](COVERAGE_README.md).)
-
 Shapeshift can be used as a command-line script, or as Dart library.
 
 The shapeshift.dart script
