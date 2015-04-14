@@ -3,6 +3,7 @@ packages/
 bin/packages
 test/packages
 web/packages
+web/vendor/packages
 pubspec.lock
 .buildlog
 .project

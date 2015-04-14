@@ -1,0 +1,33 @@
+// Copyright 2015 Google Inc. All Rights Reserved.
+// Licensed under the Apache License, Version 2.0, found in the LICENSE file.
+
+part of shapeshift_frontend;
+
+/// A [PackageReporter] that calculates the diff between APIs found in two
+/// directories.
+///
+/// The constructor takes the paths of the two directories, and a [Writer].
+/// After it has been constructed, a [DirectoryPackageReporter] can calculate
+/// the diffs of all the files in the two directories, recursively, with
+/// [calculateAllDiffs], and can report the diffs into the [Writer] with
+/// [report].
+class JSZipPackageReporter extends PackageReporter {
+  final JSZipWrapper leftZip, rightZip;
+
+  JSZipPackageReporter(this.leftZip, this.rightZip, Writer _writer) {
+    writer = _writer;
+  }
+
+  void calculateDiff(String fileName) {
+    if (!leftZip.hasFile(fileName)) {
+      diffEl.innerHtml += "<em>Whoops, $fileName not found in the left Zip.<br />";
+      return;
+    }
+    diff[fileName] = diffApis(leftZip.read(fileName), rightZip.read(fileName));
+  }
+
+  void calculateAllDiffs() {
+    //rightZip.jsonFiles.forEach(calculateDiff);
+    rightZip.filesByLibrary['dart-async'].forEach(calculateDiff);
+  }
+}
