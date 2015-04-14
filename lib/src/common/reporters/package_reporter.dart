@@ -5,7 +5,7 @@ part of shapeshift_common;
 
 abstract class PackageReporter {
   final Map<String, DiffNode> diff = new Map<String, DiffNode>();
-  Writer writer;
+  WriterProvider writer;
   MarkdownWriter io;
 
   void calculateAllDiffs();

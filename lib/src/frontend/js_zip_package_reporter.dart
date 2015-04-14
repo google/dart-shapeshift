@@ -6,15 +6,15 @@ part of shapeshift_frontend;
 /// A [PackageReporter] that calculates the diff between APIs found in two
 /// directories.
 ///
-/// The constructor takes the paths of the two directories, and a [Writer].
+/// The constructor takes the paths of the two directories, and a [WriterProvider].
 /// After it has been constructed, a [DirectoryPackageReporter] can calculate
 /// the diffs of all the files in the two directories, recursively, with
-/// [calculateAllDiffs], and can report the diffs into the [Writer] with
+/// [calculateAllDiffs], and can report the diffs into the [WriterProvider] with
 /// [report].
 class JSZipPackageReporter extends PackageReporter {
   final JSZipWrapper leftZip, rightZip;
 
-  JSZipPackageReporter(this.leftZip, this.rightZip, Writer _writer) {
+  JSZipPackageReporter(this.leftZip, this.rightZip, WriterProvider _writer) {
     writer = _writer;
   }
 

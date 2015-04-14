@@ -23,9 +23,9 @@ class Shapeshift {
       rightPath = path.join(rightPath, args['subset']);
     }
 
-    Writer writer = (args['out'] == null)
-        ? new SingleSinkWriter(stdout)
-        : new DirectoryWriter(args['out']);
+    WriterProvider writer = (args['out'] == null)
+        ? new SingleSinkWriterProvider(stdout)
+        : new DirectoryWriterProvider(args['out']);
 
     new DirectoryPackageReporter(leftPath, rightPath, writer)
       ..calculateAllDiffs()

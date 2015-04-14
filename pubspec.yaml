@@ -2,7 +2,7 @@ name: shapeshift
 description: Understand how the shape of your Dart package is shifting.
 dependencies:
   args: any
-  doc_coverage: '>=0.1.1'
+  doc_coverage: '>=0.1.2'
   diff_match_patch: '>=0.2.1'
   json_diff: '>=0.1.0 <1.0.0'
   markdown: ">=0.7.1+2 <1.0.0"

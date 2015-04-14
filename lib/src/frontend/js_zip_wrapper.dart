@@ -44,7 +44,7 @@ void compareZips(Map<String, String> leftVersion, leftData, Map<String, String> 
   diffEl.innerHtml += '<h2>${rightVersion['version']}</h2>';
   JSZipWrapper leftZip = new JSZipWrapper(leftData);
   JSZipWrapper rightZip = new JSZipWrapper(rightData);
-  Writer writer = new HtmlWriterProvider(new HtmlWriter(diffEl));
+  WriterProvider writer = new HtmlWriterProvider(new HtmlWriter(diffEl));
 
   new JSZipPackageReporter(leftZip, rightZip, writer)
     ..calculateAllDiffs()

@@ -3,7 +3,7 @@
 
 part of shapeshift_frontend;
 
-class HtmlWriterProvider extends Writer {
+class HtmlWriterProvider extends WriterProvider {
   HtmlWriter sink;
   HtmlWriterProvider(this.sink);
 

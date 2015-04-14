@@ -6,15 +6,15 @@ part of shapeshift_cli;
 /// A [PackageReporter] that calculates the diff between APIs found in two
 /// directories.
 ///
-/// The constructor takes the paths of the two directories, and a [Writer].
+/// The constructor takes the paths of the two directories, and a [WriterProvider].
 /// After it has been constructed, a [DirectoryPackageReporter] can calculate
 /// the diffs of all the files in the two directories, recursively, with
-/// [calculateAllDiffs], and can report the diffs into the [Writer] with
+/// [calculateAllDiffs], and can report the diffs into the [WriterProvider] with
 /// [report].
 class DirectoryPackageReporter extends PackageReporter {
   final String leftPath, rightPath;
 
-  DirectoryPackageReporter(this.leftPath, this.rightPath, Writer _writer) {
+  DirectoryPackageReporter(this.leftPath, this.rightPath, WriterProvider _writer) {
     writer = _writer;
   }
 
