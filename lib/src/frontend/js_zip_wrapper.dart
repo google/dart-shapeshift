@@ -46,9 +46,9 @@ void compareZips(Map<String, String> leftVersion, leftData, Map<String, String> 
   String leftV = leftVersion['version'];
   String rightV = rightVersion['version'];
   var header = new HeadingElement.h1()
-    ..text = '$leftV to $rightV';
+    ..text = 'Shapeshift from $leftV to $rightV';
   Element issuesLink = new AnchorElement()
-    ..attributes['href'] = 'X'
+    ..attributes['href'] = 'https://github.com/google/dart-shapeshift/issues'
     ..text = 'GitHub';
   var summaryText = new ParagraphElement()
     ..appendText('''The following report is the difference in the public API

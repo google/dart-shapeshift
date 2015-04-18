@@ -3,4 +3,6 @@
 
 part of shapeshift_frontend;
 
+Element leftVersionSelect;
+Element rightVersionSelect;
 Element diffEl;

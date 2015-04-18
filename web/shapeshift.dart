@@ -14,6 +14,8 @@ const String storageApiBase = "https://www.googleapis.com/storage/v1/b/dart-arch
 const String storageBase = "https://storage.googleapis.com/dart-archive";
 
 void main() {
+  leftVersionSelect = querySelector('#left-version');
+  rightVersionSelect = querySelector('#right-version');
   diffEl = querySelector('#diff');
 
   context['processZip'] = (err, data) {
@@ -28,23 +30,45 @@ void main() {
     });
   };
 
+  // TODO: add dev channel.
   HttpRequest.getString("$storageApiBase?prefix=channels/stable/release/&delimiter=/")
-        .then((resp) { getListing('stable', resp); });
+        .then((resp) { getVersionFiles('stable', resp); });
 }
 
-void getListing(String channel, String respString) {
+void addToSelects(Map<String, String> version) {
+  OptionElement left = new OptionElement()
+        ..text = version['version']
+        ..attributes['value'] = version['version'];
+  leftVersionSelect.children.add(left);
+
+  OptionElement right = new OptionElement()
+        ..text = version['version']
+        ..attributes['value'] = version['version'];
+  rightVersionSelect.children.add(right);
+}
+
+void getVersionFiles(String channel, String respString) {
   Map<String,Object> resp = JSON.decode(respString);
   List<String> versions = (resp["prefixes"] as List<String>);
   versions.removeWhere((e) => e.contains('latest'));
 
   // Format is lines of "channels/stable/release/\d+/".
-  Iterable<Future> versionRequests = versions.map((String path) => HttpRequest.getString("$storageBase/${path}VERSION"));
+  Iterable<Future> versionRequests =
+      versions.map(
+          (String path) => HttpRequest.getString("$storageBase/${path}VERSION"));
   Future versionResponses = Future.wait(versionRequests.toList());
   versionResponses.then((Iterable versionStringsIter) {
     List<String> versionStrings = versionStringsIter.toList();
-    List<Map<String,String>> versionMaps = versionStrings.map((e) => JSON.decode(e)).toList();
+    List<Map<String, String>> versionMaps =
+        versionStrings.map((e) => JSON.decode(e)).toList();
     versionMaps.forEach((map) => map['channel'] = channel);
     versionMaps.sort((a,b) => - a['date'].compareTo(b['date']));
+    versionMaps.forEach(addToSelects);
+
+    // Cannot use the newest version as the older version.
+    leftVersionSelect.children.first.attributes['disabled'] = 'disabled';
+    // Cannot use the oldest version as the newer version.
+    rightVersionSelect.children.last.attributes['disabled'] = 'disabled';
     compareVersions(versionMaps[2], versionMaps[0]);
   });
 }

@@ -21,23 +21,23 @@
       <div class="container">
         <h1>Shapeshift</h1>
 
-        <!--table style="width: 100%; display: none;"><tr>
-          <td style="width: 310px;">
-            <p>
-            Gimme the name of a Dart package or core library, like args,
-            collection, unittest, or dart:async
-            </p>
-            <input type="text" id="package" placeholder="package/library name" />
-            <input type="button" id="getPackage" value="calculate coverage gaps" /><br /><br />
-          </td>
-        </tr></table-->
-        <div id="diff">
+        <div>
           <p>Understand how the shape of the Dart SDK is shifting.</p>
 
           <p>Shapeshift executes against two versions of Dart docgen-generated
           APIs to expose how your API has changed. Shapeshift generates a set
           of markdown files that list API differences in your Dart package.</p>
         </div>
+
+        <form>
+          <label for="left-version">Left Version:</label>
+          <select id="left-version"></select>
+          <label for="right-version">Right Version:</label>
+          <select id="right-version"></select>
+          <input type="button" id="getDiff" value="diff" />
+        </form>
+
+        <div id="diff"></div>
       </div>
       <footer>
         <p>
