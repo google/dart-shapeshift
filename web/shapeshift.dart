@@ -45,7 +45,7 @@ void getListing(String channel, String respString) {
     List<Map<String,String>> versionMaps = versionStrings.map((e) => JSON.decode(e)).toList();
     versionMaps.forEach((map) => map['channel'] = channel);
     versionMaps.sort((a,b) => - a['date'].compareTo(b['date']));
-    compareVersions(versionMaps[1], versionMaps[0]);
+    compareVersions(versionMaps[2], versionMaps[0]);
   });
 }
 
@@ -54,16 +54,18 @@ void compareVersions(Map<String,String> left, Map<String,String> right) {
       '${left['revision']}/api-docs/dart-api-docs.zip';
   String rightUri = '$storageBase/channels/${right['channel']}/release/' +
       '${right['revision']}/api-docs/dart-api-docs.zip';
-  diffEl.innerHtml += '<h2>${left['version']} =&gt; ${right['version']}</h2>';
-  context['JSZipUtils']
-      .callMethod('getBinaryContent', [rightUri, (err, rightData) {
-        if (err != null)
-          throw err;
-        context['JSZipUtils']
-            .callMethod('getBinaryContent', [leftUri, (err, leftData) {
-              if (err != null)
-                throw err;
-              compareZips(left, leftData, right, rightData);
-            }]);
-      }]);
+
+  getBinaryContent(rightUri, (err, rightData) {
+    //TODO: this, better
+    if (err != null)
+      throw err;
+
+    getBinaryContent(leftUri, (err, leftData) {
+      //TODO: this, better
+      if (err != null)
+        throw err;
+
+      compareZips(left, leftData, right, rightData);
+    });
+  });
 }

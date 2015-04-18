@@ -4,8 +4,8 @@
 part of shapeshift_common;
 
 class MarkdownDiffWriter extends MarkdownWriter {
-  MarkdownDiffWriter(openIo, shouldClose)
-      : super(openIo, shouldClose);
+  MarkdownDiffWriter(openIo, {shouldClose: true, shouldWriteMetadata: true})
+      : super(openIo, shouldClose: shouldClose, shouldWriteMetadata: shouldWriteMetadata);
 
   void writeWasNow(Object theOld, Object theNew,
       {bool blockquote: false, bool link: false}) {

@@ -7,6 +7,7 @@ class HtmlWriterProvider extends WriterProvider {
   HtmlWriter sink;
   HtmlWriterProvider(this.sink);
 
-  /// In the SingleSinkWriter, the writer is simple the original sink.
-  MarkdownWriter writerFor(String _) => new MarkdownDiffWriter(() => sink, false);
+  MarkdownWriter writerFor(String _) =>
+      new MarkdownDiffWriter(
+          () => sink, shouldClose: false, shouldWriteMetadata: false);
 }

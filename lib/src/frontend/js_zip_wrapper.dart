@@ -39,9 +39,27 @@ class JSZipWrapper {
   String read(String fileName) => zip.callMethod('file', [fileName]).callMethod('asText', []) as String;
 }
 
+void getBinaryContent(uri, callback) =>
+    context['JSZipUtils'].callMethod('getBinaryContent', [uri, callback]);
+
 void compareZips(Map<String, String> leftVersion, leftData, Map<String, String> rightVersion, rightData) {
-  diffEl.innerHtml += '<h2>${leftVersion['version']}</h2>';
-  diffEl.innerHtml += '<h2>${rightVersion['version']}</h2>';
+  String leftV = leftVersion['version'];
+  String rightV = rightVersion['version'];
+  var header = new HeadingElement.h1()
+    ..text = '$leftV to $rightV';
+  Element issuesLink = new AnchorElement()
+    ..attributes['href'] = 'X'
+    ..text = 'GitHub';
+  var summaryText = new ParagraphElement()
+    ..appendText('''The following report is the difference in the public API
+             between the Dart $leftV SDK and the Dart $rightV SDK. The
+             Shapeshift tool is still very new, and and issue reports at ''')
+    ..append(issuesLink)
+    ..appendText(' are highly appreciated!');
+  diffEl
+    ..append(header)
+    ..append(summaryText);
+
   JSZipWrapper leftZip = new JSZipWrapper(leftData);
   JSZipWrapper rightZip = new JSZipWrapper(rightData);
   WriterProvider writer = new HtmlWriterProvider(new HtmlWriter(diffEl));
