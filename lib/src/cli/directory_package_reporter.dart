@@ -23,15 +23,15 @@ class DirectoryPackageReporter extends PackageReporter {
     File right = new File(path.join(rightPath, fileName));
     if (!left.existsSync()) {
       String associatedLibrary = associatedLibraryJsonPath(left.path);
-      if (associatedLibrary != null)
-        // TODO: I'm thinking of not printing anything here.
-        print('"${left.path}" doesn\'t exist; diffing '
-              '$associatedLibrary should catch this.');
-      else
+      if (associatedLibrary != null) {
+        // fileName not found in the left path, which will be noted in the
+        // library JSON file. Don't worry about it.
+      } else {
         print('Hmm... "${left.path} doesn\'t exist, which is weird.');
+      }
       return;
     }
-    diff[fileName] = diffApis(left.readAsStringSync(), right.readAsStringSync());
+    add(fileName, diffApis(left.readAsStringSync(), right.readAsStringSync()));
   }
 
   void calculateAllDiffs() {
