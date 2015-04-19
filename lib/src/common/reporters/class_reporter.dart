@@ -1,7 +1,14 @@
 // Copyright 2015 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-part of shapeshift_common;
+library shapeshift_common.class_reporter;
+
+import 'package:doc_coverage/doc_coverage_common.dart';
+import 'package:json_diff/json_diff.dart' show DiffNode;
+
+import '../markdown_diff_writer.dart';
+import 'methods_reporter.dart';
+import 'variables_reporter.dart';
 
 class ClassReporter {
   static bool hideInherited = true;

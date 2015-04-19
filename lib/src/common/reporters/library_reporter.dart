@@ -1,7 +1,13 @@
 // Copyright 2015 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-part of shapeshift_common;
+library shapeshift_common.library_reporter;
+
+import 'package:json_diff/json_diff.dart';
+
+import '../markdown_diff_writer.dart';
+import 'methods_reporter.dart';
+import 'classes_reporter.dart';
 
 class LibraryReporter {
   static bool shouldErase = true;

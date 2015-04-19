@@ -1,7 +1,10 @@
 // Copyright 2014 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-part of shapeshift_common;
+library shapeshift_common.markdown_diff_writer;
+
+import 'package:diff_match_patch/diff_match_patch.dart';
+import 'package:doc_coverage/doc_coverage_common.dart';
 
 class MarkdownDiffWriter extends MarkdownWriter {
   MarkdownDiffWriter(openIo, {shouldClose: true, shouldWriteMetadata: true})

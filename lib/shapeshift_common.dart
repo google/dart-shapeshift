@@ -3,21 +3,16 @@
 
 library shapeshift_common;
 
-import 'package:diff_match_patch/diff_match_patch.dart';
-import 'package:doc_coverage/doc_coverage_common.dart';
-import 'package:json_diff/json_diff.dart';
-
 export 'package:doc_coverage/doc_coverage_common.dart';
 export 'package:json_diff/json_diff.dart' show DiffNode;
 
-part 'src/common/api_differ.dart';
-part 'src/common/library_api_diff.dart';
-part 'src/common/markdown_diff_writer.dart';
+export 'src/common/api_differ.dart';
+export 'src/common/library_api_diff.dart';
+export 'src/common/markdown_diff_writer.dart';
 
-part 'src/common/reporters/classes_reporter.dart';
-part 'src/common/reporters/class_reporter.dart';
-part 'src/common/reporters/library_reporter.dart';
-part 'src/common/reporters/method_attributes_reporter.dart';
-part 'src/common/reporters/methods_reporter.dart';
-part 'src/common/reporters/package_reporter.dart';
-part 'src/common/reporters/variables_reporter.dart';
+export 'src/common/reporters/class_reporter.dart';
+export 'src/common/reporters/library_reporter.dart';
+export 'src/common/reporters/method_attributes_reporter.dart';
+export 'src/common/reporters/methods_reporter.dart';
+export 'src/common/reporters/package_reporter.dart';
+export 'src/common/reporters/variables_reporter.dart';
