@@ -4,46 +4,38 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
-import 'dart:js';
 
 import 'package:shapeshift/shapeshift_frontend.dart';
-
-const String latestApi = 'https://storage.googleapis.com/dart-archive/channels/stable/release/44672/api-docs/dart-api-docs.zip';
 
 const String storageApiBase = "https://www.googleapis.com/storage/v1/b/dart-archive/o";
 const String storageBase = "https://storage.googleapis.com/dart-archive";
 
+final Map<String, Map<String, String>> versionMaps = new Map();
+
 void main() {
   leftVersionSelect = querySelector('#left-version');
   rightVersionSelect = querySelector('#right-version');
-  diffEl = querySelector('#diff');
-
-  context['processZip'] = (err, data) {
-    if (err != null) {
-      throw 'something something dark side';
-    }
-    JSZipWrapper zip = new JSZipWrapper(data);
-    Map<String, List> files = zip.filesByLibrary;
-    List<String> libs = files.keys.toList()..sort((a, b) => a.compareTo(b));
-    libs.forEach((String lib) {
-      diffEl.innerHtml += '$lib<br />';
-    });
-  };
+  goButton = querySelector('#get-diff');
+  goButton.onClick.listen(go);
+  diffContainer = querySelector('#diff-container');
 
   // TODO: add dev channel.
   HttpRequest.getString("$storageApiBase?prefix=channels/stable/release/&delimiter=/")
         .then((resp) { getVersionFiles('stable', resp); });
+  HttpRequest.getString("$storageApiBase?prefix=channels/dev/release/&delimiter=/")
+        .then((resp) { getVersionFiles('dev', resp); });
 }
 
-void addToSelects(Map<String, String> version) {
+void addToSelects(String rev) {
+  Map version = versionMaps[rev];
   OptionElement left = new OptionElement()
-        ..text = version['version']
-        ..attributes['value'] = version['version'];
+    ..text = version['version']
+    ..attributes['value'] = version['revision'];
   leftVersionSelect.children.add(left);
 
   OptionElement right = new OptionElement()
-        ..text = version['version']
-        ..attributes['value'] = version['version'];
+    ..text = version['version']
+    ..attributes['value'] = version['revision'];
   rightVersionSelect.children.add(right);
 }
 
@@ -53,24 +45,36 @@ void getVersionFiles(String channel, String respString) {
   versions.removeWhere((e) => e.contains('latest'));
 
   // Format is lines of "channels/stable/release/\d+/".
-  Iterable<Future> versionRequests =
-      versions.map(
-          (String path) => HttpRequest.getString("$storageBase/${path}VERSION"));
+  Iterable<Future> versionRequests = versions.map(
+      (String path) => HttpRequest.getString("$storageBase/${path}VERSION"));
   Future versionResponses = Future.wait(versionRequests.toList());
   versionResponses.then((Iterable versionStringsIter) {
     List<String> versionStrings = versionStringsIter.toList();
-    List<Map<String, String>> versionMaps =
-        versionStrings.map((e) => JSON.decode(e)).toList();
-    versionMaps.forEach((map) => map['channel'] = channel);
-    versionMaps.sort((a,b) => - a['date'].compareTo(b['date']));
-    versionMaps.forEach(addToSelects);
+    versionStrings.map((e) => JSON.decode(e)).forEach((Map<String, String> v) {
+      v['channel'] = channel;
+      versionMaps[v['revision']] = v;
+    });
+    List sortedVersions = versionMaps.keys.toList()..sort();
+    (sortedVersions.reversed).forEach(addToSelects);
 
     // Cannot use the newest version as the older version.
     leftVersionSelect.children.first.attributes['disabled'] = 'disabled';
     // Cannot use the oldest version as the newer version.
     rightVersionSelect.children.last.attributes['disabled'] = 'disabled';
-    compareVersions(versionMaps[2], versionMaps[0]);
+    //compareVersions(versionMaps[2], versionMaps[0]);
   });
+}
+
+void go(Event event) {
+  String left = leftVersionSelect.selectedOptions[0].attributes['value'];
+  String right = rightVersionSelect.selectedOptions[0].attributes['value'];
+  if (left == right)
+    // TODO: error
+    return;
+
+  // TODO: validate left is "before" right
+
+  compareVersions(versionMaps[left], versionMaps[right]);
 }
 
 void compareVersions(Map<String,String> left, Map<String,String> right) {

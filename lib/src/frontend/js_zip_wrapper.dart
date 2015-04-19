@@ -42,13 +42,17 @@ class JSZipWrapper {
 void getBinaryContent(uri, callback) =>
     context['JSZipUtils'].callMethod('getBinaryContent', [uri, callback]);
 
-void compareZips(Map<String, String> leftVersion, leftData, Map<String, String> rightVersion, rightData) {
+const String issuesUrl = 'https://github.com/google/dart-shapeshift/issues';
+
+void compareZips(Map<String, String> leftVersion,
+                 leftData,
+                 Map<String, String> rightVersion,
+                 rightData) {
   String leftV = leftVersion['version'];
   String rightV = rightVersion['version'];
   var header = new HeadingElement.h1()
-    ..text = 'Shapeshift from $leftV to $rightV';
-  Element issuesLink = new AnchorElement()
-    ..attributes['href'] = 'https://github.com/google/dart-shapeshift/issues'
+    ..text = 'Changes from $leftV to $rightV';
+  AnchorElement issuesLink = new AnchorElement(href: issuesUrl)
     ..text = 'GitHub';
   var summaryText = new ParagraphElement()
     ..appendText('''The following report is the difference in the public API
@@ -56,13 +60,16 @@ void compareZips(Map<String, String> leftVersion, leftData, Map<String, String> 
              Shapeshift tool is still very new, and and issue reports at ''')
     ..append(issuesLink)
     ..appendText(' are highly appreciated!');
-  diffEl
+  diffContainer
     ..append(header)
     ..append(summaryText);
 
+  DivElement diffElement = new DivElement();
+  diffContainer.append(diffElement);
+
   JSZipWrapper leftZip = new JSZipWrapper(leftData);
   JSZipWrapper rightZip = new JSZipWrapper(rightData);
-  WriterProvider writer = new HtmlWriterProvider(new HtmlWriter(diffEl));
+  WriterProvider writer = new HtmlWriterProvider(new HtmlWriter(diffElement));
 
   new JSZipPackageReporter(leftZip, rightZip, writer)
     ..calculateAllDiffs()

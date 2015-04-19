@@ -3,6 +3,7 @@
 
 part of shapeshift_frontend;
 
-Element leftVersionSelect;
-Element rightVersionSelect;
-Element diffEl;
+SelectElement leftVersionSelect;
+SelectElement rightVersionSelect;
+Element goButton;
+Element diffContainer;
