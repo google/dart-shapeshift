@@ -1,9 +1,5 @@
 build/
-packages/
-bin/packages
-test/packages
-web/packages
-web/vendor/packages
+packages
 pubspec.lock
 .buildlog
 .project
