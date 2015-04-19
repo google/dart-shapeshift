@@ -1,7 +1,6 @@
 // Copyright 2015 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 
@@ -11,8 +10,8 @@ const String _storageApiBase =
     "https://www.googleapis.com/storage/v1/b/dart-archive/o";
 const String _storageBase = "https://storage.googleapis.com/dart-archive";
 
-final Map<String, Map<String, String>> _versionMaps =
-    new Map<String, Map<String, String>>();
+final Map<int, Map<String, String>> _versionMaps =
+    new Map<int, Map<String, String>>();
 
 void main() {
   leftVersionSelect = querySelector('#left-version');
@@ -22,24 +21,10 @@ void main() {
   goButton.onClick.listen(_go);
   diffContainer = querySelector('#diff-container');
 
-  // TODO: add dev channel.
-  HttpRequest
-      .getString("$_storageApiBase?prefix=channels/stable/release/&delimiter=/")
-      .then((resp) {
-    _getVersionFiles('stable', resp);
-  });
-  HttpRequest
-      .getString("$_storageApiBase?prefix=channels/dev/release/&delimiter=/")
-      .then((resp) {
-    _getVersionFiles('dev', resp);
-  });
+  _startDownload();
 }
 
-void _addToSelects(String rev) {
-  leftVersionSelect.disabled = false;
-  rightVersionSelect.disabled = false;
-  goButton.disabled = false;
-
+void _addToSelects(int rev) {
   Map version = _versionMaps[rev];
   OptionElement left = new OptionElement()
     ..text = version['version']
@@ -52,22 +37,42 @@ void _addToSelects(String rev) {
   rightVersionSelect.children.add(right);
 }
 
-_getVersionFiles(String channel, String respString) async {
+_startDownload() async {
+  await _getVersionFiles(
+      'dev', "$_storageApiBase?prefix=channels/dev/release/&delimiter=/");
+  await _getVersionFiles(
+      'stable', "$_storageApiBase?prefix=channels/stable/release/&delimiter=/");
+
+  _updateSelectors();
+}
+
+_getVersionFiles(String channel, String url) async {
+  var respString = await HttpRequest.getString(url);
+
   Map<String, Object> resp = JSON.decode(respString);
   List<String> versions = (resp["prefixes"] as List<String>);
   versions.removeWhere((e) => e.contains('latest'));
 
-  // Format is lines of "channels/stable/release/\d+/".
-  Iterable<Future> versionRequests = versions.map(
-      (String path) => HttpRequest.getString("$_storageBase/${path}VERSION"));
+  for (var path in versions) {
+    var versionString =
+        await HttpRequest.getString("$_storageBase/${path}VERSION");
 
-  List<String> versionStrings = await Future.wait(versionRequests.toList());
+    var json = JSON.decode(versionString) as Map<String, String>;
 
-  versionStrings.map((e) => JSON.decode(e)).forEach((Map<String, String> v) {
-    v['channel'] = channel;
-    _versionMaps[v['revision']] = v;
-  });
+    json['channel'] = channel;
+
+    int revision = int.parse(json['revision']);
+    _versionMaps[revision] = json;
+  }
+}
+
+void _updateSelectors() {
+  leftVersionSelect.disabled = false;
+  rightVersionSelect.disabled = false;
+  goButton.disabled = false;
+
   List sortedVersions = _versionMaps.keys.toList()..sort();
+
   (sortedVersions.reversed).forEach(_addToSelects);
 
   // Cannot use the newest version as the older version.
@@ -77,8 +82,8 @@ _getVersionFiles(String channel, String respString) async {
 }
 
 void _go(Event event) {
-  String left = leftVersionSelect.selectedOptions[0].attributes['value'];
-  String right = rightVersionSelect.selectedOptions[0].attributes['value'];
+  int left = int.parse(leftVersionSelect.selectedOptions[0].attributes['value']);
+  int right = int.parse(rightVersionSelect.selectedOptions[0].attributes['value']);
   bool includeComments = includeCommentsCheck.checked;
   if (left == right)
       // TODO: error
