@@ -39,13 +39,28 @@ class JSZipWrapper {
       zip.callMethod('file', [fileName]).callMethod('asText', []) as String;
 }
 
-void getBinaryContent(uri, callback) =>
-    context['JSZipUtils'].callMethod('getBinaryContent', [uri, callback]);
+Future<ByteBuffer> getBinaryContent(uri) {
+  var completer = new Completer<ByteBuffer>();
+
+  context['JSZipUtils'].callMethod('getBinaryContent', [
+    uri,
+    (err, data) {
+      if (err != null) {
+        completer.completeError(err);
+      } else {
+        completer.complete(data);
+      }
+    }
+  ]);
+
+  return completer.future;
+}
 
 const String issuesUrl = 'https://github.com/google/dart-shapeshift/issues';
 
-void compareZips(Map<String, String> leftVersion, leftData,
-    Map<String, String> rightVersion, rightData, bool includeComments) {
+void compareZips(Map<String, String> leftVersion, ByteBuffer leftData,
+    Map<String, String> rightVersion, ByteBuffer rightData,
+    bool includeComments) {
   String leftV = leftVersion['version'];
   String rightV = rightVersion['version'];
   var header = new HeadingElement.h1()..text = 'Changes from $leftV to $rightV';
@@ -57,6 +72,9 @@ void compareZips(Map<String, String> leftVersion, leftData,
              Shapeshift tool is still very new, and and issue reports at ''')
     ..append(issuesLink)
     ..appendText(' are highly appreciated!');
+
+  diffContainer.setInnerHtml('');
+
   diffContainer
     ..append(header)
     ..append(summaryText);

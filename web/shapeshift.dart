@@ -1,6 +1,7 @@
 // Copyright 2015 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 
@@ -71,6 +72,9 @@ void _updateSelectors() {
   rightVersionSelect.disabled = false;
   goButton.disabled = false;
 
+  leftVersionSelect.children.clear();
+  rightVersionSelect.children.clear();
+
   List sortedVersions = _versionMaps.keys.toList()..sort();
 
   (sortedVersions.reversed).forEach(_addToSelects);
@@ -81,34 +85,44 @@ void _updateSelectors() {
   rightVersionSelect.children.last.attributes['disabled'] = 'disabled';
 }
 
-void _go(Event event) {
-  int left = int.parse(leftVersionSelect.selectedOptions[0].attributes['value']);
-  int right = int.parse(rightVersionSelect.selectedOptions[0].attributes['value']);
-  bool includeComments = includeCommentsCheck.checked;
-  if (left == right)
-      // TODO: error
-      return;
+_go(Event event) async {
+  try {
+    if (goButton.disabled) {
+      throw 'Slow down!';
+    }
+    goButton.disabled = true;
 
-  // TODO: validate left is "before" right
+    diffContainer.setInnerHtml('<em>working...</em>');
 
-  _compareVersions(_versionMaps[left], _versionMaps[right], includeComments);
+    int left =
+        int.parse(leftVersionSelect.selectedOptions[0].attributes['value']);
+    int right =
+        int.parse(rightVersionSelect.selectedOptions[0].attributes['value']);
+    bool includeComments = includeCommentsCheck.checked;
+
+    if (left == right) {
+      diffContainer
+          .setInnerHtml('<em>Cannot compare the same version - $left</em>');
+    }
+
+    // TODO: validate left is "before" right
+
+    await _compareVersions(
+        _versionMaps[left], _versionMaps[right], includeComments);
+  } finally {
+    goButton.disabled = false;
+  }
 }
 
-void _compareVersions(Map left, Map right, bool includeComments) {
+Future _compareVersions(Map left, Map right, bool includeComments) async {
   String leftUri = '$_storageBase/channels/${left['channel']}/release/' +
       '${left['revision']}/api-docs/dart-api-docs.zip';
   String rightUri = '$_storageBase/channels/${right['channel']}/release/' +
       '${right['revision']}/api-docs/dart-api-docs.zip';
 
-  getBinaryContent(rightUri, (err, rightData) {
-    //TODO: this, better
-    if (err != null) throw err;
+  var rightData = await getBinaryContent(rightUri);
 
-    getBinaryContent(leftUri, (err, leftData) {
-      //TODO: this, better
-      if (err != null) throw err;
+  var leftData = await getBinaryContent(leftUri);
 
-      compareZips(left, leftData, right, rightData, includeComments);
-    });
-  });
+  compareZips(left, leftData, right, rightData, includeComments);
 }
