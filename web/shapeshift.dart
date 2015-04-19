@@ -35,6 +35,10 @@ void main() {
 }
 
 void addToSelects(String rev) {
+  leftVersionSelect.disabled = false;
+  rightVersionSelect.disabled = false;
+  goButton.disabled = false;
+
   Map version = versionMaps[rev];
   OptionElement left = new OptionElement()
     ..text = version['version']

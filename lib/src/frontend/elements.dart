@@ -6,5 +6,5 @@ part of shapeshift_frontend;
 SelectElement leftVersionSelect;
 SelectElement rightVersionSelect;
 InputElement includeCommentsCheck;
-Element goButton;
+ButtonElement goButton;
 Element diffContainer;
