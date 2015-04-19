@@ -10,9 +10,11 @@ import 'reporters/class_reporter.dart';
 import 'reporters/library_reporter.dart';
 
 class LibraryApiDiff {
-  String libraryName;
-  DiffNode lybrary;
-  final List<DiffNode> classes = new List();
+  final String libraryName;
+  final DiffNode lybrary;
+  final List<DiffNode> classes = new List<DiffNode>();
+
+  LibraryApiDiff(this.libraryName, this.lybrary);
 
   void report(MarkdownWriter _io) {
     _io.writeMetadata(libraryName);
