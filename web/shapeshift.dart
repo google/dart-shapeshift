@@ -15,6 +15,7 @@ final Map<String, Map<String, String>> versionMaps = new Map();
 void main() {
   leftVersionSelect = querySelector('#left-version');
   rightVersionSelect = querySelector('#right-version');
+  includeCommentsCheck = querySelector('#include-comments');
   goButton = querySelector('#get-diff');
   goButton.onClick.listen(go);
   diffContainer = querySelector('#diff-container');
@@ -61,23 +62,23 @@ void getVersionFiles(String channel, String respString) {
     leftVersionSelect.children.first.attributes['disabled'] = 'disabled';
     // Cannot use the oldest version as the newer version.
     rightVersionSelect.children.last.attributes['disabled'] = 'disabled';
-    //compareVersions(versionMaps[2], versionMaps[0]);
   });
 }
 
 void go(Event event) {
   String left = leftVersionSelect.selectedOptions[0].attributes['value'];
   String right = rightVersionSelect.selectedOptions[0].attributes['value'];
+  bool includeComments = includeCommentsCheck.checked;
   if (left == right)
     // TODO: error
     return;
 
   // TODO: validate left is "before" right
 
-  compareVersions(versionMaps[left], versionMaps[right]);
+  compareVersions(versionMaps[left], versionMaps[right], includeComments);
 }
 
-void compareVersions(Map<String,String> left, Map<String,String> right) {
+void compareVersions(Map left, Map right, bool includeComments) {
   String leftUri = '$storageBase/channels/${left['channel']}/release/' +
       '${left['revision']}/api-docs/dart-api-docs.zip';
   String rightUri = '$storageBase/channels/${right['channel']}/release/' +
@@ -93,7 +94,7 @@ void compareVersions(Map<String,String> left, Map<String,String> right) {
       if (err != null)
         throw err;
 
-      compareZips(left, leftData, right, rightData);
+      compareZips(left, leftData, right, rightData, includeComments);
     });
   });
 }

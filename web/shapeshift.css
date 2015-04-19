@@ -15,6 +15,21 @@ strong {
   color: rgb(48, 48, 48);
 }
 
+#version-selection {
+  background-color: #eee;
+  border: solid 1px #ddd;
+  display: table;
+}
+
+#version-selection .table-cell {
+  display: table-cell;
+  padding: 10px;
+}
+
+#version-selection .table-cell >div {
+  padding: 2px 0;
+}
+
 .the-body {
   background-color: #FFF;
   border: solid 1px #CCC;

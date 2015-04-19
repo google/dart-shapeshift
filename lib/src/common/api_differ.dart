@@ -5,8 +5,9 @@ part of shapeshift_common;
 
 class ApiDiffer {
   final String a, b;
+  final bool includeComments;
 
-  ApiDiffer(this.a, this.b);
+  ApiDiffer(this.a, this.b, {this.includeComments: true});
 
   DiffNode diff() {
     JsonDiffer differ = new JsonDiffer(a, b);
@@ -16,6 +17,8 @@ class ApiDiffer {
       ..add('annotations[]');
     differ.metadataToKeep
       ..add('qualifiedName');
+    if (!includeComments)
+      differ.ignored.add('comment');
     differ.ensureIdentical(['name', 'qualifiedName']);
     return differ.diff()
       ..metadata['qualifiedName'] = differ.leftJson['qualifiedName']
@@ -24,4 +27,5 @@ class ApiDiffer {
   }
 }
 
-DiffNode diffApis(String a, String b) => new ApiDiffer(a, b).diff();
+DiffNode diffApis(String a, String b, {includeComments: true}) =>
+    new ApiDiffer(a, b, includeComments: includeComments).diff();

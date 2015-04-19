@@ -29,12 +29,22 @@
           of markdown files that list API differences in your Dart package.</p>
         </div>
 
-        <form>
-          <label for="left-version">Left Version:</label>
-          <select id="left-version"></select>
-          <label for="right-version">Right Version:</label>
-          <select id="right-version"></select>
-          <input type="button" id="get-diff" value="diff" />
+        <form id="version-selection">
+          <div class="table-cell">
+            <div>
+              <label for="left-version">Left Version:</label>
+              <select id="left-version"></select>
+              <label for="right-version">Right Version:</label>
+              <select id="right-version"></select>
+            </div>
+            <div>
+              <label for="include-comments">Include comment changes?</label>
+              <input type="checkbox" id="include-comments" checked="checked" />
+            </div>
+          </div>
+          <div class="table-cell">
+            <input type="button" id="get-diff" value="diff" />
+          </div>
         </form>
 
         <div id="diff-container"></div>

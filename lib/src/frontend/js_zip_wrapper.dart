@@ -47,7 +47,8 @@ const String issuesUrl = 'https://github.com/google/dart-shapeshift/issues';
 void compareZips(Map<String, String> leftVersion,
                  leftData,
                  Map<String, String> rightVersion,
-                 rightData) {
+                 rightData,
+                 bool includeComments) {
   String leftV = leftVersion['version'];
   String rightV = rightVersion['version'];
   var header = new HeadingElement.h1()
@@ -71,7 +72,7 @@ void compareZips(Map<String, String> leftVersion,
   JSZipWrapper rightZip = new JSZipWrapper(rightData);
   WriterProvider writer = new HtmlWriterProvider(new HtmlWriter(diffElement));
 
-  new JSZipPackageReporter(leftZip, rightZip, writer)
+  new JSZipPackageReporter(leftZip, rightZip, writer, includeComments: includeComments)
     ..calculateAllDiffs()
     ..report();
 }

@@ -14,8 +14,10 @@ part of shapeshift_frontend;
 class JSZipPackageReporter extends PackageReporter {
   final JSZipWrapper leftZip, rightZip;
 
-  JSZipPackageReporter(this.leftZip, this.rightZip, WriterProvider _writer) {
+  JSZipPackageReporter(this.leftZip, this.rightZip, WriterProvider _writer,
+      {includeComments: true}) {
     writer = _writer;
+    this.includeComments = includeComments;
   }
 
   void calculateDiff(String fileName) {
@@ -24,7 +26,10 @@ class JSZipPackageReporter extends PackageReporter {
       // JSON file.
       return;
     }
-    add(fileName, diffApis(leftZip.read(fileName), rightZip.read(fileName)));
+    add(fileName,
+        diffApis(leftZip.read(fileName),
+                 rightZip.read(fileName),
+                 includeComments: includeComments));
   }
 
   void calculateAllDiffs() {

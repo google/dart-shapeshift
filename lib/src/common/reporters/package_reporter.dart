@@ -7,6 +7,7 @@ abstract class PackageReporter {
   final Map<String, DiffNode> diff = new Map<String, DiffNode>();
   Map<String, LibraryApiDiff> libraryDiffs = new Map();
   WriterProvider writer;
+  bool includeComments;
 
   void calculateAllDiffs();
 
