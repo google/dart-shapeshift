@@ -13,13 +13,11 @@ class LibraryApiDiff {
   String libraryName;
   DiffNode lybrary;
   final List<DiffNode> classes = new List();
-  MarkdownWriter io;
 
   void report(MarkdownWriter _io) {
-    io = _io;
-    io.writeMetadata(libraryName);
-    new LibraryReporter(lybrary, io).report();
-    classes.forEach((diff) => new ClassReporter(diff, io).report());
-    io.close();
+    _io.writeMetadata(libraryName);
+    new LibraryReporter(lybrary, _io).report();
+    classes.forEach((diff) => new ClassReporter(diff, _io).report());
+    _io.close();
   }
 }
