@@ -9,12 +9,10 @@ import 'dart:convert';
 jsonFrom(Map obj) => new JsonEncoder().convert(obj);
 
 Map<String, dynamic> classWithVariables(Map variables) =>
-  baseClass
-    ..['variables'] = variables;
+    baseClass..['variables'] = variables;
 
 Map<String, dynamic> classWithMethods(Map methods) =>
-  baseClass
-    ..['methods']['methods'] = methods;
+    baseClass..['methods']['methods'] = methods;
 
 Map<String, dynamic> get baseClass => {
   'name': 'Foo',
@@ -32,14 +30,12 @@ Map<String, dynamic> get baseClass => {
     'operators': {},
     'methods': {},
   },
-  'annotations': [
-  ],
+  'annotations': [],
 };
 
-Map<String, dynamic> variableNamed(String name) =>
-    baseVariable
-      ..['name'] = name
-      ..['qualifiedName'] = 'foo.Foo.$name';
+Map<String, dynamic> variableNamed(String name) => baseVariable
+  ..['name'] = name
+  ..['qualifiedName'] = 'foo.Foo.$name';
 
 Map<String, dynamic> get baseVariable => {
   'name': 'foo',
@@ -48,16 +44,13 @@ Map<String, dynamic> get baseVariable => {
   'final': false,
   'static': false,
   'constant': false,
-  'type': [
-    {'outer': 'dart:core.String', 'inner': []},
-  ],
+  'type': [{'outer': 'dart:core.String', 'inner': []},],
   'annotations': [],
 };
 
-Map<String, dynamic> methodNamed(String name) =>
-    baseMethod
-      ..['name'] = name
-      ..['qualifiedName'] = 'foo.Foo.$name';
+Map<String, dynamic> methodNamed(String name) => baseMethod
+  ..['name'] = name
+  ..['qualifiedName'] = 'foo.Foo.$name';
 
 Map<String, dynamic> get baseMethod => {
   'name': 'foo',
@@ -68,9 +61,7 @@ Map<String, dynamic> get baseMethod => {
   'static': false,
   'abstract': false,
   'constant': false,
-  'return': [
-    {'outer': 'dart:core.String', 'inner': []},
-  ],
+  'return': [{'outer': 'dart:core.String', 'inner': []},],
   'parameters': {},
   'annotations': [],
 };
@@ -80,7 +71,5 @@ Map<String, dynamic> get baseParameter => {
   'optional': false,
   'named': false,
   'default': false,
-  'type': [
-    {'outer': 'dart:core.String', 'inner': []}
-  ],
+  'type': [{'outer': 'dart:core.String', 'inner': []}],
 };

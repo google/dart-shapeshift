@@ -21,7 +21,8 @@ import '../../shapeshift_common.dart';
 class DirectoryPackageReporter extends PackageReporter {
   final String leftPath, rightPath;
 
-  DirectoryPackageReporter(this.leftPath, this.rightPath, WriterProvider _writer) {
+  DirectoryPackageReporter(
+      this.leftPath, this.rightPath, WriterProvider _writer) {
     writer = _writer;
   }
 

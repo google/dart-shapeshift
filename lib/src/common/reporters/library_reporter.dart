@@ -18,8 +18,7 @@ class LibraryReporter {
   LibraryReporter(this.diff, this.io);
 
   void report() {
-    if (diff == null)
-      return;
+    if (diff == null) return;
 
     io.bufferH1(diff.metadata['qualifiedName']);
     reportLibrary();
@@ -64,12 +63,9 @@ class LibraryReporter {
       new MethodsReporter(methodCategory, diff, io, erase).report();
 
   void erase(Map m, [String key]) {
-    if (!shouldErase)
-      return;
+    if (!shouldErase) return;
 
-    if (key == null)
-      m.clear();
-    else
-      m.remove(key);
+    if (key == null) m.clear();
+    else m.remove(key);
   }
 }

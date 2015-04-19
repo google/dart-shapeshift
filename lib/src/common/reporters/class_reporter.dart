@@ -26,12 +26,10 @@ class ClassReporter {
   }
 
   void report() {
-    if (diff == null)
-      return;
+    if (diff == null) return;
 
     // TODO: also Errors and Typedefs?
-    io.bufferH2(
-        'class ${mdLinkToDartlang(qualifiedName, name)}');
+    io.bufferH2('class ${mdLinkToDartlang(qualifiedName, name)}');
     reportClass();
 
     // After reporting, prune and print anything remaining.
@@ -45,33 +43,28 @@ class ClassReporter {
   }
 
   void reportClass() {
-    if (diff.containsKey('annotations'))
-      _reportList('annotations', formatter: formattedAnnotation);
+    if (diff.containsKey('annotations')) _reportList('annotations',
+        formatter: formattedAnnotation);
 
     _reportImmediateChanges();
 
-    if (diff.containsKey('subclass'))
-      _reportList('subclass', formatter: classFormatter);
+    if (diff.containsKey('subclass')) _reportList('subclass',
+        formatter: classFormatter);
 
     _reportImplements();
 
     // Iterate over the method categories.
     diff.forEachOf('methods', _reportEachMethodCategory);
-    if (hideInherited)
-      erase(diff.node, 'inheritedMethods');
-    else
-      diff.forEachOf('inheritedMethods', _reportEachMethodCategory);
+    if (hideInherited) erase(diff.node, 'inheritedMethods');
+    else diff.forEachOf('inheritedMethods', _reportEachMethodCategory);
 
     reportVariables(diff, 'variables', io, erase);
-    if (hideInherited)
-      erase(diff.node, 'inheritedVariables');
-    else
-      reportVariables(diff, 'inheritedVariables', io, erase);
+    if (hideInherited) erase(diff.node, 'inheritedVariables');
+    else reportVariables(diff, 'inheritedVariables', io, erase);
   }
 
   void _reportImmediateChanges() {
-    if (!diff.hasChanged)
-      return;
+    if (!diff.hasChanged) return;
 
     diff.forEachChanged((String key, List oldNew) {
       io.writeln("$name's `${key}` changed:\n");
@@ -83,8 +76,7 @@ class ClassReporter {
   }
 
   void _reportImplements() {
-    if (!diff.containsKey('implements'))
-      return;
+    if (!diff.containsKey('implements')) return;
 
     DiffNode implements = diff['implements'];
     if (implements.hasAdded) {
@@ -105,8 +97,7 @@ class ClassReporter {
       new MethodsReporter(methodCategory, diff, io, erase).report();
 
   void _reportList(String key, {Function formatter: null}) {
-    if (formatter == null)
-      formatter = identityFormatter;
+    if (formatter == null) formatter = identityFormatter;
 
     if (diff[key].hasAdded) {
       io.writeln('$name has new ${pluralize(key)}:\n');
@@ -143,12 +134,9 @@ class ClassReporter {
   }
 
   void erase(Map m, [String key]) {
-    if (!shouldErase)
-      return;
+    if (!shouldErase) return;
 
-    if (key == null)
-      m.clear();
-    else
-      m.remove(key);
+    if (key == null) m.clear();
+    else m.remove(key);
   }
 }

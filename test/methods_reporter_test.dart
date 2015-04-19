@@ -21,12 +21,11 @@ void main() {
 
   test('Shapeshift reports on new methods', () {
     v1 = classWithMethods({'foo': methodNamed('foo')});
-    v2 = classWithMethods({'foo': methodNamed('foo'),
-                           'bar': methodNamed('bar')});
+    v2 = classWithMethods(
+        {'foo': methodNamed('foo'), 'bar': methodNamed('bar')});
 
     diffAndReport(jsonFrom(v1), jsonFrom(v2), io);
-    expectIoContains(new RegExp(
-        r'''New method \[bar\]\(.*\):
+    expectIoContains(new RegExp(r'''New method \[bar\]\(.*\):
 
 ```dart
 /// <p>Send a data event to a stream.</p>
@@ -38,6 +37,6 @@ dart:core.String bar\(\)
 void diffAndReport(String v1, String v2, ReadableStringSink io) {
   DiffNode diff = diffApis(v1, v2);
   MarkdownDiffWriter w = new MarkdownDiffWriter(() => io, shouldClose: false);
-  Function noop = (Map m, [String key]) { };
+  Function noop = (Map m, [String key]) {};
   new MethodsReporter('methods', diff['methods']['methods'], w, noop).report();
 }

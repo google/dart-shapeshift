@@ -16,10 +16,10 @@ class MethodsReporter {
   String category;
   String parenthetical;
 
-  MethodsReporter(_category, this.diff, this.io, this.erase, {this.parenthetical: ''}) {
+  MethodsReporter(_category, this.diff, this.io, this.erase,
+      {this.parenthetical: ''}) {
     category = singularize(_category);
-    if (parenthetical.isNotEmpty)
-      parenthetical = ' _($parenthetical)_';
+    if (parenthetical.isNotEmpty) parenthetical = ' _($parenthetical)_';
   }
 
   void report() {
@@ -31,7 +31,7 @@ class MethodsReporter {
 
     diff.forEach((method, attributes) {
       new MethodAttributesReporter(category, method, attributes, io, erase)
-        .report();
+          .report();
     });
   }
 
@@ -42,8 +42,7 @@ class MethodsReporter {
   }
 
   void reportEachRemoved(String methodName, Map method) {
-    if (methodName == '')
-      methodName = diff.metadata['name'];
+    if (methodName == '') methodName = diff.metadata['name'];
     io.writeln('Removed $category$parenthetical $methodName:\n');
     io.writeCodeblockHr(methodSignature(method,
         includeComment: false, includeAnnotations: false));

@@ -26,10 +26,8 @@ class JSZipPackageReporter extends PackageReporter {
       // JSON file.
       return;
     }
-    add(fileName,
-        diffApis(leftZip.read(fileName),
-                 rightZip.read(fileName),
-                 includeComments: includeComments));
+    add(fileName, diffApis(leftZip.read(fileName), rightZip.read(fileName),
+        includeComments: includeComments));
   }
 
   void calculateAllDiffs() {

@@ -22,16 +22,16 @@ abstract class PackageReporter {
     if (node.metadata['packageName'] != null) {
       // Here, file represents the API of a library.
       String libraryName = node.metadata['qualifiedName'];
-      if (!libraryDiffs.containsKey(libraryName))
-        libraryDiffs[libraryName] = new LibraryApiDiff();
+      if (!libraryDiffs.containsKey(libraryName)) libraryDiffs[libraryName] =
+          new LibraryApiDiff();
       libraryDiffs[libraryName].libraryName = libraryName;
       libraryDiffs[libraryName].lybrary = node;
     } else {
       // Here, file represents the API of a class...
       // or other library member(?).
       String libraryName = node.metadata['qualifiedName'].split('.')[0];
-      if (!libraryDiffs.containsKey(libraryName))
-        libraryDiffs[libraryName] = new LibraryApiDiff();
+      if (!libraryDiffs.containsKey(libraryName)) libraryDiffs[libraryName] =
+          new LibraryApiDiff();
       libraryDiffs[libraryName].classes.add(node);
     }
   }

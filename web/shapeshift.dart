@@ -7,7 +7,8 @@ import 'dart:html';
 
 import 'package:shapeshift/shapeshift_frontend.dart';
 
-const String storageApiBase = "https://www.googleapis.com/storage/v1/b/dart-archive/o";
+const String storageApiBase =
+    "https://www.googleapis.com/storage/v1/b/dart-archive/o";
 const String storageBase = "https://storage.googleapis.com/dart-archive";
 
 final Map<String, Map<String, String>> versionMaps = new Map();
@@ -21,10 +22,16 @@ void main() {
   diffContainer = querySelector('#diff-container');
 
   // TODO: add dev channel.
-  HttpRequest.getString("$storageApiBase?prefix=channels/stable/release/&delimiter=/")
-        .then((resp) { getVersionFiles('stable', resp); });
-  HttpRequest.getString("$storageApiBase?prefix=channels/dev/release/&delimiter=/")
-        .then((resp) { getVersionFiles('dev', resp); });
+  HttpRequest
+      .getString("$storageApiBase?prefix=channels/stable/release/&delimiter=/")
+      .then((resp) {
+    getVersionFiles('stable', resp);
+  });
+  HttpRequest
+      .getString("$storageApiBase?prefix=channels/dev/release/&delimiter=/")
+      .then((resp) {
+    getVersionFiles('dev', resp);
+  });
 }
 
 void addToSelects(String rev) {
@@ -41,7 +48,7 @@ void addToSelects(String rev) {
 }
 
 void getVersionFiles(String channel, String respString) {
-  Map<String,Object> resp = JSON.decode(respString);
+  Map<String, Object> resp = JSON.decode(respString);
   List<String> versions = (resp["prefixes"] as List<String>);
   versions.removeWhere((e) => e.contains('latest'));
 
@@ -70,8 +77,8 @@ void go(Event event) {
   String right = rightVersionSelect.selectedOptions[0].attributes['value'];
   bool includeComments = includeCommentsCheck.checked;
   if (left == right)
-    // TODO: error
-    return;
+      // TODO: error
+      return;
 
   // TODO: validate left is "before" right
 
@@ -86,13 +93,11 @@ void compareVersions(Map left, Map right, bool includeComments) {
 
   getBinaryContent(rightUri, (err, rightData) {
     //TODO: this, better
-    if (err != null)
-      throw err;
+    if (err != null) throw err;
 
     getBinaryContent(leftUri, (err, leftData) {
       //TODO: this, better
-      if (err != null)
-        throw err;
+      if (err != null) throw err;
 
       compareZips(left, leftData, right, rightData, includeComments);
     });

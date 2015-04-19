@@ -21,12 +21,10 @@ void main() {
 
   test('Shapeshift reports on changed class superclass', () {
     v1 = baseClass;
-    v2 = baseClass
-      ..['superclass'] = 'dart:core.String';
+    v2 = baseClass..['superclass'] = 'dart:core.String';
 
     diffAndReport(jsonFrom(v1), jsonFrom(v2), io);
-    expectIoContains(new RegExp(
-        r'''class \[Foo\]\(.*\)
+    expectIoContains(new RegExp(r'''class \[Foo\]\(.*\)
 ---+
 
 Foo's `superclass` changed:
@@ -40,11 +38,10 @@ Now: \[dart:core.String\]\(.*\)'''));
     v1 = baseClass;
     v2 = baseClass
       ..['annotations']
-          .add({'name':'metadata.Unstable.Unstable-','parameters':[]});
+          .add({'name': 'metadata.Unstable.Unstable-', 'parameters': []});
 
     diffAndReport(jsonFrom(v1), jsonFrom(v2), io);
-    expectIoContains(new RegExp(
-        r'''class \[Foo\]\(.*\)
+    expectIoContains(new RegExp(r'''class \[Foo\]\(.*\)
 ---+
 
 Foo has new annotations:
@@ -54,12 +51,10 @@ Foo has new annotations:
 
   test('Shapeshift reports on new subclasses', () {
     v1 = baseClass;
-    v2 = baseClass
-      ..['subclass'].add('foo.Bar');
+    v2 = baseClass..['subclass'].add('foo.Bar');
 
     diffAndReport(jsonFrom(v1), jsonFrom(v2), io);
-    expectIoContains(new RegExp(
-        r'''class \[Foo\]\(.*\)
+    expectIoContains(new RegExp(r'''class \[Foo\]\(.*\)
 ---+
 
 Foo has new subclasses:

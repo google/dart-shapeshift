@@ -17,10 +17,8 @@ class ApiDiffer {
       ..add('type')
       ..add('return')
       ..add('annotations[]');
-    differ.metadataToKeep
-      ..add('qualifiedName');
-    if (!includeComments)
-      differ.ignored.add('comment');
+    differ.metadataToKeep..add('qualifiedName');
+    if (!includeComments) differ.ignored.add('comment');
     differ.ensureIdentical(['name', 'qualifiedName']);
     return differ.diff()
       ..metadata['qualifiedName'] = differ.leftJson['qualifiedName']

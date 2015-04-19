@@ -58,13 +58,13 @@ class VariablesReporter {
     var link = mdLinkToDartlang(variable.metadata['qualifiedName'], name);
     if (variable.hasChanged) {
       variable.forEachChanged((attribute, value) =>
-        reportChangedAttributes(attribute, value, link));
+          reportChangedAttributes(attribute, value, link));
     }
     erase(variable.changed);
 
-    if (variable.node.isNotEmpty)
-      variable.node.forEach((String attributeName, DiffNode attribute) =>
-          reportDeepChange(name, variable, link, attributeName, attribute));
+    if (variable.node.isNotEmpty) variable.node.forEach(
+        (String attributeName, DiffNode attribute) =>
+            reportDeepChange(name, variable, link, attributeName, attribute));
   }
 
   void reportChangedAttributes(String attribute, List value, String link) {
@@ -78,18 +78,19 @@ class VariablesReporter {
   }
 
   void reportDeepChange(String name, DiffNode variable, String link,
-                        String attributeName, DiffNode attribute) {
+      String attributeName, DiffNode attribute) {
     if (attributeName == 'annotations') {
       if (attribute.hasAdded) {
         io.writeln('The $link $variableList has new annotations:\n');
         attribute.added.forEach((_, property) =>
-          io.writeln(propertyListItem('annotations', property)));
+            io.writeln(propertyListItem('annotations', property)));
       }
       erase(variables.added);
       if (attribute.hasChanged) {
         io.writeln('The $link $variableList\'s annotations have changed:\n');
         attribute.forEachChanged((String idx, List<Object> ann) {
-          io.writeWasNow(formattedAnnotation(ann[0]), formattedAnnotation(ann[1]));
+          io.writeWasNow(
+              formattedAnnotation(ann[0]), formattedAnnotation(ann[1]));
         });
       }
       erase(attribute.changed);
@@ -103,19 +104,19 @@ class VariablesReporter {
 
   // TODO: yanked from method_attributes_reporter; these need a superclass!
   String propertyListItem(String attributeName, Map property) {
-    if (attributeName == 'annotations')
-      return '* ${formattedAnnotation(property)}';
+    if (attributeName ==
+        'annotations') return '* ${formattedAnnotation(property)}';
 
-    if (attributeName == 'parameters')
-      return '* `${parameterSignature(property)}`';
+    if (attributeName ==
+        'parameters') return '* `${parameterSignature(property)}`';
 
     return '* `$property`';
   }
 }
 
-void reportVariables(DiffNode diff, String variableList, MarkdownWriter io, Function erase) {
-  if (!diff.containsKey(variableList))
-    return;
+void reportVariables(
+    DiffNode diff, String variableList, MarkdownWriter io, Function erase) {
+  if (!diff.containsKey(variableList)) return;
 
   new VariablesReporter(variableList, diff[variableList], io, erase).report();
 }

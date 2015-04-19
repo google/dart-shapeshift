@@ -8,7 +8,8 @@ import 'package:doc_coverage/doc_coverage_common.dart';
 
 class MarkdownDiffWriter extends MarkdownWriter {
   MarkdownDiffWriter(openIo, {shouldClose: true, shouldWriteMetadata: true})
-      : super(openIo, shouldClose: shouldClose, shouldWriteMetadata: shouldWriteMetadata);
+      : super(openIo,
+          shouldClose: shouldClose, shouldWriteMetadata: shouldWriteMetadata);
 
   void writeWasNow(Object theOld, Object theNew,
       {bool blockquote: false, bool link: false}) {
@@ -62,14 +63,12 @@ String highlightInserted(String theOld, String theNew) {
       if (d.text.contains('<blockquote>') ||
           d.text.contains('<p>') ||
           d.text.contains('<pre>')) {
-        result +=
-            '<div '
+        result += '<div '
             'style="$greenBg; display: inline-block; padding: 2px; margin: 0 1px; width: 100%;">'
             '${d.text}'
             '</div>';
       } else {
-        result +=
-            '<span style="$greenBg; padding: 1px;">${d.text}</span>';
+        result += '<span style="$greenBg; padding: 1px;">${d.text}</span>';
       }
     }
   });
