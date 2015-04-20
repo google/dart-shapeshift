@@ -43,13 +43,15 @@ class ClassReporter {
   }
 
   void reportClass() {
-    if (diff.containsKey('annotations')) _reportList('annotations',
-        formatter: formattedAnnotation);
+    if (diff.containsKey('annotations')) {
+      _reportList('annotations', formatter: formattedAnnotation);
+    }
 
     _reportImmediateChanges();
 
-    if (diff.containsKey('subclass')) _reportList('subclass',
-        formatter: classFormatter);
+    if (diff.containsKey('subclass')) {
+      _reportList('subclass', formatter: classFormatter);
+    }
 
     _reportImplements();
 

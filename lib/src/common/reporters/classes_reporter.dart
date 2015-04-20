@@ -72,11 +72,13 @@ class ClassesReporter {
         // If a class's name changed, then "name" won't be in the metadata,
         // so we'll grab it from the changed map.
         // TODO: make this better...
-        if (name == null && klass.changed.containsKey('name')) name =
-            klass.changed['name'][0];
+        if (name == null && klass.changed.containsKey('name')) {
+          name = klass.changed['name'][0];
+        }
         if (qualifiedName == null &&
-            klass.changed.containsKey('qualifiedName')) qualifiedName =
-            klass.changed['qualifiedName'][0];
+            klass.changed.containsKey('qualifiedName')) {
+          qualifiedName = klass.changed['qualifiedName'][0];
+        }
         qualifiedName = qualifiedName.replaceAll(new RegExp(r'.*\.'), '');
         String classThingLink = mdLinkToDartlang(qualifiedName, qualifiedName);
         io

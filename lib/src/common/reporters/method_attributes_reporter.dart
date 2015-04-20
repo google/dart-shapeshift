@@ -129,11 +129,13 @@ class MethodAttributesReporter {
   }
 
   String propertyListItem(String attributeName, Map property) {
-    if (attributeName ==
-        'annotations') return '* ${formattedAnnotation(property)}';
+    if (attributeName == 'annotations') {
+      return '* ${formattedAnnotation(property)}';
+    }
 
-    if (attributeName ==
-        'parameters') return '* `${parameterSignature(property)}`';
+    if (attributeName == 'parameters') {
+      return '* `${parameterSignature(property)}`';
+    }
 
     return '* `$property`';
   }
@@ -145,7 +147,7 @@ class MethodAttributesReporter {
     String propertyLink =
         mdLinkToDartlang('$methodQualifiedName,$propertyName', propertyName);
     String firstPart =
-        'The $methodLink ${category}\'s $propertyLink ${singularize(attributeName)}\'s';
+        'The $methodLink $category\'s $propertyLink ${singularize(attributeName)}\'s';
     property.forEachChanged((key, oldNew) {
       if (key == 'type') {
         io.writeln('$firstPart $key changed from `${changedType(oldNew)}`');
@@ -162,7 +164,7 @@ class MethodAttributesReporter {
       List<String> oldNew = property[key]['0'].changed['outer'];
       // This is so ugly because we are so deep, but an example would be:
       // The foo method's value parameter's type has changed from int to bool.
-      io.writeln('The [$method](#) ${category}\'s [${propertyName}](#) '
+      io.writeln('The [$method](#) $category\'s [$propertyName](#) '
           '${singularize(attributeName)}\'s $key has changed from '
           '`${oldNew[0]}` to `${oldNew[1]}`');
       io.writeHr();
@@ -176,7 +178,7 @@ class MethodAttributesReporter {
         // This is so ugly because we are so deep, but an example would be:
         // The foo method's callback parameter's return type has changed from
         // Object to String.
-        io.writeln('The [$method](#) ${category}\'s [${propertyName}](#) '
+        io.writeln('The [$method](#) $category\'s [$propertyName](#) '
             '${singularize(attributeName)}\'s return type has ${changedType(oldNew)}');
         io.writeHr();
         erase(declaration.changed, 'return');
