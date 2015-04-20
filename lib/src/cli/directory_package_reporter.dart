@@ -1,7 +1,14 @@
 // Copyright 2014 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-part of shapeshift_cli;
+library shapeshift_cli.directory_package_reporter;
+
+import 'dart:io';
+
+import 'package:doc_coverage/doc_coverage_common.dart';
+import 'package:path/path.dart' as path;
+
+import '../../shapeshift_common.dart';
 
 /// A [PackageReporter] that calculates the diff between APIs found in two
 /// directories.
@@ -14,9 +21,8 @@ part of shapeshift_cli;
 class DirectoryPackageReporter extends PackageReporter {
   final String leftPath, rightPath;
 
-  DirectoryPackageReporter(this.leftPath, this.rightPath, WriterProvider _writer) {
-    writer = _writer;
-  }
+  DirectoryPackageReporter(this.leftPath, this.rightPath, WriterProvider writer)
+      : super(writer);
 
   void calculateDiff(String fileName) {
     File left = new File(path.join(leftPath, fileName));

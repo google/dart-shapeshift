@@ -3,8 +3,10 @@
 
 library shapeshift_frontend;
 
+import 'dart:async';
 import 'dart:html';
 import 'dart:js';
+import 'dart:typed_data';
 
 import 'shapeshift_common.dart';
 import 'package:doc_coverage/doc_coverage_common.dart';

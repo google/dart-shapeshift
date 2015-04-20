@@ -1,7 +1,12 @@
 // Copyright 2015 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-part of shapeshift_common;
+library shapeshift_common.method_attribute_reporter;
+
+import 'package:doc_coverage/doc_coverage_common.dart';
+import 'package:json_diff/json_diff.dart' show DiffNode;
+
+import '../markdown_diff_writer.dart';
 
 /// Reporter for changes in a method's attributes.
 ///
@@ -31,8 +36,8 @@ class MethodAttributesReporter {
   String link;
   bool shouldHr;
 
-  MethodAttributesReporter(this.category, this.method, this.attributes,
-      this.io, this.erase) {
+  MethodAttributesReporter(
+      this.category, this.method, this.attributes, this.io, this.erase) {
     link = mdLinkToDartlang(attributes.metadata['qualifiedName'], method);
     shouldHr = false;
   }
@@ -48,47 +53,41 @@ class MethodAttributesReporter {
     reportAddedProperties(attributeName, attribute);
     reportChangedProperties(attributeName, attribute);
 
-    if (shouldHr)
-      io.writeHr();
+    if (shouldHr) io.writeHr();
 
     attribute.node.forEach((propertyName, property) {
-      reportEachProperty(
-          attributeName, propertyName, property);
+      reportEachProperty(attributeName, propertyName, property);
     });
   }
 
   void reportEachChanged(String key, List oldNew) {
     // We don't care about commentFrom changing.
-    if (key == 'commentFrom')
-      return;
+    if (key == 'commentFrom') return;
 
     io.writeln('The $link $category\'s `${key}` changed:\n');
     if (key == 'return') {
       io.writeWasNow(simpleType(oldNew[0]), simpleType(oldNew[1]));
     } else {
-      io.writeWasNow(oldNew[0], oldNew[1],
-          blockquote: key == 'comment');
+      io.writeWasNow(oldNew[0], oldNew[1], blockquote: key == 'comment');
     }
     io.writeHr();
   }
 
   void reportRemovedProperties(String attributeName, DiffNode attribute) {
-    if (!attribute.hasRemoved)
-      return;
+    if (!attribute.hasRemoved) return;
 
     io.writeln('The $link $category has removed $attributeName:\n');
     shouldHr = true;
 
-    attribute.forEachRemoved((_, property) =>
-        io.writeln(propertyListItem(attributeName, property)));
+    attribute.forEachRemoved(
+        (_, property) => io.writeln(propertyListItem(attributeName, property)));
 
     io.writeln('');
     erase(attribute.removed);
   }
 
   void reportAddedProperties(String attributeName, DiffNode attribute) {
-    if (!attribute.hasAdded)
-      return;
+    if (!attribute.hasAdded) return;
 
     if (shouldHr) {
       // TODO: get this font-weight up.
@@ -99,15 +98,14 @@ class MethodAttributesReporter {
 
     shouldHr = true;
 
-    attribute.forEachAdded((_, property) =>
-      io.writeln(propertyListItem(attributeName, property)));
+    attribute.forEachAdded(
+        (_, property) => io.writeln(propertyListItem(attributeName, property)));
 
     erase(attribute.added);
   }
 
   void reportChangedProperties(String attributeName, DiffNode attribute) {
-    if (!attribute.hasChanged)
-      return;
+    if (!attribute.hasChanged) return;
 
     if (shouldHr) {
       // TODO: get this font weight up.
@@ -131,28 +129,26 @@ class MethodAttributesReporter {
   }
 
   String propertyListItem(String attributeName, Map property) {
-    if (attributeName == 'annotations')
-      return '* ${formattedAnnotation(property)}';
+    if (attributeName ==
+        'annotations') return '* ${formattedAnnotation(property)}';
 
-    if (attributeName == 'parameters')
-      return '* `${parameterSignature(property)}`';
+    if (attributeName ==
+        'parameters') return '* `${parameterSignature(property)}`';
 
     return '* `$property`';
   }
 
-  void reportEachProperty(String attributeName,
-                          String propertyName,
-                          DiffNode property) {
+  void reportEachProperty(
+      String attributeName, String propertyName, DiffNode property) {
     String methodQualifiedName = attributes.metadata['qualifiedName'];
     String methodLink = mdLinkToDartlang(methodQualifiedName, method);
-    String propertyLink = mdLinkToDartlang(
-        '$methodQualifiedName,$propertyName', propertyName);
+    String propertyLink =
+        mdLinkToDartlang('$methodQualifiedName,$propertyName', propertyName);
     String firstPart =
         'The $methodLink ${category}\'s $propertyLink ${singularize(attributeName)}\'s';
     property.forEachChanged((key, oldNew) {
       if (key == 'type') {
-        io.writeln(
-            '$firstPart $key changed from `${changedType(oldNew)}`');
+        io.writeln('$firstPart $key changed from `${changedType(oldNew)}`');
       } else {
         io.writeln(
             '$firstPart changed from `$key: ${oldNew[0]}` to `$key: ${oldNew[1]}`');
@@ -166,8 +162,7 @@ class MethodAttributesReporter {
       List<String> oldNew = property[key]['0'].changed['outer'];
       // This is so ugly because we are so deep, but an example would be:
       // The foo method's value parameter's type has changed from int to bool.
-      io.writeln(
-          'The [$method](#) ${category}\'s [${propertyName}](#) '
+      io.writeln('The [$method](#) ${category}\'s [${propertyName}](#) '
           '${singularize(attributeName)}\'s $key has changed from '
           '`${oldNew[0]}` to `${oldNew[1]}`');
       io.writeHr();
@@ -181,8 +176,7 @@ class MethodAttributesReporter {
         // This is so ugly because we are so deep, but an example would be:
         // The foo method's callback parameter's return type has changed from
         // Object to String.
-        io.writeln(
-            'The [$method](#) ${category}\'s [${propertyName}](#) '
+        io.writeln('The [$method](#) ${category}\'s [${propertyName}](#) '
             '${singularize(attributeName)}\'s return type has ${changedType(oldNew)}');
         io.writeHr();
         erase(declaration.changed, 'return');

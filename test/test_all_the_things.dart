@@ -1,5 +1,6 @@
 import 'class_reporter_test.dart' as class_reporter_test;
-import 'method_attributes_reporter_test.dart' as method_attributes_reporter_test;
+import 'method_attributes_reporter_test.dart'
+    as method_attributes_reporter_test;
 import 'methods_reporter_test.dart' as methods_reporter_test;
 import 'variables_reporter_test.dart' as variables_reporter_test;
 
