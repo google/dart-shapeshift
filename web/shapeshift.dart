@@ -17,6 +17,10 @@ final Map<int, Map<String, String>> _versionMaps =
 void main() {
   leftVersionSelect = querySelector('#left-version');
   rightVersionSelect = querySelector('#right-version');
+  leftVersionStableOptGroup = leftVersionSelect.querySelector('.stable');
+  leftVersionDevOptGroup = leftVersionSelect.querySelector('.dev');
+  rightVersionStableOptGroup = rightVersionSelect.querySelector('.stable');
+  rightVersionDevOptGroup = rightVersionSelect.querySelector('.dev');
   includeCommentsCheck = querySelector('#include-comments');
   goButton = querySelector('#get-diff');
   goButton.onClick.listen(_go);
@@ -30,12 +34,17 @@ void _addToSelects(int rev) {
   OptionElement left = new OptionElement()
     ..text = version['version']
     ..attributes['value'] = version['revision'];
-  leftVersionSelect.children.add(left);
-
   OptionElement right = new OptionElement()
     ..text = version['version']
     ..attributes['value'] = version['revision'];
-  rightVersionSelect.children.add(right);
+
+  if (version['channel'] == 'stable') {
+    leftVersionStableOptGroup.children.add(left);
+    rightVersionStableOptGroup.children.add(right);
+  } else {
+    leftVersionDevOptGroup.children.add(left);
+    rightVersionDevOptGroup.children.add(right);
+  }
 }
 
 _startDownload() async {
@@ -72,17 +81,19 @@ void _updateSelectors() {
   rightVersionSelect.disabled = false;
   goButton.disabled = false;
 
-  leftVersionSelect.children.clear();
-  rightVersionSelect.children.clear();
+  leftVersionStableOptGroup.children.clear();
+  leftVersionDevOptGroup.children.clear();
+  rightVersionStableOptGroup.children.clear();
+  rightVersionDevOptGroup.children.clear();
 
   List sortedVersions = _versionMaps.keys.toList()..sort();
 
   (sortedVersions.reversed).forEach(_addToSelects);
 
   // Cannot use the newest version as the older version.
-  leftVersionSelect.children.first.attributes['disabled'] = 'disabled';
+  //leftVersionSelect.children.first.attributes['disabled'] = 'disabled';
   // Cannot use the oldest version as the newer version.
-  rightVersionSelect.children.last.attributes['disabled'] = 'disabled';
+  //rightVersionSelect.children.last.attributes['disabled'] = 'disabled';
 }
 
 _go(Event event) async {

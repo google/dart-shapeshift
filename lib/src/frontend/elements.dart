@@ -5,6 +5,10 @@ part of shapeshift_frontend;
 
 SelectElement leftVersionSelect;
 SelectElement rightVersionSelect;
+OptGroupElement leftVersionStableOptGroup;
+OptGroupElement leftVersionDevOptGroup;
+OptGroupElement rightVersionStableOptGroup;
+OptGroupElement rightVersionDevOptGroup;
 InputElement includeCommentsCheck;
 InputElement goButton;
 Element diffContainer;

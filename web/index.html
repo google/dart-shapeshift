@@ -33,9 +33,15 @@
           <div class="table-cell">
             <div>
               <label for="left-version">Left Version:</label>
-              <select id="left-version" disabled></select>
+              <select id="left-version" disabled>
+                <optgroup label="Stable" class="stable"></optgroup>
+                <optgroup label="Dev" class="dev"></optgroup>
+              </select>
               <label for="right-version">Right Version:</label>
-              <select id="right-version" disabled></select>
+              <select id="right-version" disabled>
+                <optgroup label="Stable" class="stable"></optgroup>
+                <optgroup label="Dev" class="dev"></optgroup>
+              </select>
             </div>
             <div>
               <label for="include-comments">Include comment changes?</label>

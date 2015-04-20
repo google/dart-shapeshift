@@ -80,6 +80,22 @@ a:hover, a:focus {
   text-decoration: underline;
 }
 
+pre {
+  background-color: #ddd;
+  border: solid 1px #999;
+  box-shadow: 1px 1px 3px #999 inset;
+  font-size: 13px;
+  overflow: auto;
+  padding: 5px;
+}
+
+p >code,
+li >code {
+  background-color: #eee;
+  border-bottom: solid 1px #ccc;
+  white-space: nowrap;
+}
+
 footer {
   position: absolute;
   bottom: 0;
