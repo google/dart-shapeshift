@@ -28,6 +28,9 @@ abstract class PackageReporter {
       String libraryName = node.metadata['qualifiedName'];
       if (!libraryDiffs.containsKey(libraryName)) {
         libraryDiffs[libraryName] = new LibraryApiDiff(libraryName, node);
+      } else if (libraryDiffs[libraryName].isUninitialized) {
+        libraryDiffs[libraryName].libraryName = libraryName;
+        libraryDiffs[libraryName].lybrary = node;
       }
     } else {
       // Here, file represents the API of a class...

@@ -10,11 +10,13 @@ import 'reporters/class_reporter.dart';
 import 'reporters/library_reporter.dart';
 
 class LibraryApiDiff {
-  final String libraryName;
-  final DiffNode lybrary;
+  String libraryName;
+  DiffNode lybrary;
   final List<DiffNode> classes = new List<DiffNode>();
 
   LibraryApiDiff(this.libraryName, this.lybrary);
+
+  bool get isUninitialized => libraryName == null;
 
   void report(MarkdownWriter _io) {
     _io.writeMetadata(libraryName);

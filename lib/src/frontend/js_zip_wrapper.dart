@@ -86,8 +86,9 @@ void compareZips(Map<String, String> leftVersion, ByteBuffer leftData,
   JSZipWrapper rightZip = new JSZipWrapper(rightData);
   WriterProvider writer = new HtmlWriterProvider(new HtmlWriter(diffElement));
 
-  new JSZipPackageReporter(leftZip, rightZip, writer,
-      includeComments: includeComments)
+  new JSZipPackageReporter(leftZip, rightZip,
+      int.parse(leftVersion['revision']), int.parse(rightVersion['revision']),
+      writer, includeComments: includeComments)
     ..calculateAllDiffs()
     ..report();
 }

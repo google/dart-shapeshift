@@ -13,23 +13,24 @@ part of shapeshift_frontend;
 /// [report].
 class JSZipPackageReporter extends PackageReporter {
   final JSZipWrapper leftZip, rightZip;
+  final int leftRevision, rightRevision;
 
-  JSZipPackageReporter(this.leftZip, this.rightZip, WriterProvider _writer,
-      {includeComments: true})
+  JSZipPackageReporter(this.leftZip, this.rightZip, this.leftRevision,
+      this.rightRevision, WriterProvider _writer, {includeComments: true})
       : super(_writer, includeComments: includeComments);
 
   void calculateDiff(String fileName) {
-    if (!leftZip.hasFile(fileName)) {
-      // fileName not found in the left Zip, which will be noted in the library
-      // JSON file.
+    // If fileName not found in the left Zip, it will be noted in the library
+    // JSON file.
+    if (!leftZip.hasFile(fileName))
       return;
-    }
-    add(fileName, diffApis(leftZip.read(fileName), rightZip.read(fileName),
-        includeComments: includeComments));
+    add(fileName,
+        diffSdkApis(leftZip.read(fileName), rightZip.read(fileName),
+            leftRevision, rightRevision, includeComments: includeComments));
   }
 
   void calculateAllDiffs() {
     //rightZip.jsonFiles.forEach(calculateDiff);
-    rightZip.filesByLibrary['dart-async'].forEach(calculateDiff);
+    rightZip.filesByLibrary['dart-core'].forEach(calculateDiff);
   }
 }
