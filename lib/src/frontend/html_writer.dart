@@ -11,10 +11,11 @@ class HtmlWriter extends StringSink {
   void write(Object obj) {
     // I'm a little worried about this... I have to gunarantee _no_ nesting
     // here, like `write("* bullet"); write("* another bullet");`.
-    el.setInnerHtml(el.innerHtml + markdownToHtml(obj.toString()), treeSanitizer: allHtml);
+    el.setInnerHtml(el.innerHtml + markdownToHtml(obj.toString()),
+        treeSanitizer: allHtml);
   }
 
-  void writeAll(Iterable objects, [String separator=""]) {
+  void writeAll(Iterable objects, [String separator = ""]) {
     // Don't use.
   }
 
@@ -22,5 +23,5 @@ class HtmlWriter extends StringSink {
     // Don't use.
   }
 
-  void writeln([Object obj='']) => write(obj.toString() + '\n');
+  void writeln([Object obj = '']) => write(obj.toString() + '\n');
 }

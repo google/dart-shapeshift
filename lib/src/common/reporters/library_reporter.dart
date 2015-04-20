@@ -1,7 +1,13 @@
 // Copyright 2015 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-part of shapeshift_common;
+library shapeshift_common.library_reporter;
+
+import 'package:json_diff/json_diff.dart';
+
+import '../markdown_diff_writer.dart';
+import 'methods_reporter.dart';
+import 'classes_reporter.dart';
 
 class LibraryReporter {
   static bool shouldErase = true;
@@ -12,8 +18,7 @@ class LibraryReporter {
   LibraryReporter(this.diff, this.io);
 
   void report() {
-    if (diff == null)
-      return;
+    if (diff == null) return;
 
     io.bufferH1(diff.metadata['qualifiedName']);
     reportLibrary();
@@ -58,12 +63,9 @@ class LibraryReporter {
       new MethodsReporter(methodCategory, diff, io, erase).report();
 
   void erase(Map m, [String key]) {
-    if (!shouldErase)
-      return;
+    if (!shouldErase) return;
 
-    if (key == null)
-      m.clear();
-    else
-      m.remove(key);
+    if (key == null) m.clear();
+    else m.remove(key);
   }
 }

@@ -7,28 +7,26 @@ import 'dart:html';
 
 import 'package:shapeshift/shapeshift_frontend.dart';
 
-const String storageApiBase = "https://www.googleapis.com/storage/v1/b/dart-archive/o";
-const String storageBase = "https://storage.googleapis.com/dart-archive";
+const String _storageApiBase =
+    "https://www.googleapis.com/storage/v1/b/dart-archive/o";
+const String _storageBase = "https://storage.googleapis.com/dart-archive";
 
-final Map<String, Map<String, String>> versionMaps = new Map();
+final Map<int, Map<String, String>> _versionMaps =
+    new Map<int, Map<String, String>>();
 
 void main() {
   leftVersionSelect = querySelector('#left-version');
   rightVersionSelect = querySelector('#right-version');
   includeCommentsCheck = querySelector('#include-comments');
   goButton = querySelector('#get-diff');
-  goButton.onClick.listen(go);
+  goButton.onClick.listen(_go);
   diffContainer = querySelector('#diff-container');
 
-  // TODO: add dev channel.
-  HttpRequest.getString("$storageApiBase?prefix=channels/stable/release/&delimiter=/")
-        .then((resp) { getVersionFiles('stable', resp); });
-  HttpRequest.getString("$storageApiBase?prefix=channels/dev/release/&delimiter=/")
-        .then((resp) { getVersionFiles('dev', resp); });
+  _startDownload();
 }
 
-void addToSelects(String rev) {
-  Map version = versionMaps[rev];
+void _addToSelects(int rev) {
+  Map version = _versionMaps[rev];
   OptionElement left = new OptionElement()
     ..text = version['version']
     ..attributes['value'] = version['revision'];
@@ -40,61 +38,91 @@ void addToSelects(String rev) {
   rightVersionSelect.children.add(right);
 }
 
-void getVersionFiles(String channel, String respString) {
-  Map<String,Object> resp = JSON.decode(respString);
+_startDownload() async {
+  await _getVersionFiles(
+      'dev', "$_storageApiBase?prefix=channels/dev/release/&delimiter=/");
+  await _getVersionFiles(
+      'stable', "$_storageApiBase?prefix=channels/stable/release/&delimiter=/");
+
+  _updateSelectors();
+}
+
+_getVersionFiles(String channel, String url) async {
+  var respString = await HttpRequest.getString(url);
+
+  Map<String, Object> resp = JSON.decode(respString);
   List<String> versions = (resp["prefixes"] as List<String>);
   versions.removeWhere((e) => e.contains('latest'));
 
-  // Format is lines of "channels/stable/release/\d+/".
-  Iterable<Future> versionRequests = versions.map(
-      (String path) => HttpRequest.getString("$storageBase/${path}VERSION"));
-  Future versionResponses = Future.wait(versionRequests.toList());
-  versionResponses.then((Iterable versionStringsIter) {
-    List<String> versionStrings = versionStringsIter.toList();
-    versionStrings.map((e) => JSON.decode(e)).forEach((Map<String, String> v) {
-      v['channel'] = channel;
-      versionMaps[v['revision']] = v;
-    });
-    List sortedVersions = versionMaps.keys.toList()..sort();
-    (sortedVersions.reversed).forEach(addToSelects);
+  for (var path in versions) {
+    var versionString =
+        await HttpRequest.getString("$_storageBase/${path}VERSION");
 
-    // Cannot use the newest version as the older version.
-    leftVersionSelect.children.first.attributes['disabled'] = 'disabled';
-    // Cannot use the oldest version as the newer version.
-    rightVersionSelect.children.last.attributes['disabled'] = 'disabled';
-  });
+    var json = JSON.decode(versionString) as Map<String, String>;
+
+    json['channel'] = channel;
+
+    int revision = int.parse(json['revision']);
+    _versionMaps[revision] = json;
+  }
 }
 
-void go(Event event) {
-  String left = leftVersionSelect.selectedOptions[0].attributes['value'];
-  String right = rightVersionSelect.selectedOptions[0].attributes['value'];
-  bool includeComments = includeCommentsCheck.checked;
-  if (left == right)
-    // TODO: error
-    return;
+void _updateSelectors() {
+  leftVersionSelect.disabled = false;
+  rightVersionSelect.disabled = false;
+  goButton.disabled = false;
 
-  // TODO: validate left is "before" right
+  leftVersionSelect.children.clear();
+  rightVersionSelect.children.clear();
 
-  compareVersions(versionMaps[left], versionMaps[right], includeComments);
+  List sortedVersions = _versionMaps.keys.toList()..sort();
+
+  (sortedVersions.reversed).forEach(_addToSelects);
+
+  // Cannot use the newest version as the older version.
+  leftVersionSelect.children.first.attributes['disabled'] = 'disabled';
+  // Cannot use the oldest version as the newer version.
+  rightVersionSelect.children.last.attributes['disabled'] = 'disabled';
 }
 
-void compareVersions(Map left, Map right, bool includeComments) {
-  String leftUri = '$storageBase/channels/${left['channel']}/release/' +
+_go(Event event) async {
+  try {
+    if (goButton.disabled) {
+      throw 'Slow down!';
+    }
+    goButton.disabled = true;
+
+    diffContainer.setInnerHtml('<em>working...</em>');
+
+    int left =
+        int.parse(leftVersionSelect.selectedOptions[0].attributes['value']);
+    int right =
+        int.parse(rightVersionSelect.selectedOptions[0].attributes['value']);
+    bool includeComments = includeCommentsCheck.checked;
+
+    if (left == right) {
+      diffContainer
+          .setInnerHtml('<em>Cannot compare the same version - $left</em>');
+    }
+
+    // TODO: validate left is "before" right
+
+    await _compareVersions(
+        _versionMaps[left], _versionMaps[right], includeComments);
+  } finally {
+    goButton.disabled = false;
+  }
+}
+
+Future _compareVersions(Map left, Map right, bool includeComments) async {
+  String leftUri = '$_storageBase/channels/${left['channel']}/release/' +
       '${left['revision']}/api-docs/dart-api-docs.zip';
-  String rightUri = '$storageBase/channels/${right['channel']}/release/' +
+  String rightUri = '$_storageBase/channels/${right['channel']}/release/' +
       '${right['revision']}/api-docs/dart-api-docs.zip';
 
-  getBinaryContent(rightUri, (err, rightData) {
-    //TODO: this, better
-    if (err != null)
-      throw err;
+  var rightData = await getBinaryContent(rightUri);
 
-    getBinaryContent(leftUri, (err, leftData) {
-      //TODO: this, better
-      if (err != null)
-        throw err;
+  var leftData = await getBinaryContent(leftUri);
 
-      compareZips(left, leftData, right, rightData, includeComments);
-    });
-  });
+  compareZips(left, leftData, right, rightData, includeComments);
 }

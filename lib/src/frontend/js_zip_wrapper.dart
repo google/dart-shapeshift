@@ -6,8 +6,7 @@ part of shapeshift_frontend;
 class JSZipWrapper {
   final JsObject zip;
 
-  JSZipWrapper(data)
-      : zip = new JsObject(context['JSZip'], [data]);
+  JSZipWrapper(data) : zip = new JsObject(context['JSZip'], [data]);
 
   static String libraryFor(String file) =>
       new RegExp('docgen/([^.]+)').firstMatch(file)[1];
@@ -17,17 +16,17 @@ class JSZipWrapper {
     return fileArray.map((e) => e).toList();
   }
 
-  List<String> get jsonFiles =>
-    files..removeWhere((file) =>
-        !file.endsWith('.json') || file.endsWith('index.json') || file.endsWith('library_list.json'));
+  List<String> get jsonFiles => files
+    ..removeWhere((file) => !file.endsWith('.json') ||
+        file.endsWith('index.json') ||
+        file.endsWith('library_list.json'));
 
   Map<String, List<String>> get filesByLibrary {
     Map<String, List<String>> map = new Map();
 
     jsonFiles.forEach((file) {
       String lib = libraryFor(file);
-      if (!map.containsKey(lib))
-        map[lib] = new List();
+      if (!map.containsKey(lib)) map[lib] = new List();
       map[lib].add(file);
     });
 
@@ -36,23 +35,35 @@ class JSZipWrapper {
 
   bool hasFile(String fileName) => zip['files'].hasProperty(fileName);
 
-  String read(String fileName) => zip.callMethod('file', [fileName]).callMethod('asText', []) as String;
+  String read(String fileName) =>
+      zip.callMethod('file', [fileName]).callMethod('asText', []) as String;
 }
 
-void getBinaryContent(uri, callback) =>
-    context['JSZipUtils'].callMethod('getBinaryContent', [uri, callback]);
+Future<ByteBuffer> getBinaryContent(uri) {
+  var completer = new Completer<ByteBuffer>();
+
+  context['JSZipUtils'].callMethod('getBinaryContent', [
+    uri,
+    (err, data) {
+      if (err != null) {
+        completer.completeError(err);
+      } else {
+        completer.complete(data);
+      }
+    }
+  ]);
+
+  return completer.future;
+}
 
 const String issuesUrl = 'https://github.com/google/dart-shapeshift/issues';
 
-void compareZips(Map<String, String> leftVersion,
-                 leftData,
-                 Map<String, String> rightVersion,
-                 rightData,
-                 bool includeComments) {
+void compareZips(Map<String, String> leftVersion, ByteBuffer leftData,
+    Map<String, String> rightVersion, ByteBuffer rightData,
+    bool includeComments) {
   String leftV = leftVersion['version'];
   String rightV = rightVersion['version'];
-  var header = new HeadingElement.h1()
-    ..text = 'Changes from $leftV to $rightV';
+  var header = new HeadingElement.h1()..text = 'Changes from $leftV to $rightV';
   AnchorElement issuesLink = new AnchorElement(href: issuesUrl)
     ..text = 'GitHub';
   var summaryText = new ParagraphElement()
@@ -61,6 +72,9 @@ void compareZips(Map<String, String> leftVersion,
              Shapeshift tool is still very new, and and issue reports at ''')
     ..append(issuesLink)
     ..appendText(' are highly appreciated!');
+
+  diffContainer.setInnerHtml('');
+
   diffContainer
     ..append(header)
     ..append(summaryText);
@@ -72,7 +86,8 @@ void compareZips(Map<String, String> leftVersion,
   JSZipWrapper rightZip = new JSZipWrapper(rightData);
   WriterProvider writer = new HtmlWriterProvider(new HtmlWriter(diffElement));
 
-  new JSZipPackageReporter(leftZip, rightZip, writer, includeComments: includeComments)
+  new JSZipPackageReporter(leftZip, rightZip, writer,
+      includeComments: includeComments)
     ..calculateAllDiffs()
     ..report();
 }

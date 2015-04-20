@@ -1,7 +1,12 @@
 // Copyright 2015 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-part of shapeshift_common;
+library shapeshift_common.method_reporter;
+
+import 'package:doc_coverage/doc_coverage_common.dart';
+import 'package:json_diff/json_diff.dart' show DiffNode;
+
+import 'method_attributes_reporter.dart';
 
 class MethodsReporter {
   final DiffNode diff;
@@ -11,10 +16,10 @@ class MethodsReporter {
   String category;
   String parenthetical;
 
-  MethodsReporter(_category, this.diff, this.io, this.erase, {this.parenthetical: ''}) {
+  MethodsReporter(_category, this.diff, this.io, this.erase,
+      {this.parenthetical: ''}) {
     category = singularize(_category);
-    if (parenthetical.isNotEmpty)
-      parenthetical = ' _($parenthetical)_';
+    if (parenthetical.isNotEmpty) parenthetical = ' _($parenthetical)_';
   }
 
   void report() {
@@ -26,7 +31,7 @@ class MethodsReporter {
 
     diff.forEach((method, attributes) {
       new MethodAttributesReporter(category, method, attributes, io, erase)
-        .report();
+          .report();
     });
   }
 
@@ -37,8 +42,7 @@ class MethodsReporter {
   }
 
   void reportEachRemoved(String methodName, Map method) {
-    if (methodName == '')
-      methodName = diff.metadata['name'];
+    if (methodName == '') methodName = diff.metadata['name'];
     io.writeln('Removed $category$parenthetical $methodName:\n');
     io.writeCodeblockHr(methodSignature(method,
         includeComment: false, includeAnnotations: false));

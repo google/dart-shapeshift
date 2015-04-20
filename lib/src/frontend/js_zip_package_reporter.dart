@@ -15,10 +15,8 @@ class JSZipPackageReporter extends PackageReporter {
   final JSZipWrapper leftZip, rightZip;
 
   JSZipPackageReporter(this.leftZip, this.rightZip, WriterProvider _writer,
-      {includeComments: true}) {
-    writer = _writer;
-    this.includeComments = includeComments;
-  }
+      {includeComments: true})
+      : super(_writer, includeComments: includeComments);
 
   void calculateDiff(String fileName) {
     if (!leftZip.hasFile(fileName)) {
@@ -26,10 +24,8 @@ class JSZipPackageReporter extends PackageReporter {
       // JSON file.
       return;
     }
-    add(fileName,
-        diffApis(leftZip.read(fileName),
-                 rightZip.read(fileName),
-                 includeComments: includeComments));
+    add(fileName, diffApis(leftZip.read(fileName), rightZip.read(fileName),
+        includeComments: includeComments));
   }
 
   void calculateAllDiffs() {

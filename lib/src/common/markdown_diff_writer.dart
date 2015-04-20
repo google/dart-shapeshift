@@ -1,11 +1,15 @@
 // Copyright 2014 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-part of shapeshift_common;
+library shapeshift_common.markdown_diff_writer;
+
+import 'package:diff_match_patch/diff_match_patch.dart';
+import 'package:doc_coverage/doc_coverage_common.dart';
 
 class MarkdownDiffWriter extends MarkdownWriter {
   MarkdownDiffWriter(openIo, {shouldClose: true, shouldWriteMetadata: true})
-      : super(openIo, shouldClose: shouldClose, shouldWriteMetadata: shouldWriteMetadata);
+      : super(openIo,
+          shouldClose: shouldClose, shouldWriteMetadata: shouldWriteMetadata);
 
   void writeWasNow(Object theOld, Object theNew,
       {bool blockquote: false, bool link: false}) {
@@ -59,14 +63,12 @@ String highlightInserted(String theOld, String theNew) {
       if (d.text.contains('<blockquote>') ||
           d.text.contains('<p>') ||
           d.text.contains('<pre>')) {
-        result +=
-            '<div '
+        result += '<div '
             'style="$greenBg; display: inline-block; padding: 2px; margin: 0 1px; width: 100%;">'
             '${d.text}'
             '</div>';
       } else {
-        result +=
-            '<span style="$greenBg; padding: 1px;">${d.text}</span>';
+        result += '<span style="$greenBg; padding: 1px;">${d.text}</span>';
       }
     }
   });
