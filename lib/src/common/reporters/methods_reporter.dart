@@ -37,14 +37,20 @@ class MethodsReporter {
 
   void reportEachAdded(String methodName, Map method) {
     String link = mdLinkToDartlang(method['qualifiedName'], methodName);
+    bool includeType = category != 'constructor';
+    bool includeParens = category != 'setter' && category != 'getter';
     io.writeln('New $category$parenthetical $link:\n');
-    io.writeCodeblockHr(methodSignature(method));
+    io.writeCodeblockHr(methodSignature(method, includeReturn: includeType,
+        includeParens: includeParens));
   }
 
   void reportEachRemoved(String methodName, Map method) {
     if (methodName == '') methodName = diff.metadata['name'];
+    bool includeType = category != 'constructor';
+    bool includeParens = category != 'setter' && category != 'getter';
     io.writeln('Removed $category$parenthetical $methodName:\n');
     io.writeCodeblockHr(methodSignature(method,
-        includeComment: false, includeAnnotations: false));
+        includeComment: false, includeAnnotations: false,
+        includeReturn: includeType, includeParens: includeParens));
   }
 }
