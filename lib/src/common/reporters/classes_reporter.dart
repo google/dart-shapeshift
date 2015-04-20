@@ -6,10 +6,12 @@ part of shapeshift_common;
 class ClassesReporter {
   final String category;
   final DiffNode diff;
+  final String libraryName;
   final MarkdownDiffWriter io;
   final Function erase;
 
-  ClassesReporter(this.category, this.diff, this.io, this.erase);
+  ClassesReporter(this.category, this.diff, this.libraryName, this.io,
+      this.erase);
 
   void report() {
     reportRemovedClasses();
@@ -76,7 +78,7 @@ class ClassesReporter {
             mdLinkToDartlang(qualifiedName, qualifiedName);
         io
           ..writeln(
-            '${name}\'s $classThingLink $category `$key` changed:\n')
+            '${libraryName}\'s $classThingLink $category `$key` changed:\n')
           ..writeWasNow(oldNew[0], oldNew[1],
             blockquote: ['comment', 'preview'].contains(key))
           ..writeHr();

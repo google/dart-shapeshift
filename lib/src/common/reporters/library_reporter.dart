@@ -8,25 +8,25 @@ class LibraryReporter {
 
   final DiffNode diff;
   final MarkdownDiffWriter io;
+  String qualifiedName;
 
-  LibraryReporter(this.diff, this.io);
+  LibraryReporter(this.diff, this.io) {
+    qualifiedName = diff.metadata['qualifiedName'];
+  }
 
   void report() {
     if (diff == null)
       return;
 
-    io.bufferH1(diff.metadata['qualifiedName']);
+    io.bufferH1(qualifiedName);
     reportLibrary();
 
     // After reporting, prune and print anything remaining.
     diff.prune();
-    String qn = diff.metadata['qualifiedName'];
     diff.metadata.clear();
-    String ds = diff.toString();
-    if (ds.isNotEmpty) {
-      print('${qn} HAS UNRESOLVED NODES:');
-      print(ds);
-    }
+    String diffString = diff.toString();
+    if (diffString.isNotEmpty)
+      print('ERROR: $qualifiedName has unresolved nodes:\n$diffString');
   }
 
   void reportLibrary() {
@@ -38,8 +38,8 @@ class LibraryReporter {
     }
 
     // Iterate over the class categories ('classes', 'typedefs', 'errors').
-    diff.forEachOf('classes', (String classCategory, DiffNode diff) =>
-        new ClassesReporter(classCategory, diff, io, erase).report());
+    diff.forEachOf('classes', (String classCategory, DiffNode classDiff) =>
+        new ClassesReporter(classCategory, classDiff, qualifiedName, io, erase).report());
 
     diff.changed.forEach((String key, List oldNew) {
       io.writeln("${diff.metadata['name']}'s `${key}` changed:\n");
