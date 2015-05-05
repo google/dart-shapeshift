@@ -32,8 +32,9 @@ class ApiDiffer {
 DiffNode diffApis(String a, String b, {includeComments: true}) =>
     new ApiDiffer(a, b, includeComments: includeComments).diff();
 
-DiffNode diffSdkApis(String left, String right, int leftRevision,
-    int rightRevision, {includeComments: true}) {
+DiffNode diffSdkApis(
+    String left, String right, int leftRevision, int rightRevision,
+    {includeComments: true}) {
   // The dartdoc utility used to generate JSON for the Dart SDK with names of
   // libraries and library members that looked like "dart-core",
   // "dart-core.String", etc. After revision 41515 (Dart 1.8.0-dev.3.0),
@@ -43,8 +44,8 @@ DiffNode diffSdkApis(String left, String right, int leftRevision,
   // library member was renamed. So we have to do this ugly munging.
   int lastRevisionWithHyphens = 41515;
 
-  if (leftRevision <= lastRevisionWithHyphens
-      && rightRevision > lastRevisionWithHyphens) {
+  if (leftRevision <= lastRevisionWithHyphens &&
+      rightRevision > lastRevisionWithHyphens) {
     left = scrubHyphens(left);
   }
 

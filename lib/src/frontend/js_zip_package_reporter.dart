@@ -22,11 +22,9 @@ class JSZipPackageReporter extends PackageReporter {
   void calculateDiff(String fileName) {
     // If fileName not found in the left Zip, it will be noted in the library
     // JSON file.
-    if (!leftZip.hasFile(fileName))
-      return;
-    add(fileName,
-        diffSdkApis(leftZip.read(fileName), rightZip.read(fileName),
-            leftRevision, rightRevision, includeComments: includeComments));
+    if (!leftZip.hasFile(fileName)) return;
+    add(fileName, diffSdkApis(leftZip.read(fileName), rightZip.read(fileName),
+        leftRevision, rightRevision, includeComments: includeComments));
   }
 
   void calculateAllDiffs() {

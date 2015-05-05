@@ -3,11 +3,11 @@
 
 library shapeshift_common.utils;
 
-RegExp oldStyle = new RegExp(r'"(name|outer|qualifiedName|return|superclass)":\s*"dart-');
+RegExp oldStyle =
+    new RegExp(r'"(name|outer|qualifiedName|return|superclass)":\s*"dart-');
 RegExp oldStyleList =
     new RegExp(r'"implements":\s*\[(("dart-[^"]+"(,\s*)?)+)\]');
-RegExp oldStyleLink =
-    new RegExp(r'a( href="[^"]*")?>dart-');
+RegExp oldStyleLink = new RegExp(r'a( href="[^"]*")?>dart-');
 
 String scrubHyphens(String json) {
   String _replaceAllNamesInAList(Match m) {
@@ -18,6 +18,6 @@ String scrubHyphens(String json) {
   return json
       .replaceAllMapped(oldStyle, (Match m) => '"${m[1]}":"dart:')
       .replaceAllMapped(oldStyleList, _replaceAllNamesInAList)
-      .replaceAllMapped(oldStyleLink,
-          (Match m) => 'a${m[1] == null ? '' : m[1]}>dart:');
+      .replaceAllMapped(
+          oldStyleLink, (Match m) => 'a${m[1] == null ? '' : m[1]}>dart:');
 }

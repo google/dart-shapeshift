@@ -40,8 +40,8 @@ class MethodsReporter {
     bool includeType = category != 'constructor';
     bool includeParens = category != 'setter' && category != 'getter';
     io.writeln('New $category$parenthetical $link:\n');
-    io.writeCodeblockHr(methodSignature(method, includeReturn: includeType,
-        includeParens: includeParens));
+    io.writeCodeblockHr(methodSignature(method,
+        includeReturn: includeType, includeParens: includeParens));
   }
 
   void reportEachRemoved(String methodName, Map method) {
@@ -50,7 +50,9 @@ class MethodsReporter {
     bool includeParens = category != 'setter' && category != 'getter';
     io.writeln('Removed $category$parenthetical $methodName:\n');
     io.writeCodeblockHr(methodSignature(method,
-        includeComment: false, includeAnnotations: false,
-        includeReturn: includeType, includeParens: includeParens));
+        includeComment: false,
+        includeAnnotations: false,
+        includeReturn: includeType,
+        includeParens: includeParens));
   }
 }
