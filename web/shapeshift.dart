@@ -14,37 +14,44 @@ const String _storageBase = "https://storage.googleapis.com/dart-archive";
 final Map<int, Map<String, String>> _versionMaps =
     new Map<int, Map<String, String>>();
 
-final Element statusElement = querySelector('#status');
+final InputElement _includeCommentsCheck = querySelector('#include-comments');
+final InputElement _goButton = querySelector('#get-diff');
+final Element _statusElement = querySelector('#status');
+
+final DivElement _diffContainer = querySelector('#diff-container');
+
+final SelectElement _leftVersionSelect = querySelector('#left-version');
+final OptGroupElement _leftVersionStableOptGroup =
+    _leftVersionSelect.querySelector('.stable');
+final OptGroupElement _leftVersionDevOptGroup =
+    _leftVersionSelect.querySelector('.dev');
+
+final SelectElement _rightVersionSelect = querySelector('#right-version');
+final OptGroupElement rightVersionStableOptGroup =
+    _rightVersionSelect.querySelector('.stable');
+final OptGroupElement rightVersionDevOptGroup =
+    _rightVersionSelect.querySelector('.dev');
+
 void main() {
-  leftVersionSelect = querySelector('#left-version');
-  rightVersionSelect = querySelector('#right-version');
-  leftVersionStableOptGroup = leftVersionSelect.querySelector('.stable');
-  leftVersionDevOptGroup = leftVersionSelect.querySelector('.dev');
-  rightVersionStableOptGroup = rightVersionSelect.querySelector('.stable');
-  rightVersionDevOptGroup = rightVersionSelect.querySelector('.dev');
-  includeCommentsCheck = querySelector('#include-comments');
-  goButton = querySelector('#get-diff');
-  goButton.onClick.listen(_go);
-  diffContainer = querySelector('#diff-container');
-  statusElement = querySelector('#status');
+  _goButton.onClick.listen(_go);
 
   _startDownload();
 }
 
 void _addToSelects(int rev) {
   Map version = _versionMaps[rev];
-  OptionElement left = new OptionElement()
+  var left = new OptionElement()
     ..text = version['version']
     ..attributes['value'] = version['revision'];
-  OptionElement right = new OptionElement()
+  var right = new OptionElement()
     ..text = version['version']
     ..attributes['value'] = version['revision'];
 
   if (version['channel'] == 'stable') {
-    leftVersionStableOptGroup.children.add(left);
+    _leftVersionStableOptGroup.children.add(left);
     rightVersionStableOptGroup.children.add(right);
   } else {
-    leftVersionDevOptGroup.children.add(left);
+    _leftVersionDevOptGroup.children.add(left);
     rightVersionDevOptGroup.children.add(right);
   }
 }
@@ -85,12 +92,12 @@ _getVersionFiles(String channel, String url) async {
 }
 
 void _updateSelectors() {
-  leftVersionSelect.disabled = false;
-  rightVersionSelect.disabled = false;
-  goButton.disabled = false;
+  _leftVersionSelect.disabled = false;
+  _rightVersionSelect.disabled = false;
+  _goButton.disabled = false;
 
-  leftVersionStableOptGroup.children.clear();
-  leftVersionDevOptGroup.children.clear();
+  _leftVersionStableOptGroup.children.clear();
+  _leftVersionDevOptGroup.children.clear();
   rightVersionStableOptGroup.children.clear();
   rightVersionDevOptGroup.children.clear();
 
@@ -106,27 +113,27 @@ void _updateSelectors() {
 
 void _updateStatus([String value]) {
   if (value == null || value.isEmpty) {
-    statusElement.classes.remove('active');
+    _statusElement.classes.remove('active');
   } else {
-    statusElement.classes.add('active');
-    statusElement.setInnerHtml('<em>$value</em>');
+    _statusElement.classes.add('active');
+    _statusElement.setInnerHtml('<em>$value</em>');
   }
 }
 
 Future _go(Event event) async {
   try {
-    if (goButton.disabled) {
+    if (_goButton.disabled) {
       throw 'Slow down!';
     }
-    goButton.disabled = true;
+    _goButton.disabled = true;
 
     _updateStatus('Calculating diff');
 
     int left =
-        int.parse(leftVersionSelect.selectedOptions[0].attributes['value']);
+        int.parse(_leftVersionSelect.selectedOptions[0].attributes['value']);
     int right =
-        int.parse(rightVersionSelect.selectedOptions[0].attributes['value']);
-    bool includeComments = includeCommentsCheck.checked;
+        int.parse(_rightVersionSelect.selectedOptions[0].attributes['value']);
+    bool includeComments = _includeCommentsCheck.checked;
 
     if (left == right) {
       _updateStatus('Cannot compare the same version - $left');
@@ -139,7 +146,7 @@ Future _go(Event event) async {
         _versionMaps[left], _versionMaps[right], includeComments);
     _updateStatus();
   } finally {
-    goButton.disabled = false;
+    _goButton.disabled = false;
   }
 }
 
@@ -153,5 +160,6 @@ Future _compareVersions(Map left, Map right, bool includeComments) async {
 
   var leftData = await getBinaryContent(leftUri);
 
-  compareZips(left, leftData, right, rightData, includeComments);
+  compareZips(
+      left, leftData, right, rightData, includeComments, _diffContainer);
 }

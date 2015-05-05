@@ -60,7 +60,7 @@ const String issuesUrl = 'https://github.com/google/dart-shapeshift/issues';
 
 void compareZips(Map<String, String> leftVersion, ByteBuffer leftData,
     Map<String, String> rightVersion, ByteBuffer rightData,
-    bool includeComments) {
+    bool includeComments, DivElement diffContainer) {
   String leftV = leftVersion['version'];
   String rightV = rightVersion['version'];
   var header = new HeadingElement.h1()..text = 'Changes from $leftV to $rightV';
