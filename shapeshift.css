@@ -15,6 +15,18 @@ strong {
   color: rgb(48, 48, 48);
 }
 
+#status {
+  display: none;
+  text-align: center;
+  font-style: italic;
+  font-size: 150%;
+  margin-top: 2em;
+}
+
+#status.active {
+  display: block;
+}
+
 #version-selection {
   background-color: #eee;
   border: solid 1px #ddd;
