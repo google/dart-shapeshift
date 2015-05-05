@@ -5,7 +5,7 @@
 library utils_tests;
 
 import 'package:shapeshift/shapeshift_common.dart';
-import 'package:unittest/unittest.dart';
+import "package:test/test.dart";
 
 void main() {
   test('Shapeshift scrubHyphens doesn\'t change OK strings', () {
