@@ -15,8 +15,8 @@ class ClassesReporter {
   final MarkdownDiffWriter io;
   final Function erase;
 
-  ClassesReporter(this.category, this.diff, this.libraryName, this.io,
-      this.erase);
+  ClassesReporter(
+      this.category, this.diff, this.libraryName, this.io, this.erase);
 
   void report() {
     reportRemovedClasses();
@@ -82,7 +82,8 @@ class ClassesReporter {
         qualifiedName = qualifiedName.replaceAll(new RegExp(r'.*\.'), '');
         String classThingLink = mdLinkToDartlang(qualifiedName, qualifiedName);
         io
-          ..writeln('${libraryName}\'s $classThingLink $category `$key` changed:\n')
+          ..writeln(
+              '${libraryName}\'s $classThingLink $category `$key` changed:\n')
           ..writeWasNow(oldNew[0], oldNew[1],
               blockquote: ['comment', 'preview'].contains(key))
           ..writeHr();

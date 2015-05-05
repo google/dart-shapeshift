@@ -30,8 +30,9 @@ class LibraryReporter {
     diff.prune();
     diff.metadata.clear();
     String diffString = diff.toString();
-    if (diffString.isNotEmpty)
+    if (diffString.isNotEmpty) {
       print('ERROR: $qualifiedName has unresolved nodes:\n$diffString');
+    }
   }
 
   void reportLibrary() {
@@ -44,7 +45,8 @@ class LibraryReporter {
 
     // Iterate over the class categories ('classes', 'typedefs', 'errors').
     diff.forEachOf('classes', (String classCategory, DiffNode classDiff) =>
-        new ClassesReporter(classCategory, classDiff, qualifiedName, io, erase).report());
+        new ClassesReporter(classCategory, classDiff, qualifiedName, io, erase)
+            .report());
 
     diff.changed.forEach((String key, List oldNew) {
       io.writeln("${diff.metadata['name']}'s `${key}` changed:\n");

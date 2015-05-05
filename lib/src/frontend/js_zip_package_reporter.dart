@@ -1,7 +1,10 @@
 // Copyright 2015 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-part of shapeshift_frontend;
+import '../../shapeshift_common.dart';
+import 'package:doc_coverage/doc_coverage_common.dart';
+
+import 'js_zip_wrapper.dart';
 
 /// A [PackageReporter] that calculates the diff between APIs found in two
 /// directories.
@@ -22,11 +25,9 @@ class JSZipPackageReporter extends PackageReporter {
   void calculateDiff(String fileName) {
     // If fileName not found in the left Zip, it will be noted in the library
     // JSON file.
-    if (!leftZip.hasFile(fileName))
-      return;
-    add(fileName,
-        diffSdkApis(leftZip.read(fileName), rightZip.read(fileName),
-            leftRevision, rightRevision, includeComments: includeComments));
+    if (!leftZip.hasFile(fileName)) return;
+    add(fileName, diffSdkApis(leftZip.read(fileName), rightZip.read(fileName),
+        leftRevision, rightRevision, includeComments: includeComments));
   }
 
   void calculateAllDiffs() {

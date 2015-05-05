@@ -1,7 +1,20 @@
 // Copyright 2015 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-part of shapeshift_frontend;
+library shaepshift.frontend.js_zip_wrapper;
+
+import 'dart:async';
+import 'dart:html';
+import 'dart:js';
+import 'dart:typed_data';
+
+import 'package:doc_coverage/doc_coverage_common.dart';
+
+import '../../shapeshift_common.dart';
+
+import 'js_zip_package_reporter.dart';
+import 'html_writer.dart';
+import 'html_writer_provider.dart';
 
 class JSZipWrapper {
   final JsObject zip;
@@ -60,7 +73,7 @@ const String issuesUrl = 'https://github.com/google/dart-shapeshift/issues';
 
 void compareZips(Map<String, String> leftVersion, ByteBuffer leftData,
     Map<String, String> rightVersion, ByteBuffer rightData,
-    bool includeComments) {
+    bool includeComments, DivElement diffContainer) {
   String leftV = leftVersion['version'];
   String rightV = rightVersion['version'];
   var header = new HeadingElement.h1()..text = 'Changes from $leftV to $rightV';
