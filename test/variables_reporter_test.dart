@@ -5,7 +5,7 @@
 library variables_reporter_tests;
 
 import 'package:shapeshift/shapeshift_common.dart';
-import "package:test/test.dart";
+import 'package:test/test.dart';
 
 import 'test_helpers.dart';
 
