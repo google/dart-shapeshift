@@ -14,6 +14,7 @@ const String _storageBase = "https://storage.googleapis.com/dart-archive";
 final Map<int, Map<String, String>> _versionMaps =
     new Map<int, Map<String, String>>();
 
+final Element statusElement = querySelector('#status');
 void main() {
   leftVersionSelect = querySelector('#left-version');
   rightVersionSelect = querySelector('#right-version');
@@ -25,6 +26,7 @@ void main() {
   goButton = querySelector('#get-diff');
   goButton.onClick.listen(_go);
   diffContainer = querySelector('#diff-container');
+  statusElement = querySelector('#status');
 
   _startDownload();
 }
@@ -53,17 +55,23 @@ _startDownload() async {
   await _getVersionFiles(
       'stable', "$_storageApiBase?prefix=channels/stable/release/&delimiter=/");
 
+  _updateStatus();
   _updateSelectors();
 }
 
 _getVersionFiles(String channel, String url) async {
+  _updateStatus('$channel: getting list');
   var respString = await HttpRequest.getString(url);
 
   Map<String, Object> resp = JSON.decode(respString);
   List<String> versions = (resp["prefixes"] as List<String>);
   versions.removeWhere((e) => e.contains('latest'));
 
-  for (var path in versions) {
+  for (var i = 0; i < versions.length; i++) {
+    _updateStatus('$channel: ${i+1} of ${versions.length}');
+
+    var path = versions[i];
+
     var versionString =
         await HttpRequest.getString("$_storageBase/${path}VERSION");
 
@@ -96,14 +104,23 @@ void _updateSelectors() {
   //rightVersionSelect.children.last.attributes['disabled'] = 'disabled';
 }
 
-_go(Event event) async {
+void _updateStatus([String value]) {
+  if (value == null || value.isEmpty) {
+    statusElement.classes.remove('active');
+  } else {
+    statusElement.classes.add('active');
+    statusElement.setInnerHtml('<em>$value</em>');
+  }
+}
+
+Future _go(Event event) async {
   try {
     if (goButton.disabled) {
       throw 'Slow down!';
     }
     goButton.disabled = true;
 
-    diffContainer.setInnerHtml('<em>working...</em>');
+    _updateStatus('Calculating diff');
 
     int left =
         int.parse(leftVersionSelect.selectedOptions[0].attributes['value']);
@@ -112,14 +129,15 @@ _go(Event event) async {
     bool includeComments = includeCommentsCheck.checked;
 
     if (left == right) {
-      diffContainer
-          .setInnerHtml('<em>Cannot compare the same version - $left</em>');
+      _updateStatus('Cannot compare the same version - $left');
+      return;
     }
 
     // TODO: validate left is "before" right
 
     await _compareVersions(
         _versionMaps[left], _versionMaps[right], includeComments);
+    _updateStatus();
   } finally {
     goButton.disabled = false;
   }
