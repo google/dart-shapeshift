@@ -7,3 +7,4 @@ export 'package:doc_coverage/doc_coverage_cli.dart';
 export 'package:doc_coverage/doc_coverage_common.dart';
 
 export 'src/cli/directory_package_reporter.dart';
+export 'src/cli/directory_diff_writer_provider.dart';

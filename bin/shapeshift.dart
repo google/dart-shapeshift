@@ -14,6 +14,10 @@ class Shapeshift {
 
   void go(List<String> arguments) {
     parseArgs(arguments);
+    if (args.rest.isEmpty) {
+      print('Usage: shapeshift.dart [options] <leftDir> <rightDir>');
+      exit(0);
+    }
     String left = args.rest[0];
     String right = args.rest[1];
     String leftPath = path.join(args['base'], left);
@@ -25,7 +29,7 @@ class Shapeshift {
 
     WriterProvider writer = (args['out'] == null)
         ? new SingleSinkWriterProvider(stdout)
-        : new DirectoryWriterProvider(args['out']);
+        : new DirectoryDiffWriterProvider(args['out']);
 
     new DirectoryPackageReporter(leftPath, rightPath, writer)
       ..calculateAllDiffs()

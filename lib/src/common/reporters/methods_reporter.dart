@@ -6,11 +6,12 @@ library shapeshift_common.method_reporter;
 import 'package:doc_coverage/doc_coverage_common.dart';
 import 'package:json_diff/json_diff.dart' show DiffNode;
 
+import '../markdown_diff_writer.dart';
 import 'method_attributes_reporter.dart';
 
 class MethodsReporter {
   final DiffNode diff;
-  final MarkdownWriter io;
+  final MarkdownDiffWriter io;
   final Function erase;
 
   String category;
