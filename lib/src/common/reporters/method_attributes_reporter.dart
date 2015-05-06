@@ -150,7 +150,7 @@ class MethodAttributesReporter {
         'The $methodLink $category\'s $propertyLink ${singularize(attributeName)}\'s';
     property.forEachChanged((key, oldNew) {
       if (key == 'type') {
-        io.writeln('$firstPart $key changed from `${changedType(oldNew)}`');
+        io.writeln('$firstPart $key ${changedType(oldNew)}');
       } else {
         io.writeln(
             '$firstPart changed from `$key: ${oldNew[0]}` to `$key: ${oldNew[1]}`');
@@ -179,7 +179,7 @@ class MethodAttributesReporter {
         // The foo method's callback parameter's return type has changed from
         // Object to String.
         io.writeln('The [$method](#) $category\'s [$propertyName](#) '
-            '${singularize(attributeName)}\'s return type has ${changedType(oldNew)}');
+            '${singularize(attributeName)}\'s return type ${changedType(oldNew)}');
         io.writeHr();
         erase(declaration.changed, 'return');
       }
