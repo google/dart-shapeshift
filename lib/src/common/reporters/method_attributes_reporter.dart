@@ -147,13 +147,23 @@ class MethodAttributesReporter {
     String propertyLink =
         mdLinkToDartlang('$methodQualifiedName,$propertyName', propertyName);
     String firstPart =
-        'The $methodLink $category\'s $propertyLink ${singularize(attributeName)}\'s';
+        'The $methodLink $category\'s $propertyLink ${singularize(attributeName)}';
     property.forEachChanged((key, oldNew) {
       if (key == 'type') {
-        io.writeln('$firstPart $key ${changedType(oldNew)}');
+        io.writeln('$firstPart\'s $key ${changedType(oldNew)}');
+      } else if (key == 'default') {
+        String change = (oldNew[0])
+            ? 'no longer has a default value (was ${property.changed['value'][0]}).'
+            : 'now has a default value (${property.changed['value'][1]}).';
+        io.writeln('$firstPart $change');
       } else {
+        if (key == 'value' && property.changed.containsKey('default')) {
+          // We will report the changed 'value' when reporting the changed
+          // 'default'.
+          return;
+        }
         io.writeln(
-            '$firstPart changed from `$key: ${oldNew[0]}` to `$key: ${oldNew[1]}`');
+            '$firstPart\'s $key changed from `$key: ${oldNew[0]}` to `$key: ${oldNew[1]}`');
       }
       io.writeHr();
     });
