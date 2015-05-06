@@ -27,9 +27,9 @@ final OptGroupElement _leftVersionDevOptGroup =
     _leftVersionSelect.querySelector('.dev');
 
 final SelectElement _rightVersionSelect = querySelector('#right-version');
-final OptGroupElement rightVersionStableOptGroup =
+final OptGroupElement _rightVersionStableOptGroup =
     _rightVersionSelect.querySelector('.stable');
-final OptGroupElement rightVersionDevOptGroup =
+final OptGroupElement _rightVersionDevOptGroup =
     _rightVersionSelect.querySelector('.dev');
 
 void main() {
@@ -49,10 +49,10 @@ void _addToSelects(int rev) {
 
   if (version['channel'] == 'stable') {
     _leftVersionStableOptGroup.children.add(left);
-    rightVersionStableOptGroup.children.add(right);
+    _rightVersionStableOptGroup.children.add(right);
   } else {
     _leftVersionDevOptGroup.children.add(left);
-    rightVersionDevOptGroup.children.add(right);
+    _rightVersionDevOptGroup.children.add(right);
   }
 }
 
@@ -98,8 +98,8 @@ void _updateSelectors() {
 
   _leftVersionStableOptGroup.children.clear();
   _leftVersionDevOptGroup.children.clear();
-  rightVersionStableOptGroup.children.clear();
-  rightVersionDevOptGroup.children.clear();
+  _rightVersionStableOptGroup.children.clear();
+  _rightVersionDevOptGroup.children.clear();
 
   List sortedVersions = _versionMaps.keys.toList()..sort();
 
