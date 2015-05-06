@@ -4,12 +4,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
+import 'dart:typed_data';
 
 import 'package:shapeshift/shapeshift_frontend.dart';
 
 const String _storageApiBase =
     "https://www.googleapis.com/storage/v1/b/dart-archive/o";
 const String _storageBase = "https://storage.googleapis.com/dart-archive";
+
+const String _flavor = 'raw';
 
 final Map<int, Map<String, String>> _versionMaps =
     new Map<int, Map<String, String>>();
@@ -57,16 +60,17 @@ void _addToSelects(int rev) {
 }
 
 _startDownload() async {
-  await _getVersionFiles(
-      'dev', "$_storageApiBase?prefix=channels/dev/release/&delimiter=/");
-  await _getVersionFiles(
-      'stable', "$_storageApiBase?prefix=channels/stable/release/&delimiter=/");
+  await _getVersionFiles('dev');
+  await _getVersionFiles('stable');
 
   _updateStatus();
   _updateSelectors();
 }
 
-_getVersionFiles(String channel, String url) async {
+Future _getVersionFiles(String channel) async {
+  var url =
+      "$_storageApiBase?prefix=channels/${channel}/${_flavor}/&delimiter=/";
+
   _updateStatus('$channel: getting list');
   var respString = await HttpRequest.getString(url);
 
@@ -79,8 +83,13 @@ _getVersionFiles(String channel, String url) async {
 
     var path = versions[i];
 
-    var versionString =
-        await HttpRequest.getString("$_storageBase/${path}VERSION");
+    String versionString;
+    try {
+      versionString =
+          await HttpRequest.getString("$_storageBase/${path}VERSION");
+    } catch (_) {
+      continue;
+    }
 
     var json = JSON.decode(versionString) as Map<String, String>;
 
@@ -127,8 +136,6 @@ Future _go(Event event) async {
     }
     _goButton.disabled = true;
 
-    _updateStatus('Calculating diff');
-
     int left =
         int.parse(_leftVersionSelect.selectedOptions[0].attributes['value']);
     int right =
@@ -142,24 +149,34 @@ Future _go(Event event) async {
 
     // TODO: validate left is "before" right
 
-    await _compareVersions(
-        _versionMaps[left], _versionMaps[right], includeComments);
-    _updateStatus();
+    try {
+      await _compareVersions(
+          _versionMaps[left], _versionMaps[right], includeComments);
+      _updateStatus();
+    } catch (e, stack) {
+      print('Error comparing versions');
+      print(e);
+      print(stack);
+      _updateStatus('Error comparing versions. See console output.');
+    }
   } finally {
     _goButton.disabled = false;
   }
 }
 
 Future _compareVersions(Map left, Map right, bool includeComments) async {
-  String leftUri = '$_storageBase/channels/${left['channel']}/release/' +
-      '${left['revision']}/api-docs/dart-api-docs.zip';
-  String rightUri = '$_storageBase/channels/${right['channel']}/release/' +
-      '${right['revision']}/api-docs/dart-api-docs.zip';
+  var leftData = await _getData(left['channel'], left['revision']);
+  var rightData = await _getData(right['channel'], right['revision']);
 
-  var rightData = await getBinaryContent(rightUri);
-
-  var leftData = await getBinaryContent(leftUri);
-
+  _updateStatus('Calculating diff');
   compareZips(
       left, leftData, right, rightData, includeComments, _diffContainer);
+}
+
+Future<ByteBuffer> _getData(String channel, String revision) async {
+  var uri = '$_storageBase/channels/$channel/${_flavor}/${revision}'
+      '/api-docs/dart-api-docs.zip';
+
+  _updateStatus('Downloading docs: $channel $revision');
+  return await getBinaryContent(uri);
 }
