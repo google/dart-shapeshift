@@ -72,7 +72,19 @@ Future _getVersionFiles(String channel) async {
       "$_storageApiBase?prefix=channels/${channel}/${_flavor}/&delimiter=/";
 
   _updateStatus('$channel: getting list');
-  var respString = await HttpRequest.getString(url);
+  var respString;
+  try {
+    respString = await HttpRequest.getString(url);
+  } catch (e, stack) {
+    if (e is ProgressEvent) {
+      _printError(e, stack,
+          'Error loading the Dart version lists '
+          '(${e.currentTarget.status}: ${e.currentTarget.statusText}).');
+    } else {
+      _printError(e, stack, 'Error loading the Dart version lists.');
+    }
+    throw(e);
+  }
 
   Map<String, Object> resp = JSON.decode(respString);
   List<String> versions = (resp["prefixes"] as List<String>);
@@ -154,10 +166,7 @@ Future _go(Event event) async {
           _versionMaps[left], _versionMaps[right], includeComments);
       _updateStatus();
     } catch (e, stack) {
-      print('Error comparing versions');
-      print(e);
-      print(stack);
-      _updateStatus('Error comparing versions. See console output.');
+      _printError(e, stack, 'Error comparing versions.');
     }
   } finally {
     _goButton.disabled = false;
@@ -179,4 +188,11 @@ Future<ByteBuffer> _getData(String channel, String revision) async {
 
   _updateStatus('Downloading docs: $channel $revision');
   return await getBinaryContent(uri);
+}
+
+void _printError(e, stack, String message) {
+  print(message);
+  print(e);
+  print(stack);
+  _updateStatus('$message See console output.');
 }
