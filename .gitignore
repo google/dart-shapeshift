@@ -1,6 +1,5 @@
 build/
 packages
-pubspec.lock
 .buildlog
 .project
 .pub/
