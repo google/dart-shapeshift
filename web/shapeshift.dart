@@ -78,13 +78,12 @@ Future _getVersionFiles(String channel) async {
     respString = await HttpRequest.getString(url);
   } catch (e, stack) {
     if (e is ProgressEvent) {
-      _printError(e, stack,
-          'Error loading the Dart version lists '
+      _printError(e, stack, 'Error loading the Dart version lists '
           '(${e.currentTarget.status}: ${e.currentTarget.statusText}).');
     } else {
       _printError(e, stack, 'Error loading the Dart version lists.');
     }
-    throw(e);
+    throw (e);
   }
 
   Map<String, Object> resp = JSON.decode(respString);

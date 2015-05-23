@@ -12,7 +12,7 @@ import '../../shapeshift_common.dart';
 class DirectoryDiffWriterProvider extends DirectoryWriterProvider {
   /// Constructs a [DirectoryDiffWriterProvider] that will use [path] when creating
   /// new writers.
-  DirectoryDiffWriterProvider(path): super(path);
+  DirectoryDiffWriterProvider(path) : super(path);
 
   MarkdownWriter writerCtor(fileTargetBuilder, {bool shouldClose: true}) =>
       new MarkdownDiffWriter(fileTargetBuilder, shouldClose: shouldClose);
