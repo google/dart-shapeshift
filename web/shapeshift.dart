@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:typed_data';
 
+import 'package:quiver/async.dart' as qa;
 import 'package:shapeshift/shapeshift_frontend.dart';
 
 const String _storageApiBase =
@@ -90,17 +91,17 @@ Future _getVersionFiles(String channel) async {
   List<String> versions = (resp["prefixes"] as List<String>);
   versions.removeWhere((e) => e.contains('latest'));
 
-  for (var i = 0; i < versions.length; i++) {
-    _updateStatus('$channel: ${i+1} of ${versions.length}');
-
-    var path = versions[i];
-
+  int finished = 0;
+  await qa.forEachAsync(versions, (path) async {
     String versionString;
     try {
       versionString =
           await HttpRequest.getString("$_storageBase/${path}VERSION");
     } catch (_) {
-      continue;
+      return;
+    } finally {
+      finished++;
+      _updateStatus('$channel: $finished of ${versions.length}');
     }
 
     var json = JSON.decode(versionString) as Map<String, String>;
@@ -109,7 +110,7 @@ Future _getVersionFiles(String channel) async {
 
     int revision = int.parse(json['revision']);
     _versionMaps[revision] = json;
-  }
+  }, maxTasks: 6);
 }
 
 void _updateSelectors() {

@@ -76,11 +76,15 @@ packages:
   pool:
     description: pool
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   pub_semver:
     description: pub_semver
     source: hosted
     version: "1.2.1"
+  quiver:
+    description: quiver
+    source: hosted
+    version: "0.21.3+1"
   route:
     description: route
     source: hosted
