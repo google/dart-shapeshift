@@ -7,6 +7,7 @@ export 'package:doc_coverage/doc_coverage_common.dart';
 export 'package:json_diff/json_diff.dart' show DiffNode;
 
 export 'src/common/api_differ.dart';
+export 'src/common/hybrid_revision.dart';
 export 'src/common/library_api_diff.dart';
 export 'src/common/markdown_diff_writer.dart';
 export 'src/common/utils.dart';

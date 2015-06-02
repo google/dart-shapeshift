@@ -88,9 +88,7 @@ void compareZips(Map<String, String> leftVersion, ByteBuffer leftData,
 
   diffContainer.setInnerHtml('');
 
-  diffContainer
-    ..append(header)
-    ..append(summaryText);
+  diffContainer..append(header)..append(summaryText);
 
   DivElement diffElement = new DivElement();
   diffContainer.append(diffElement);
@@ -99,9 +97,11 @@ void compareZips(Map<String, String> leftVersion, ByteBuffer leftData,
   JSZipWrapper rightZip = new JSZipWrapper(rightData);
   WriterProvider writer = new HtmlWriterProvider(new HtmlWriter(diffElement));
 
-  new JSZipPackageReporter(leftZip, rightZip,
-      int.parse(leftVersion['revision']), int.parse(rightVersion['revision']),
-      writer, includeComments: includeComments)
+  var leftHybrid = HybridRevision.parse(leftVersion['path']);
+  var rightHybrid = HybridRevision.parse(rightVersion['path']);
+
+  new JSZipPackageReporter(leftZip, rightZip, leftHybrid, rightHybrid, writer,
+      includeComments: includeComments)
     ..calculateAllDiffs()
     ..report();
 }

@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:html';
 import 'dart:typed_data';
 
+import 'package:path/path.dart' as p;
 import 'package:quiver/async.dart' as qa;
 import 'package:shapeshift/shapeshift_frontend.dart';
 
@@ -13,10 +14,10 @@ const String _storageApiBase =
     "https://www.googleapis.com/storage/v1/b/dart-archive/o";
 const String _storageBase = "https://storage.googleapis.com/dart-archive";
 
-const String _flavor = 'raw';
+const String _flavor = 'release';
 
-final Map<int, Map<String, String>> _versionMaps =
-    new Map<int, Map<String, String>>();
+final Map<HybridRevision, Map<String, String>> _versionMaps =
+    new Map<HybridRevision, Map<String, String>>();
 
 final InputElement _includeCommentsCheck = querySelector('#include-comments');
 final InputElement _goButton = querySelector('#get-diff');
@@ -42,14 +43,14 @@ void main() {
   _startDownload();
 }
 
-void _addToSelects(int rev) {
+void _addToSelects(HybridRevision rev) {
   Map version = _versionMaps[rev];
   var left = new OptionElement()
     ..text = version['version']
-    ..attributes['value'] = version['revision'];
+    ..attributes['value'] = rev.value.toString();
   var right = new OptionElement()
     ..text = version['version']
-    ..attributes['value'] = version['revision'];
+    ..attributes['value'] = rev.value.toString();
 
   if (version['channel'] == 'stable') {
     _leftVersionStableOptGroup.children.add(left);
@@ -87,7 +88,7 @@ Future _getVersionFiles(String channel) async {
   }
 
   Map<String, Object> resp = JSON.decode(respString);
-  List<String> versions = (resp["prefixes"] as List<String>);
+  List<String> versions = resp["prefixes"] as List<String>;
   versions.removeWhere((e) => e.contains('latest'));
 
   int finished = 0;
@@ -96,19 +97,23 @@ Future _getVersionFiles(String channel) async {
     try {
       versionString =
           await HttpRequest.getString("$_storageBase/${path}VERSION");
-    } catch (_) {
+      var json = JSON.decode(versionString) as Map<String, String>;
+
+      json['channel'] = channel;
+
+      var revisionString = p.basename(path);
+      json['path'] = revisionString;
+
+      var revision = HybridRevision.parse(revisionString);
+
+      _versionMaps[revision] = json;
+    } catch (e) {
+      window.console.error("Error with $path - $e");
       return;
     } finally {
       finished++;
       _updateStatus('$channel: $finished of ${versions.length}');
     }
-
-    var json = JSON.decode(versionString) as Map<String, String>;
-
-    json['channel'] = channel;
-
-    int revision = int.parse(json['revision']);
-    _versionMaps[revision] = json;
   }, maxTasks: 6);
 }
 
@@ -148,10 +153,10 @@ Future _go(Event event) async {
     }
     _goButton.disabled = true;
 
-    int left =
-        int.parse(_leftVersionSelect.selectedOptions[0].attributes['value']);
-    int right =
-        int.parse(_rightVersionSelect.selectedOptions[0].attributes['value']);
+    HybridRevision left = HybridRevision
+        .parse(_leftVersionSelect.selectedOptions[0].attributes['value']);
+    HybridRevision right = HybridRevision
+        .parse(_rightVersionSelect.selectedOptions[0].attributes['value']);
     bool includeComments = _includeCommentsCheck.checked;
 
     if (left == right) {
@@ -174,8 +179,8 @@ Future _go(Event event) async {
 }
 
 Future _compareVersions(Map left, Map right, bool includeComments) async {
-  var leftData = await _getData(left['channel'], left['revision']);
-  var rightData = await _getData(right['channel'], right['revision']);
+  var leftData = await _getData(left['channel'], left['path']);
+  var rightData = await _getData(right['channel'], right['path']);
 
   _updateStatus('Calculating diff');
   compareZips(

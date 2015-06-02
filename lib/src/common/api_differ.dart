@@ -5,7 +5,10 @@ library shapeshift_common.api_differ;
 
 import 'package:json_diff/json_diff.dart';
 
+import 'hybrid_revision.dart';
 import 'utils.dart';
+
+const _lastRevisionWithHyphens = 41515;
 
 class ApiDiffer {
   final String a, b;
@@ -15,10 +18,7 @@ class ApiDiffer {
 
   DiffNode diff() {
     JsonDiffer differ = new JsonDiffer(a, b);
-    differ.atomics
-      ..add('type')
-      ..add('return')
-      ..add('annotations[]');
+    differ.atomics..add('type')..add('return')..add('annotations[]');
     differ.metadataToKeep..add('qualifiedName');
     if (!includeComments) differ.ignored.add('comment');
     differ.ensureIdentical(['name', 'qualifiedName']);
@@ -32,9 +32,8 @@ class ApiDiffer {
 DiffNode diffApis(String a, String b, {includeComments: true}) =>
     new ApiDiffer(a, b, includeComments: includeComments).diff();
 
-DiffNode diffSdkApis(
-    String left, String right, int leftRevision, int rightRevision,
-    {includeComments: true}) {
+DiffNode diffSdkApis(String left, String right, HybridRevision leftRevision,
+    HybridRevision rightRevision, {includeComments: true}) {
   // The dartdoc utility used to generate JSON for the Dart SDK with names of
   // libraries and library members that looked like "dart-core",
   // "dart-core.String", etc. After revision 41515 (Dart 1.8.0-dev.3.0),
@@ -42,11 +41,13 @@ DiffNode diffSdkApis(
   // "dart:core.String". So when comparing a revision <= 41515 with a
   // revision > 41515, the diff will think that every single library and
   // library member was renamed. So we have to do this ugly munging.
-  int lastRevisionWithHyphens = 41515;
 
-  if (leftRevision <= lastRevisionWithHyphens &&
-      rightRevision > lastRevisionWithHyphens) {
-    left = scrubHyphens(left);
+  if (leftRevision is SvnRevision &&
+      leftRevision.value <= _lastRevisionWithHyphens) {
+    if (rightRevision is SemVerRevision ||
+        (rightRevision as SvnRevision).value > _lastRevisionWithHyphens) {
+      left = scrubHyphens(left);
+    }
   }
 
   return diffApis(left, right, includeComments: includeComments);

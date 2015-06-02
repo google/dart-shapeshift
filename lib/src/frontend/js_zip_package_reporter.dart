@@ -16,7 +16,7 @@ import 'js_zip_wrapper.dart';
 /// [report].
 class JSZipPackageReporter extends PackageReporter {
   final JSZipWrapper leftZip, rightZip;
-  final int leftRevision, rightRevision;
+  final HybridRevision leftRevision, rightRevision;
 
   JSZipPackageReporter(this.leftZip, this.rightZip, this.leftRevision,
       this.rightRevision, WriterProvider _writer, {includeComments: true})
