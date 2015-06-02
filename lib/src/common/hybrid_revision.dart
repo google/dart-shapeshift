@@ -1,3 +1,5 @@
+library shapshift.hybrid_revision;
+
 import 'package:pub_semver/pub_semver.dart';
 
 abstract class HybridRevision<T> implements Comparable<HybridRevision> {
