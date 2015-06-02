@@ -2,19 +2,13 @@
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert';
 import 'dart:html';
 import 'dart:typed_data';
 
+import 'package:http/browser_client.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:quiver/async.dart' as qa;
 import 'package:shapeshift/shapeshift_frontend.dart';
-
-const String _storageApiBase =
-    "https://www.googleapis.com/storage/v1/b/dart-archive/o";
-const String _storageBase = "https://storage.googleapis.com/dart-archive";
-
-const String _flavor = 'release';
 
 final Map<HybridRevision, Map<String, String>> _versionMaps =
     new Map<HybridRevision, Map<String, String>>();
@@ -62,59 +56,49 @@ void _addToSelects(HybridRevision rev) {
 }
 
 _startDownload() async {
-  await _getVersionFiles('dev');
-  await _getVersionFiles('stable');
+  await _populateVersionFiles('dev');
+  await _populateVersionFiles('stable');
 
   _updateStatus();
   _updateSelectors();
 }
 
-Future _getVersionFiles(String channel) async {
-  var url =
-      "$_storageApiBase?prefix=channels/${channel}/${_flavor}/&delimiter=/";
-
+Future _populateVersionFiles(String channel) async {
   _updateStatus('$channel: getting list');
-  var respString;
+  List<String> versions;
+
+  var client = new http.BrowserClient();
+  var dd = new DartDownloads(client: client);
   try {
-    respString = await HttpRequest.getString(url);
-  } catch (e, stack) {
-    if (e is ProgressEvent) {
-      _printError(e, stack, 'Error loading the Dart version lists '
-          '(${e.currentTarget.status}: ${e.currentTarget.statusText}).');
-    } else {
-      _printError(e, stack, 'Error loading the Dart version lists.');
-    }
-    throw (e);
+    versions = await dd.getVersionPaths(channel).toList();
+
+    versions.removeWhere((e) => e.contains('latest'));
+
+    int finished = 0;
+    await qa.forEachAsync(versions, (path) async {
+      try {
+        var revisionString = p.basename(path);
+
+        var json = await dd.getVersionMap(channel, revisionString);
+
+        json['channel'] = channel;
+
+        json['path'] = revisionString;
+
+        var revision = HybridRevision.parse(revisionString);
+
+        _versionMaps[revision] = json;
+      } catch (e) {
+        window.console.error("Error with $path - $e");
+        return;
+      } finally {
+        finished++;
+        _updateStatus('$channel: $finished of ${versions.length}');
+      }
+    }, maxTasks: 6);
+  } finally {
+    dd.close();
   }
-
-  Map<String, Object> resp = JSON.decode(respString);
-  List<String> versions = resp["prefixes"] as List<String>;
-  versions.removeWhere((e) => e.contains('latest'));
-
-  int finished = 0;
-  await qa.forEachAsync(versions, (path) async {
-    String versionString;
-    try {
-      versionString =
-          await HttpRequest.getString("$_storageBase/${path}VERSION");
-      var json = JSON.decode(versionString) as Map<String, String>;
-
-      json['channel'] = channel;
-
-      var revisionString = p.basename(path);
-      json['path'] = revisionString;
-
-      var revision = HybridRevision.parse(revisionString);
-
-      _versionMaps[revision] = json;
-    } catch (e) {
-      window.console.error("Error with $path - $e");
-      return;
-    } finally {
-      finished++;
-      _updateStatus('$channel: $finished of ${versions.length}');
-    }
-  }, maxTasks: 6);
 }
 
 void _updateSelectors() {
@@ -188,11 +172,19 @@ Future _compareVersions(Map left, Map right, bool includeComments) async {
 }
 
 Future<ByteBuffer> _getData(String channel, String revision) async {
-  var uri = '$_storageBase/channels/$channel/${_flavor}/${revision}'
-      '/api-docs/dart-api-docs.zip';
+  Uri docsUri;
+
+  var client = new http.BrowserClient();
+  var dd = new DartDownloads(client: client);
+  try {
+    docsUri = await dd.getDownloadLink(
+        channel, revision, 'api-docs/dart-api-docs.zip');
+  } finally {
+    dd.close();
+  }
 
   _updateStatus('Downloading docs: $channel $revision');
-  return await getBinaryContent(uri);
+  return await getBinaryContent(docsUri.toString());
 }
 
 void _printError(e, stack, String message) {

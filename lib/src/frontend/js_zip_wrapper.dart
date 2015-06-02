@@ -52,7 +52,7 @@ class JSZipWrapper {
       zip.callMethod('file', [fileName]).callMethod('asText', []) as String;
 }
 
-Future<ByteBuffer> getBinaryContent(uri) {
+Future<ByteBuffer> getBinaryContent(String uri) {
   var completer = new Completer<ByteBuffer>();
 
   context['JSZipUtils'].callMethod('getBinaryContent', [
