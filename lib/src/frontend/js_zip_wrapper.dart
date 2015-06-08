@@ -16,43 +16,49 @@ import 'js_zip_package_reporter.dart';
 import 'html_writer.dart';
 import 'html_writer_provider.dart';
 
+String _libraryFor(String file) =>
+    new RegExp('docgen/([^.]+)').firstMatch(file)[1];
+
 class JSZipWrapper {
   final JsObject zip;
+  final List<String> files;
 
-  JSZipWrapper(data) : zip = new JsObject(context['JSZip'], [data]);
+  factory JSZipWrapper(ByteBuffer data) {
+    var zip = new JsObject(context['JSZip'], [data]);
 
-  static String libraryFor(String file) =>
-      new RegExp('docgen/([^.]+)').firstMatch(file)[1];
+    var files = new List<String>.from(
+        context['Object'].callMethod('keys', [zip['files']]));
 
-  List<String> get files {
-    JsArray fileArray = context['Object'].callMethod('keys', [zip['files']]);
-    return fileArray.map((e) => e).toList();
+    return new JSZipWrapper._(zip, files);
   }
 
-  List<String> get jsonFiles => files
-    ..removeWhere((file) => !file.endsWith('.json') ||
-        file.endsWith('index.json') ||
-        file.endsWith('library_list.json'));
+  JSZipWrapper._(this.zip, this.files);
+
+  Iterable<String> get _jsonFiles => files.where((file) {
+    return file.endsWith('.json') &&
+        !file.endsWith('index.json') &&
+        !file.endsWith('library_list.json');
+  });
 
   Map<String, List<String>> get filesByLibrary {
-    Map<String, List<String>> map = new Map();
+    var map = <String, List<String>>{};
 
-    jsonFiles.forEach((file) {
-      String lib = libraryFor(file);
-      if (!map.containsKey(lib)) map[lib] = new List();
-      map[lib].add(file);
-    });
+    for (var file in _jsonFiles) {
+      String lib = _libraryFor(file);
+      var fileList = map.putIfAbsent(lib, () => <String>[]);
+      fileList.add(file);
+    }
 
     return map;
   }
 
-  bool hasFile(String fileName) => zip['files'].hasProperty(fileName);
+  bool hasFile(String fileName) => files.contains(fileName);
 
   String read(String fileName) =>
       zip.callMethod('file', [fileName]).callMethod('asText', []) as String;
 }
 
-Future<ByteBuffer> getBinaryContent(uri) {
+Future<ByteBuffer> getBinaryContent(String uri) {
   var completer = new Completer<ByteBuffer>();
 
   context['JSZipUtils'].callMethod('getBinaryContent', [
@@ -86,22 +92,23 @@ void compareZips(Map<String, String> leftVersion, ByteBuffer leftData,
     ..append(issuesLink)
     ..appendText(' are highly appreciated!');
 
-  diffContainer.setInnerHtml('');
+  diffContainer.children.clear();
 
   diffContainer..append(header)..append(summaryText);
 
   DivElement diffElement = new DivElement();
-  diffContainer.append(diffElement);
-
-  JSZipWrapper leftZip = new JSZipWrapper(leftData);
-  JSZipWrapper rightZip = new JSZipWrapper(rightData);
   WriterProvider writer = new HtmlWriterProvider(new HtmlWriter(diffElement));
 
   var leftHybrid = HybridRevision.parse(leftVersion['path']);
   var rightHybrid = HybridRevision.parse(rightVersion['path']);
 
+  JSZipWrapper leftZip = new JSZipWrapper(leftData);
+  JSZipWrapper rightZip = new JSZipWrapper(rightData);
+
   new JSZipPackageReporter(leftZip, rightZip, leftHybrid, rightHybrid, writer,
       includeComments: includeComments)
     ..calculateAllDiffs()
     ..report();
+
+  diffContainer.append(diffElement);
 }

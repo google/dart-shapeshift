@@ -4,4 +4,5 @@
 library shapeshift.frontend;
 
 export 'src/common/hybrid_revision.dart';
+export 'src/frontend/dart_downloads.dart';
 export 'src/frontend/js_zip_wrapper.dart';
