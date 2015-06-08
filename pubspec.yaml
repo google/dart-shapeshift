@@ -13,6 +13,7 @@ dependencies:
   path: ^1.3.3
   pub_semver: ^1.2.1
   quiver: ^0.21.3+1
+  route_hierarchical: any
 dev_dependencies:
   test: ^0.12.0
 transformers:

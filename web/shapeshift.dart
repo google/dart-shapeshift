@@ -8,6 +8,7 @@ import 'dart:typed_data';
 import 'package:http/browser_client.dart' as http;
 import 'package:path/path.dart' as p;
 import 'package:quiver/async.dart' as qa;
+import 'package:route_hierarchical/client.dart';
 import 'package:shapeshift/shapeshift_frontend.dart';
 
 final Map<HybridRevision, Map<String, String>> _versionMaps =
@@ -31,10 +32,20 @@ final OptGroupElement _rightVersionStableOptGroup =
 final OptGroupElement _rightVersionDevOptGroup =
     _rightVersionSelect.querySelector('.dev');
 
+final Router _router = new Router(useFragment: true);
+
 void main() {
-  _goButton.onClick.listen(_go);
+  _goButton.onClick.listen(_goClicked);
 
   _startDownload();
+
+  _router.root
+    ..addRoute(
+        name: 'compare',
+        path: '/compare',
+        enter: (e) => _compareToNavigation(e.route));
+
+  _router.listen();
 }
 
 void _addToSelects(HybridRevision rev) {
@@ -61,6 +72,13 @@ _startDownload() async {
 
   _updateStatus();
   _updateSelectors();
+
+  if (_router.activePath.isNotEmpty) {
+    var active = _router.activePath.last;
+    if (active.name == 'compare') {
+      _router.reload();
+    }
+  }
 }
 
 Future _populateVersionFiles(String channel) async {
@@ -130,25 +148,55 @@ void _updateStatus([String value]) {
   }
 }
 
-Future _go(Event event) async {
+Future _goClicked(Event event) async {
+  var leftVersionString =
+      _leftVersionSelect.selectedOptions[0].attributes['value'];
+  var rightVersionString =
+      _rightVersionSelect.selectedOptions[0].attributes['value'];
+
+  var params = {
+    'leftVersion': leftVersionString,
+    'rightVersion': rightVersionString
+  };
+
+  if (_includeCommentsCheck.checked) {
+    params['includeComments'] = 'true';
+  }
+
+  await _router.go('compare', {}, queryParameters: params);
+}
+
+Future _compareToNavigation(Route route) async {
+  var leftVersionString = route.queryParameters['leftVersion'];
+  var rightVersionString = route.queryParameters['rightVersion'];
+
+  var includeComments = route.queryParameters.containsKey('includeComments');
+
+  await _compareValues(leftVersionString, rightVersionString, includeComments);
+}
+
+Future _compareValues(
+    String leftValue, String rightValue, bool includeComments) async {
   try {
     if (_goButton.disabled) {
-      throw 'Slow down!';
+      print('Waiting on navigation...');
+      return;
     }
     _goButton.disabled = true;
+    _diffContainer.children.clear();
 
-    HybridRevision left = HybridRevision
-        .parse(_leftVersionSelect.selectedOptions[0].attributes['value']);
-    HybridRevision right = HybridRevision
-        .parse(_rightVersionSelect.selectedOptions[0].attributes['value']);
-    bool includeComments = _includeCommentsCheck.checked;
+    _select(_leftVersionSelect, leftValue);
+    _select(_rightVersionSelect, rightValue);
+
+    HybridRevision left = HybridRevision.parse(leftValue);
+    HybridRevision right = HybridRevision.parse(rightValue);
+
+    // TODO: update selection, right?
 
     if (left == right) {
       _updateStatus('Cannot compare the same version - $left');
       return;
     }
-
-    // TODO: validate left is "before" right
 
     try {
       await _compareVersions(
@@ -192,4 +240,17 @@ void _printError(e, stack, String message) {
   print(e);
   print(stack);
   _updateStatus('$message See console output.');
+}
+
+void _select(SelectElement element, String valueAttrValue) {
+  var option = element.options.firstWhere((OptionElement oe) {
+    return oe.attributes['value'] == valueAttrValue;
+  }, orElse: () => null);
+
+  if (option == null) return;
+
+  if (element.selectedOptions.contains(option)) return;
+
+  var index = element.options.indexOf(option);
+  element.selectedIndex = index;
 }
