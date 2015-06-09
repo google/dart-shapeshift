@@ -105,10 +105,10 @@ void compareZips(Map<String, String> leftVersion, ByteBuffer leftData,
   JSZipWrapper leftZip = new JSZipWrapper(leftData);
   JSZipWrapper rightZip = new JSZipWrapper(rightData);
 
-  new JSZipPackageReporter(leftZip, rightZip, leftHybrid, rightHybrid, writer,
+  new JSZipPackageReporter(leftZip, rightZip, leftHybrid, rightHybrid,
       includeComments: includeComments)
     ..calculateAllDiffs()
-    ..report();
+    ..writeReport(writer);
 
   diffContainer.append(diffElement);
 }

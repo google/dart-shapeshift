@@ -21,8 +21,7 @@ import '../../shapeshift_common.dart';
 class DirectoryPackageReporter extends PackageReporter {
   final String leftPath, rightPath;
 
-  DirectoryPackageReporter(this.leftPath, this.rightPath, WriterProvider writer)
-      : super(writer);
+  DirectoryPackageReporter(this.leftPath, this.rightPath);
 
   void calculateDiff(String fileName) {
     File left = new File(path.join(leftPath, fileName));

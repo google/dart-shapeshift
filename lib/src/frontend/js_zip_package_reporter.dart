@@ -18,9 +18,10 @@ class JSZipPackageReporter extends PackageReporter {
   final JSZipWrapper leftZip, rightZip;
   final HybridRevision leftRevision, rightRevision;
 
-  JSZipPackageReporter(this.leftZip, this.rightZip, this.leftRevision,
-      this.rightRevision, WriterProvider _writer, {includeComments: true})
-      : super(_writer, includeComments: includeComments);
+  JSZipPackageReporter(
+      this.leftZip, this.rightZip, this.leftRevision, this.rightRevision,
+      {includeComments: true})
+      : super(includeComments: includeComments);
 
   void _calculateDiff(String fileName) {
     // If fileName not found in the left Zip, it will be noted in the library

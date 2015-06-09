@@ -12,10 +12,9 @@ abstract class PackageReporter {
   final Map<String, DiffNode> diff = new Map<String, DiffNode>();
   final Map<String, LibraryApiDiff> libraryDiffs =
       new Map<String, LibraryApiDiff>();
-  final WriterProvider writer;
   final bool includeComments;
 
-  PackageReporter(this.writer, {bool includeComments: false})
+  PackageReporter({bool includeComments: false})
       : this.includeComments = includeComments;
 
   void calculateAllDiffs();
@@ -43,7 +42,7 @@ abstract class PackageReporter {
     }
   }
 
-  void report() {
+  void writeReport(WriterProvider writer) {
     libraryDiffs.forEach((String name, LibraryApiDiff libraryDiff) {
       libraryDiff.report(writer.writerFor(name));
     });
