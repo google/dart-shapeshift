@@ -1,9 +1,10 @@
 // Copyright 2015 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
-import '../../shapeshift_common.dart';
 import 'package:doc_coverage/doc_coverage_common.dart';
+import 'package:sdk_builds/sdk_builds.dart';
 
+import '../../shapeshift_common.dart';
 import 'js_zip_wrapper.dart';
 
 /// A [PackageReporter] that calculates the diff between APIs found in two
@@ -16,7 +17,7 @@ import 'js_zip_wrapper.dart';
 /// [report].
 class JSZipPackageReporter extends PackageReporter {
   final JSZipWrapper leftZip, rightZip;
-  final HybridRevision leftRevision, rightRevision;
+  final VersionInfo leftRevision, rightRevision;
 
   JSZipPackageReporter(
       this.leftZip, this.rightZip, this.leftRevision, this.rightRevision,

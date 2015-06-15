@@ -9,6 +9,7 @@ import 'dart:js';
 import 'dart:typed_data';
 
 import 'package:doc_coverage/doc_coverage_common.dart';
+import 'package:sdk_builds/sdk_builds.dart';
 
 import '../../shapeshift_common.dart';
 
@@ -77,11 +78,11 @@ Future<ByteBuffer> getBinaryContent(String uri) {
 
 const String issuesUrl = 'https://github.com/google/dart-shapeshift/issues';
 
-void compareZips(Map<String, String> leftVersion, ByteBuffer leftData,
-    Map<String, String> rightVersion, ByteBuffer rightData,
-    bool includeComments, DivElement diffContainer) {
-  String leftV = leftVersion['version'];
-  String rightV = rightVersion['version'];
+void compareZips(VersionInfo leftVersion, ByteBuffer leftData,
+    VersionInfo rightVersion, ByteBuffer rightData, bool includeComments,
+    DivElement diffContainer) {
+  String leftV = leftVersion.version.toString();
+  String rightV = rightVersion.version.toString();
   var header = new HeadingElement.h1()..text = 'Changes from $leftV to $rightV';
   AnchorElement issuesLink = new AnchorElement(href: issuesUrl)
     ..text = 'GitHub';
@@ -99,13 +100,10 @@ void compareZips(Map<String, String> leftVersion, ByteBuffer leftData,
   DivElement diffElement = new DivElement();
   WriterProvider writer = new HtmlWriterProvider(new HtmlWriter(diffElement));
 
-  var leftHybrid = HybridRevision.parse(leftVersion['path']);
-  var rightHybrid = HybridRevision.parse(rightVersion['path']);
-
   JSZipWrapper leftZip = new JSZipWrapper(leftData);
   JSZipWrapper rightZip = new JSZipWrapper(rightData);
 
-  new JSZipPackageReporter(leftZip, rightZip, leftHybrid, rightHybrid,
+  new JSZipPackageReporter(leftZip, rightZip, leftVersion, rightVersion,
       includeComments: includeComments)
     ..calculateAllDiffs()
     ..writeReport(writer);
