@@ -31,9 +31,10 @@ class Shapeshift {
         ? new SingleSinkWriterProvider(stdout)
         : new DirectoryDiffWriterProvider(args['out']);
 
-    new DirectoryPackageReporter(leftPath, rightPath)
-      ..calculateAllDiffs()
-      ..writeReport(writer);
+    var report =
+        new DirectoryPackageReporter(leftPath, rightPath).calculateAllDiffs();
+
+    report.write(writer);
   }
 
   void parseArgs(List<String> arguments) {

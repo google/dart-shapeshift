@@ -103,10 +103,11 @@ void compareZips(VersionInfo leftVersion, ByteBuffer leftData,
   JSZipWrapper leftZip = new JSZipWrapper(leftData);
   JSZipWrapper rightZip = new JSZipWrapper(rightData);
 
-  new JSZipPackageReporter(leftZip, rightZip, leftVersion, rightVersion,
-      includeComments: includeComments)
-    ..calculateAllDiffs()
-    ..writeReport(writer);
+  var report = new JSZipPackageReporter(
+      leftZip, rightZip, leftVersion, rightVersion,
+      includeComments: includeComments).calculateAllDiffs();
+
+  report.write(writer);
 
   diffContainer.append(diffElement);
 }

@@ -9,15 +9,18 @@ import 'package:json_diff/json_diff.dart';
 import '../library_api_diff.dart';
 
 abstract class PackageReporter {
-  final Map<String, DiffNode> diff = new Map<String, DiffNode>();
-  final Map<String, LibraryApiDiff> libraryDiffs =
-      new Map<String, LibraryApiDiff>();
   final bool includeComments;
 
   PackageReporter({bool includeComments: false})
       : this.includeComments = includeComments;
 
-  void calculateAllDiffs();
+  PackageReport calculateAllDiffs();
+}
+
+class PackageReport {
+  final Map<String, DiffNode> diff = new Map<String, DiffNode>();
+  final Map<String, LibraryApiDiff> libraryDiffs =
+      new Map<String, LibraryApiDiff>();
 
   void add(String name, DiffNode node) {
     diff[name] = node;
@@ -42,7 +45,7 @@ abstract class PackageReporter {
     }
   }
 
-  void writeReport(WriterProvider writer) {
+  void write(WriterProvider writer) {
     libraryDiffs.forEach((String name, LibraryApiDiff libraryDiff) {
       libraryDiff.report(writer.writerFor(name));
     });

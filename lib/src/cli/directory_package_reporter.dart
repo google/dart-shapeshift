@@ -23,7 +23,7 @@ class DirectoryPackageReporter extends PackageReporter {
 
   DirectoryPackageReporter(this.leftPath, this.rightPath);
 
-  void calculateDiff(String fileName) {
+  void _calculateDiff(PackageReport report, String fileName) {
     File left = new File(path.join(leftPath, fileName));
     File right = new File(path.join(rightPath, fileName));
     if (!left.existsSync()) {
@@ -36,15 +36,18 @@ class DirectoryPackageReporter extends PackageReporter {
       }
       return;
     }
-    add(fileName, diffApis(left.readAsStringSync(), right.readAsStringSync()));
+    report.add(
+        fileName, diffApis(left.readAsStringSync(), right.readAsStringSync()));
   }
 
-  void calculateAllDiffs() {
+  PackageReport calculateAllDiffs() {
     List rightRawLs = new Directory(rightPath).listSync(recursive: true);
     List rightLs = rightRawLs
         .where((FileSystemEntity f) => f is File)
         .map((File f) => f.path)
         .toList();
+
+    var report = new PackageReport();
 
     rightLs.forEach((String file) {
       file = path.relative(file, from: rightPath);
@@ -54,7 +57,9 @@ class DirectoryPackageReporter extends PackageReporter {
         print('Skipping $file');
         return;
       }
-      calculateDiff(file);
+      _calculateDiff(report, file);
     });
+
+    return report;
   }
 }
