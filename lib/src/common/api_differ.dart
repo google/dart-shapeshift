@@ -4,8 +4,8 @@
 library shapeshift_common.api_differ;
 
 import 'package:json_diff/json_diff.dart';
+import 'package:sdk_builds/sdk_builds.dart';
 
-import 'hybrid_revision.dart';
 import 'utils.dart';
 
 const _lastRevisionWithHyphens = 41515;
@@ -32,8 +32,8 @@ class ApiDiffer {
 DiffNode diffApis(String a, String b, {includeComments: true}) =>
     new ApiDiffer(a, b, includeComments: includeComments).diff();
 
-DiffNode diffSdkApis(String left, String right, HybridRevision leftRevision,
-    HybridRevision rightRevision, {includeComments: true}) {
+DiffNode diffSdkApis(String left, String right, VersionInfo leftRevision,
+    VersionInfo rightRevision, {includeComments: true}) {
   // The dartdoc utility used to generate JSON for the Dart SDK with names of
   // libraries and library members that looked like "dart-core",
   // "dart-core.String", etc. After revision 41515 (Dart 1.8.0-dev.3.0),
@@ -42,10 +42,10 @@ DiffNode diffSdkApis(String left, String right, HybridRevision leftRevision,
   // revision > 41515, the diff will think that every single library and
   // library member was renamed. So we have to do this ugly munging.
 
-  if (leftRevision is SvnRevision &&
-      leftRevision.value <= _lastRevisionWithHyphens) {
-    if (rightRevision is SemVerRevision ||
-        (rightRevision as SvnRevision).value > _lastRevisionWithHyphens) {
+  if (leftRevision is SvnVersionInfo &&
+      leftRevision.revision <= _lastRevisionWithHyphens) {
+    if (rightRevision is GitVersionInfo ||
+        (rightRevision as SvnVersionInfo).revision > _lastRevisionWithHyphens) {
       left = scrubHyphens(left);
     }
   }

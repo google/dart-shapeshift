@@ -18,10 +18,10 @@ class LibraryApiDiff {
 
   bool get isUninitialized => libraryName == null;
 
-  void report(MarkdownWriter _io) {
-    _io.writeMetadata(libraryName);
-    new LibraryReporter(lybrary, _io).report();
-    classes.forEach((diff) => new ClassReporter(diff, _io).report());
-    _io.close();
+  void report(MarkdownWriter writer) {
+    writer.writeMetadata(libraryName);
+    new LibraryReporter(lybrary, writer).report();
+    classes.forEach((diff) => new ClassReporter(diff, writer).report());
+    writer.close();
   }
 }

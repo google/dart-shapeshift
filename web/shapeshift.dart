@@ -6,13 +6,11 @@ import 'dart:html';
 import 'dart:typed_data';
 
 import 'package:http/browser_client.dart' as http;
-import 'package:path/path.dart' as p;
-import 'package:quiver/async.dart' as qa;
 import 'package:route_hierarchical/client.dart';
+import 'package:sdk_builds/sdk_builds.dart';
 import 'package:shapeshift/shapeshift_frontend.dart';
 
-final Map<HybridRevision, Map<String, String>> _versionMaps =
-    new Map<HybridRevision, Map<String, String>>();
+final Map<String, VersionInfo> _versionMaps = new Map<String, VersionInfo>();
 
 final InputElement _includeCommentsCheck = querySelector('#include-comments');
 final InputElement _goButton = querySelector('#get-diff');
@@ -48,16 +46,17 @@ void main() {
   _router.listen();
 }
 
-void _addToSelects(HybridRevision rev) {
-  Map version = _versionMaps[rev];
-  var left = new OptionElement()
-    ..text = version['version']
-    ..attributes['value'] = rev.value.toString();
-  var right = new OptionElement()
-    ..text = version['version']
-    ..attributes['value'] = rev.value.toString();
+void _addToSelects(VersionInfo rev) {
+  var str = rev.version.toString();
 
-  if (version['channel'] == 'stable') {
+  var left = new OptionElement()
+    ..text = str
+    ..attributes['value'] = str;
+  var right = new OptionElement()
+    ..text = str
+    ..attributes['value'] = rev.version.toString();
+
+  if (rev.channel == 'stable') {
     _leftVersionStableOptGroup.children.add(left);
     _rightVersionStableOptGroup.children.add(right);
   } else {
@@ -83,37 +82,16 @@ _startDownload() async {
 
 Future _populateVersionFiles(String channel) async {
   _updateStatus('$channel: getting list');
-  List<String> versions;
 
   var client = new http.BrowserClient();
   var dd = new DartDownloads(client: client);
+
   try {
-    versions = await dd.getVersionPaths(channel).toList();
+    var list = await dd.getVersions(channel);
 
-    versions.removeWhere((e) => e.contains('latest'));
-
-    int finished = 0;
-    await qa.forEachAsync(versions, (path) async {
-      try {
-        var revisionString = p.basename(path);
-
-        var json = await dd.getVersionMap(channel, revisionString);
-
-        json['channel'] = channel;
-
-        json['path'] = revisionString;
-
-        var revision = HybridRevision.parse(revisionString);
-
-        _versionMaps[revision] = json;
-      } catch (e) {
-        window.console.error("Error with $path - $e");
-        return;
-      } finally {
-        finished++;
-        _updateStatus('$channel: $finished of ${versions.length}');
-      }
-    }, maxTasks: 6);
+    for (var vi in list) {
+      _versionMaps[vi.version.toString()] = vi;
+    }
   } finally {
     dd.close();
   }
@@ -129,7 +107,7 @@ void _updateSelectors() {
   _rightVersionStableOptGroup.children.clear();
   _rightVersionDevOptGroup.children.clear();
 
-  List sortedVersions = _versionMaps.keys.toList()..sort();
+  List sortedVersions = _versionMaps.values.toList()..sort();
 
   (sortedVersions.reversed).forEach(_addToSelects);
 
@@ -188,19 +166,18 @@ Future _compareValues(
     _select(_leftVersionSelect, leftValue);
     _select(_rightVersionSelect, rightValue);
 
-    HybridRevision left = HybridRevision.parse(leftValue);
-    HybridRevision right = HybridRevision.parse(rightValue);
+    VersionInfo left = _versionMaps[leftValue];
+    VersionInfo right = _versionMaps[rightValue];
 
     // TODO: update selection, right?
 
     if (left == right) {
-      _updateStatus('Cannot compare the same version - $left');
+      _updateStatus('Cannot compare the same version - ${left.version}');
       return;
     }
 
     try {
-      await _compareVersions(
-          _versionMaps[left], _versionMaps[right], includeComments);
+      await _compareVersions(left, right, includeComments);
       _updateStatus();
     } catch (e, stack) {
       _printError(e, stack, 'Error comparing versions.');
@@ -210,28 +187,29 @@ Future _compareValues(
   }
 }
 
-Future _compareVersions(Map left, Map right, bool includeComments) async {
-  var leftData = await _getData(left['channel'], left['path']);
-  var rightData = await _getData(right['channel'], right['path']);
+Future _compareVersions(
+    VersionInfo left, VersionInfo right, bool includeComments) async {
+  var leftData = await _getData(left);
+  var rightData = await _getData(right);
 
   _updateStatus('Calculating diff');
   compareZips(
       left, leftData, right, rightData, includeComments, _diffContainer);
 }
 
-Future<ByteBuffer> _getData(String channel, String revision) async {
+Future<ByteBuffer> _getData(VersionInfo info) async {
   Uri docsUri;
 
   var client = new http.BrowserClient();
   var dd = new DartDownloads(client: client);
   try {
     docsUri = await dd.getDownloadLink(
-        channel, revision, 'api-docs/dart-api-docs.zip');
+        info.channel, info.revisionPath, 'api-docs/dart-api-docs.zip');
   } finally {
     dd.close();
   }
 
-  _updateStatus('Downloading docs: $channel $revision');
+  _updateStatus('Downloading docs: ${info.channel} ${info.revisionPath}');
   return await getBinaryContent(docsUri.toString());
 }
 
