@@ -24,15 +24,22 @@ class JSZipPackageReporter extends PackageReporter {
       {includeComments: true})
       : super(includeComments: includeComments);
 
-  void _calculateDiff(String fileName) {
+  void _calculateDiff(PackageReport report, String fileName) {
     // If fileName not found in the left Zip, it will be noted in the library
     // JSON file.
     if (!leftZip.hasFile(fileName)) return;
-    add(fileName, diffSdkApis(leftZip.read(fileName), rightZip.read(fileName),
-        leftRevision, rightRevision, includeComments: includeComments));
+    report.add(fileName, diffSdkApis(leftZip.read(fileName),
+        rightZip.read(fileName), leftRevision, rightRevision,
+        includeComments: includeComments));
   }
 
-  void calculateAllDiffs() {
-    rightZip.filesByLibrary['dart-core'].forEach(_calculateDiff);
+  PackageReport calculateAllDiffs() {
+    var report = new PackageReport();
+
+    for (var fileName in rightZip.filesByLibrary['dart-core']) {
+      _calculateDiff(report, fileName);
+    }
+
+    return report;
   }
 }

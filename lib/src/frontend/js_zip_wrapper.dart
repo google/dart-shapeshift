@@ -9,6 +9,7 @@ import 'dart:js';
 import 'dart:typed_data';
 
 import 'package:doc_coverage/doc_coverage_common.dart';
+import 'package:path/path.dart' as p;
 import 'package:sdk_builds/sdk_builds.dart';
 
 import '../../shapeshift_common.dart';
@@ -17,8 +18,13 @@ import 'js_zip_package_reporter.dart';
 import 'html_writer.dart';
 import 'html_writer_provider.dart';
 
-String _libraryFor(String file) =>
-    new RegExp('docgen/([^.]+)').firstMatch(file)[1];
+String _libraryFor(String file) {
+  var segments = p.split(file);
+  var fileSegment = segments.last;
+  assert(p.extension(fileSegment) == '.json');
+  var fileParts = fileSegment.split('.');
+  return fileParts.first;
+}
 
 class JSZipWrapper {
   final JsObject zip;
@@ -103,10 +109,11 @@ void compareZips(VersionInfo leftVersion, ByteBuffer leftData,
   JSZipWrapper leftZip = new JSZipWrapper(leftData);
   JSZipWrapper rightZip = new JSZipWrapper(rightData);
 
-  new JSZipPackageReporter(leftZip, rightZip, leftVersion, rightVersion,
-      includeComments: includeComments)
-    ..calculateAllDiffs()
-    ..writeReport(writer);
+  var report = new JSZipPackageReporter(
+      leftZip, rightZip, leftVersion, rightVersion,
+      includeComments: includeComments).calculateAllDiffs();
+
+  report.write(writer);
 
   diffContainer.append(diffElement);
 }
