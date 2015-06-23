@@ -61,6 +61,14 @@ strong {
   padding: 15px 15px 80px 15px;
 }
 
+.the-header a {
+  cursor: pointer;
+}
+
+.the-header.disabled a {
+  cursor: wait;
+}
+
 .container:first-child {
   border-top: 0;
 }

@@ -8,11 +8,8 @@ import 'dart:html';
 import 'dart:js';
 import 'dart:typed_data';
 
-import 'package:doc_coverage/doc_coverage_common.dart';
 import 'package:path/path.dart' as p;
 import 'package:sdk_builds/sdk_builds.dart';
-
-import '../../shapeshift_common.dart';
 
 import 'js_zip_package_reporter.dart';
 import 'html_writer.dart';
@@ -103,17 +100,78 @@ void compareZips(VersionInfo leftVersion, ByteBuffer leftData,
 
   diffContainer..append(header)..append(summaryText);
 
-  DivElement diffElement = new DivElement();
-  WriterProvider writer = new HtmlWriterProvider(new HtmlWriter(diffElement));
-
   JSZipWrapper leftZip = new JSZipWrapper(leftData);
   JSZipWrapper rightZip = new JSZipWrapper(rightData);
 
-  var report = new JSZipPackageReporter(
+  var reporter = new JSZipPackageReporter(
       leftZip, rightZip, leftVersion, rightVersion,
-      includeComments: includeComments).calculateAllDiffs();
+      includeComments: includeComments);
 
-  report.write(writer);
+  var contentHost = new DivElement()..classes.add("the-host");
 
-  diffContainer.append(diffElement);
+  new _UIManager(contentHost, reporter);
+
+  diffContainer.append(contentHost);
+}
+
+class _UIManager {
+  static const _disabledClass = 'disabled';
+  bool get _working => _header.classes.contains(_disabledClass);
+
+  final DivElement _host;
+  final JSZipPackageReporter _reporter;
+  final DivElement _header;
+
+  DivElement _content;
+
+  _UIManager(this._host, this._reporter) : this._header = new DivElement()
+        ..classes.add('the-header') {
+    var libraryNames = _reporter.rightZip.filesByLibrary.keys.toList();
+    libraryNames.sort();
+
+    for (var libText in libraryNames) {
+      assert(libText.startsWith('dart-'));
+
+      var link = new AnchorElement()..text = libText.substring(5);
+
+      link.onClick.listen((_) {
+        _writeContent(libText);
+      });
+
+      _header.children.add(link);
+
+      _header.appendHtml(r' ');
+    }
+
+    _host.append(_header);
+
+    _content = new DivElement()
+      ..text = 'content here!'
+      ..classes.add('the-content');
+
+    _host.append(_content);
+
+    _writeContent('dart-core');
+  }
+
+  Future _writeContent(String library) async {
+    if (_working) return;
+
+    try {
+      _header.classes.add(_disabledClass);
+      _content.children.clear();
+
+      _content.text = 'Loading $library ...';
+
+      await letHtmlUpdate();
+
+      var report = await _reporter.calculateDiffForLibrary(library);
+
+      _content.children.clear();
+      var writer = new HtmlWriterProvider(new HtmlWriter(_content));
+      report.write(writer);
+    } finally {
+      _header.classes.remove(_disabledClass);
+    }
+  }
 }
