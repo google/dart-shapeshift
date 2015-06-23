@@ -48,7 +48,7 @@ packages:
   googleapis:
     description: googleapis
     source: hosted
-    version: "0.10.0"
+    version: "0.11.0"
   html:
     description: html
     source: hosted
@@ -148,7 +148,7 @@ packages:
   test:
     description: test
     source: hosted
-    version: "0.12.3"
+    version: "0.12.3+2"
   utf:
     description: utf
     source: hosted
