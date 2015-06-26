@@ -1,6 +1,8 @@
 // Copyright 2015 Google Inc. All Rights Reserved.
 // Licensed under the Apache License, Version 2.0, found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:doc_coverage/doc_coverage_common.dart';
 import 'package:sdk_builds/sdk_builds.dart';
 
@@ -33,6 +35,19 @@ class JSZipPackageReporter extends PackageReporter {
         includeComments: includeComments));
   }
 
+  /// This can be *slow*, so it is async and it inserts a small delay before
+  /// processing each file to ensure UI – like a web page – can update.
+  Future<PackageReport> calculateDiffForLibrary(String library) async {
+    var report = new PackageReport();
+
+    for (var fileName in rightZip.filesByLibrary[library]) {
+      await _calculateDiff(report, fileName);
+      await letHtmlUpdate();
+    }
+
+    return report;
+  }
+
   PackageReport calculateAllDiffs() {
     var report = new PackageReport();
 
@@ -42,4 +57,9 @@ class JSZipPackageReporter extends PackageReporter {
 
     return report;
   }
+}
+
+Future letHtmlUpdate() async {
+  // inject a delay so that the html updates
+  await new Future.delayed(const Duration(seconds: 0));
 }
